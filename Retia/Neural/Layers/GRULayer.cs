@@ -609,9 +609,9 @@ namespace Retia.Neural.Layers
 
         public override LayerSpecBase CreateSpec()
         {
-            var br = (Matrix)_br.Weight.Multiply(0.5f);
-            var bz = (Matrix)_bz.Weight.Multiply(0.5f);
-            var bh = (Matrix)_bh.Weight.Multiply(0.5f);
+            //var br = (Matrix)_br.Weight.Multiply(0.5f);
+            //var bz = (Matrix)_bz.Weight.Multiply(0.5f);
+            //var bh = (Matrix)_bh.Weight.Multiply(0.5f);
 
             var weights = new GruLayerWeights
                           {
@@ -623,13 +623,13 @@ namespace Retia.Neural.Layers
                               Whz = _whz.Weight,
                               Whh = _whh.Weight,
 
-                              bxr = br,
-                              bxz = bz,
-                              bxh = bh,
+                              bxr = _br.Weight,
+                              bxz = _bz.Weight,
+                              bxh = _bh.Weight,
 
-                              bhr = br,
-                              bhz = bz,
-                              bhh = bh
+                              //bhr = br,
+                              //bhz = bz,
+                              //bhh = bh
                           };
 
             return new GruLayerSpec(_wxh.Weight.ColumnCount, BatchSize, SeqLen, 1, _wxh.Weight.RowCount, weights);
