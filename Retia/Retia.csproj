@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{80608848-F915-434C-A22C-62A2BB9DE046}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Retia</RootNamespace>
+    <AssemblyName>Retia</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\Out\$(Platform)\$(Configuration)</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>..\Out\$(Platform)\$(Configuration)</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MarkdownLog, Version=0.9.3.36, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MarkdownLog.0.9.3\lib\portable-net45+sl50+MonoAndroid10+MonoTouch10\MarkdownLog.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Helpers\CollectionExtensions.cs" />
+    <Compile Include="Helpers\StreamHelpers.cs" />
+    <Compile Include="Integration\ConsoleProgressWriter.cs" />
+    <Compile Include="Integration\ICloneable.cs" />
+    <Compile Include="Integration\IFileWritable.cs" />
+    <Compile Include="Integration\ILogReporter.cs" />
+    <Compile Include="Integration\IProgressWriter.cs" />
+    <Compile Include="Integration\IStreamWritable.cs" />
+    <Compile Include="Integration\LogEventArgs.cs" />
+    <Compile Include="Integration\ProgressEventArgs.cs" />
+    <Compile Include="Integration\ProgressTracker.cs" />
+    <Compile Include="Mathematics\ActivationFuncs.cs" />
+    <Compile Include="Mathematics\Fir.cs" />
+    <Compile Include="Mathematics\ForThread.cs" />
+    <Compile Include="Mathematics\MatrixExtensions.cs" />
+    <Compile Include="Mathematics\MatrixFactory.cs" />
+    <Compile Include="Mathematics\ParallelFor.cs" />
+    <Compile Include="Mathematics\SoftMax.cs" />
+    <Compile Include="Neural\BiGRU.cs" />
+    <Compile Include="Mathematics\ErrorFunctions.cs" />
+    <Compile Include="Neural\Initializers\ConstantMatrixInitializer.cs" />
+    <Compile Include="Neural\Initializers\IMatrixInitializer.cs" />
+    <Compile Include="Neural\Initializers\ProportionalRandomMatrixInitializer.cs" />
+    <Compile Include="Neural\Initializers\RandomMatrixInitializer.cs" />
+    <Compile Include="Neural\IterationContextBase.cs" />
+    <Compile Include="Neural\LayeredNet.cs" />
+    <Compile Include="Neural\Layers\DropoutLayer.cs" />
+    <Compile Include="Neural\Layers\GRULayer.cs" />
+    <Compile Include="Neural\Layers\LinearLayer.cs" />
+    <Compile Include="Neural\Layers\ModulusLayer.cs" />
+    <Compile Include="Neural\Layers\NeuroLayer.cs" />
+    <Compile Include="Neural\Layers\SoftMaxLayer.cs" />
+    <Compile Include="Neural\Layers\TanhLayer.cs" />
+    <Compile Include="Neural\NeuralExtensions.cs" />
+    <Compile Include="Neural\NeuralNet.cs" />
+    <Compile Include="Neural\NeuroWeight.cs" />
+    <Compile Include="Optimizers\AdagradOptimizer.cs" />
+    <Compile Include="Optimizers\OptimizerBase.cs" />
+    <Compile Include="Optimizers\RMSPropOptimizer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RandomGenerator\BaseRandom.cs" />
+    <Compile Include="RandomGenerator\IRandom.cs" />
+    <Compile Include="RandomGenerator\SafeRandom.cs" />
+    <Compile Include="RandomGenerator\UniformRandom.cs" />
+    <Compile Include="Training\Batching\BatchDimension.cs" />
+    <Compile Include="Training\Batching\LinearBatcher.cs" />
+    <Compile Include="Training\Batching\LinearSample.cs" />
+    <Compile Include="Training\Batching\SequenceBatcher.cs" />
+    <Compile Include="Training\Data\DataProviderBase.cs" />
+    <Compile Include="Training\Data\DataSetChangedArgs.cs" />
+    <Compile Include="Training\Data\IDataProvider.cs" />
+    <Compile Include="Training\Data\IDataSet.cs" />
+    <Compile Include="Training\Data\LinearDataSet.cs" />
+    <Compile Include="Training\Data\Sample.cs" />
+    <Compile Include="Training\Data\SequentialDataSet.cs" />
+    <Compile Include="Training\Data\SetDataProvider.cs" />
+    <Compile Include="Training\Data\TrainingSequence.cs" />
+    <Compile Include="Training\Testers\ClassificationTester.cs" />
+    <Compile Include="Training\Testers\ClassResult.cs" />
+    <Compile Include="Training\Testers\ConfusionMatrix.cs" />
+    <Compile Include="Training\Testers\ITester.cs" />
+    <Compile Include="Training\Testers\TesterBase.cs" />
+    <Compile Include="Training\Testers\TestResultBase.cs" />
+    <Compile Include="Training\Trainers\ITrainingReporter.cs" />
+    <Compile Include="Training\Trainers\OptimizationReportEventArgs.cs" />
+    <Compile Include="Training\Trainers\OptimizingTrainer.cs" />
+    <Compile Include="Training\Trainers\OptimizingTrainerOptions.cs" />
+    <Compile Include="Training\Trainers\PeriodicalAction.cs" />
+    <Compile Include="Training\Trainers\TrainerBase.cs" />
+    <Compile Include="Training\Trainers\TrainerOptionsBase.cs" />
+    <Compile Include="Training\Trainers\TrainReportEventArgsBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="NugetRelativeRefs.targets" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NugetRelativeRefs.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Retia.Contracts\Retia.Contracts.csproj">
+      <Project>{d9562091-9caa-4b3e-92a1-746642339f1f}</Project>
+      <Name>Retia.Contracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
+      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
+      <Name>Retia.NativeWrapper</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="NugetRelativeRefs.targets" />
+  <Import Project="..\packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets" Condition="Exists('..\packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
