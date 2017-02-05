@@ -200,7 +200,7 @@ inline DeviceMatrixPtr::DeviceMatrixPtr(cudnnFilterDescriptor_t desc, float* raw
 	_ptr = thrust::device_pointer_cast(rawPtr);
 }
 
-inline DeviceMatrix::DeviceMatrix(int rows, int columns, int seqLength): DeviceMatrixBase<thrust::detail::normal_iterator<thrust::device_ptr<float>>>(rows, columns, seqLength)
+inline DeviceMatrix::DeviceMatrix(int rows, int columns, int seqLength): DeviceMatrixBase<thrust::device_vector<float>::iterator>(rows, columns, seqLength)
 {
 	_storage = thrust::device_vector<float>(_length);
 }
@@ -210,7 +210,7 @@ inline HostMatrixPtr::HostMatrixPtr(int rows, int columns, int seqLength, float*
 	_ptr = rawPtr;
 }
 
-inline HostMatrix::HostMatrix(int rows, int columns, int seqLength): Matrix<thrust::detail::normal_iterator<float*>, HostMatrixPtr>(rows, columns, seqLength)
+inline HostMatrix::HostMatrix(int rows, int columns, int seqLength): Matrix<thrust::host_vector<float>::iterator, HostMatrixPtr>(rows, columns, seqLength)
 {
 	_storage = thrust::host_vector<float>(_length);
 }
