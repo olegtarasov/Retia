@@ -34,6 +34,8 @@ public:
 
 	void ZeroMemory();
 
+	void Fill(float value);
+
 	TMatPtr GetSequenceElement(int idx);
 
 	float get_slow(int row, int col, int seqElement);

@@ -70,6 +70,12 @@ void Matrix<TIterator, TMatPtr>::ZeroMemory()
 }
 
 template <class TIterator, class TMatPtr>
+void Matrix<TIterator, TMatPtr>::Fill(float value)
+{
+	thrust::fill(this->begin(), this->end(), value);
+}
+
+template <class TIterator, class TMatPtr>
 TMatPtr Matrix<TIterator, TMatPtr>::GetSequenceElement(int idx)
 {
 	return TMatPtr(this->_rows, this->_columns, 1, this->raw_ptr() + this->_rows * this->_columns * idx);

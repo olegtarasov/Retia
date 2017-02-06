@@ -37,7 +37,7 @@ private:
 	std::unique_ptr<NeuroWeigth>		_w;
 
 	// Dropout
-	std::unique_ptr<CudaMemoryBlock>	_dropoutStates;
+	std::unique_ptr<DeviceMatrix>	_dropoutStates;
 	CuDnnDropoutDescriptor				_dropoutDesc;
 
 	// RNN desc

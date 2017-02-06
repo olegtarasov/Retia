@@ -9,7 +9,7 @@ public ref class LayerStateFactory
 public:
 	static ManagedMatrixContainer^ GetLayerState(LayerSpecBase^ spec)
 	{
-		auto result = gcnew ManagedMatrixContainer();
+		auto result = gcnew ManagedMatrixContainer(true);
 
 		if (spec->LayerType == LayerType::Linear)
 		{

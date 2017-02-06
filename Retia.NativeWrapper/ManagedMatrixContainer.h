@@ -11,9 +11,14 @@ using namespace MathNet::Numerics::LinearAlgebra::Single;
 public ref class ManagedMatrixContainer
 {
 public:
-	ManagedMatrixContainer()
+	ManagedMatrixContainer() : ManagedMatrixContainer(false)
+	{		
+	}
+
+	ManagedMatrixContainer(bool rowMajor)
 		: _container(new MatrixContainer()),
-		_handles(gcnew List<GCHandle>())
+		_handles(gcnew List<GCHandle>()),
+		_rowMajor(rowMajor)
 	{		
 	}
 
@@ -29,7 +34,8 @@ public:
 
 	void AddMatrix(Matrix^ matrix)
 	{
-		auto handle = GCHandle::Alloc(matrix->AsColumnMajorArray(), GCHandleType::Pinned);
+		auto arr = _rowMajor ? matrix->ToRowMajorArray() : matrix->ToColumnMajorArray();
+		auto handle = GCHandle::Alloc(arr, GCHandleType::Pinned);
 		_handles->Add(handle);
 		_container->AddMatrix(matrix->RowCount, matrix->ColumnCount, (float*)(void*)handle.AddrOfPinnedObject());
 	}
@@ -38,4 +44,5 @@ public:
 private:
 	MatrixContainer*	_container;
 	List<GCHandle>^		_handles;
+	bool _rowMajor;
 };

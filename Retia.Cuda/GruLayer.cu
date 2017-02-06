@@ -123,11 +123,14 @@ void GruLayer::TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevi
 
 void GruLayer::ForwardSequence(DeviceMatrix& input)
 {
-	/*cout << "GRU input" << endl;
-	PrintMatrix(input);*/
+	cout << "GRU input" << endl;
+	PrintMatrix(input);
+
+	cout << "GRU output before compute" << endl;
+	PrintMatrix(*_output);
 
 	// Forward through RNN
-	auto result = cudnnRNNForwardTraining(CudaContext::cudnnHandle(), _rnnDesc, _seqLen,
+	/*auto result = cudnnRNNForwardTraining(CudaContext::cudnnHandle(), _rnnDesc, _seqLen,
 		*_xTensor, input.raw_ptr(),
 		*_hxTensor, _hxTensor->device_ptr(),
 		*_cxTensor, nullptr,
@@ -136,14 +139,27 @@ void GruLayer::ForwardSequence(DeviceMatrix& input)
 		*_hyTensor, _hyTensor->device_ptr(),
 		*_cyTensor, nullptr,
 		_workspace->device_ptr(), _workspace->size(),
-		_reserve->device_ptr(), _reserve->size());
+		_reserve->device_ptr(), _reserve->size());*/
+
+	cout << "GRU weights" << endl;
+	PrintMatrix(_w->weight());
+
+	auto result = cudnnRNNForwardInference(CudaContext::cudnnHandle(), _rnnDesc, _seqLen,
+		*_xTensor, input.raw_ptr(),
+		*_hxTensor, _hxTensor->device_ptr(),
+		*_cxTensor, nullptr,
+		*_wFilter, _w->weight().raw_ptr(),
+		*_yTensor, _output->raw_ptr(),
+		*_hyTensor, _hyTensor->device_ptr(),
+		*_cyTensor, nullptr,
+		_workspace->device_ptr(), _workspace->size());
 	if (result != CUDNN_STATUS_SUCCESS)
 	{
 		throw CuDnnException(result);
 	}
 
-	/*cout << "GRU output" << endl;
-	PrintMatrix(*_output);*/
+	cout << "GRU output" << endl;
+	PrintMatrix(*_output);
 }
 
 void GruLayer::BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens)
@@ -234,13 +250,14 @@ void GruLayer::InitLayers()
 		throw CuDnnException(result);
 	}
 
-	_dropoutStates = make_unique<CudaMemoryBlock>(dropoutSz);
-	result = cudnnSetDropoutDescriptor(_dropoutDesc, CudaContext::cudnnHandle(), 0.0f, _dropoutStates->device_ptr(), dropoutSz, 1337ull);
+	_dropoutStates = make_unique<DeviceMatrix>(1, dropoutSz, 1);
+	_dropoutStates->ZeroMemory();
+	result = cudnnSetDropoutDescriptor(_dropoutDesc, CudaContext::cudnnHandle(), 0.0f, _dropoutStates->raw_ptr(), dropoutSz, 1ull);
 	if (result != CUDNN_STATUS_SUCCESS)
 	{
 		throw CuDnnException(result);
 	}
-
+	
 	// Create RNN descriptor
 	_rnnDesc.Create();
 	result = cudnnSetRNNDescriptor(_rnnDesc, _hSize, _layers, _dropoutDesc, CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL, CUDNN_GRU, CUDNN_DATA_FLOAT);
@@ -261,6 +278,8 @@ void GruLayer::InitLayers()
 	_wFilter = make_unique<CuDnnFilter>(wLen, 1, 1, false);
 	_dwFilter = make_unique<CuDnnFilter>(wLen, 1, 1, false);
 	_w = make_unique<NeuroWeigth>(1, wLen, 1);
+
+	//_w->weight().Fill(1.0f);
 
 	// Allocate workspace and reserve
 	size_t wsSize, reserveSize;

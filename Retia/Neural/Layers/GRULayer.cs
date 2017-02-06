@@ -54,21 +54,37 @@ namespace Retia.Neural.Layers
         {
             _matrixInitializer = matrixInitializer;
 
-            _wxh = _matrixInitializer.CreateMatrix(hSize, xSize);
             _wxr = _matrixInitializer.CreateMatrix(hSize, xSize);
+            _wxh = _matrixInitializer.CreateMatrix(hSize, xSize);
             _wxz = _matrixInitializer.CreateMatrix(hSize, xSize);
+
+            //_wxr = DenseMatrix.Create(hSize, xSize, 1.0f);
+            //_wxh = DenseMatrix.Create(hSize, xSize, 1.0f);
+            //_wxz = DenseMatrix.Create(hSize, xSize, 1.0f);
 
             _whh = _matrixInitializer.CreateMatrix(hSize, hSize);
             _whr = _matrixInitializer.CreateMatrix(hSize, hSize);
             _whz = _matrixInitializer.CreateMatrix(hSize, hSize);
 
-            _bxh = _matrixInitializer.CreateMatrix(hSize, 1);
+            //_whh = DenseMatrix.Create(hSize, hSize, 1.0f);
+            //_whr = DenseMatrix.Create(hSize, hSize, 1.0f);
+            //_whz = DenseMatrix.Create(hSize, hSize, 1.0f);
+
+            _bxh = _matrixInitializer.CreateMatrix(hSize, 1); //_matrixInitializer.CreateMatrix(hSize, 1);
             _bxr = _matrixInitializer.CreateMatrix(hSize, 1);
             _bxz = _matrixInitializer.CreateMatrix(hSize, 1);
 
             _bhh = _matrixInitializer.CreateMatrix(hSize, 1);
             _bhr = _matrixInitializer.CreateMatrix(hSize, 1);
             _bhz = _matrixInitializer.CreateMatrix(hSize, 1);
+
+            //_bxh = DenseMatrix.Create(hSize, 1, 2.0f); //_matrixInitializer.CreateMatrix(hSize, 1);
+            //_bxr = DenseMatrix.Create(hSize, 1, 2.0f);
+            //_bxz = DenseMatrix.Create(hSize, 1, 2.0f);
+
+            //_bhh = DenseMatrix.Create(hSize, 1, 2.0f);
+            //_bhr = DenseMatrix.Create(hSize, 1, 2.0f);
+            //_bhz = DenseMatrix.Create(hSize, 1, 2.0f);
 
             //_bxh = new Matrix(hSize, 1, 0.0);
             //_bxr = new Matrix(hSize, 1, 0.0);
@@ -286,11 +302,15 @@ namespace Retia.Neural.Layers
             z.Accumulate(_wxz.Weight, input, 1.0f);
             z.Accumulate(_whz.Weight, _lastH, 1.0f);
 
+            //var z = (Matrix)(_wxz.Weight * input + _whz.Weight * _lastH + _bxz.Weight.TileColumns(BatchSize) + _bhz.Weight.TileColumns(BatchSize));
+
 
             //var r = Br + Wxr*input + Whr*lastH;
             var r = (Matrix)(_bxr.Weight.TileColumns(BatchSize) + _bhr.Weight.TileColumns(BatchSize));
             r.Accumulate(_wxr.Weight, input, 1.0f);
             r.Accumulate(_whr.Weight, _lastH, 1.0f);
+
+            //var r = (Matrix)(_wxr.Weight * input + _whr.Weight * _lastH + _bxr.Weight.TileColumns(BatchSize) + _bhr.Weight.TileColumns(BatchSize));
 
             //Sigmoid(z);
             //Sigmoid(r);
@@ -305,8 +325,9 @@ namespace Retia.Neural.Layers
 
             var hProp = _bhh.Weight.TileColumns(BatchSize);
             hProp.Accumulate(_whh.Weight, _lastH, 1.0f);
-            
+
             hNew = (Matrix)(hNew + (Matrix)r.PointwiseMultiply(hProp));
+            //var hNew = (Matrix)(_wxh.Weight * input + r.PointwiseMultiply(_whh.Weight * _lastH + _bhh.Weight.TileColumns(BatchSize)) + _bxh.Weight.TileColumns(BatchSize));
             ActivationFuncs.ApplyTanh(hNew);
             //ApplyTanh(hNew);
 
@@ -317,7 +338,7 @@ namespace Retia.Neural.Layers
             if (inTraining)
             {
                 Outputs.Add(H);
-                _hPropVals.Add(hProp);
+                //_hPropVals.Add(hProp);
                 _hNewVals.Add(hNew);
                 _zVals.Add(z);
                 _rVals.Add(r);
