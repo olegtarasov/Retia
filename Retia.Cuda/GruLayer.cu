@@ -42,11 +42,9 @@ void GruLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
 * 7  - bxz
 * 8  - bxh
 *
-*--- NOT USED ---
-*
-* bhr
-* bhz
-* bhh
+* 9  - bhr
+* 10 - bhz
+* 11 - bhh
 */
 void GruLayer::TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevice)
 {
@@ -55,10 +53,7 @@ void GruLayer::TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevi
 	cudnnStatus_t result;
 	for (int layer = 0; layer < _layers; layer++)
 	{
-		float* bIngoreStart = nullptr;
-		int bIgnoreLen = 0;
-
-		for (int linLayerID = 0; linLayerID < 6; linLayerID++) { // 6 matrices for GRU. We use only 3 biases.
+		for (int linLayerID = 0; linLayerID < 6; linLayerID++) { // 6 matrices for GRU
 			int matIdx = layer * 12 + linLayerID;
 			int bIdx = matIdx + 6;
 
@@ -108,32 +103,14 @@ void GruLayer::TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevi
 			}
 
 			matPtr = DeviceMatrixPtr(filterDesc, filterMemPtr);
-			if (linLayerID <= 2)
+			if (hostToDevice)
 			{
-				if (hostToDevice)
-				{
-					matPtr.CopyFromLoose(*states[bIdx]);
-				}
-				else
-				{
-					matPtr.CopyToLoose(*states[bIdx]);
-				}
+				matPtr.CopyFromLoose(*states[bIdx]);
 			}
-			else // Ignore hidden state biases, but init them with zeroes
+			else
 			{
-				if (linLayerID == 3)
-				{
-					bIngoreStart = filterMemPtr;
-				}
-
-				bIgnoreLen += matPtr.length();
-
-				if (hostToDevice)
-				{
-					matPtr.ZeroMemory();
-				}
+				matPtr.CopyToLoose(*states[bIdx]);
 			}
-			
 
 			result = cudnnDestroyFilterDescriptor(filterDesc);
 			if (result != CUDNN_STATUS_SUCCESS)
@@ -141,8 +118,6 @@ void GruLayer::TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevi
 				throw CuDnnException(result);
 			}
 		}
-
-		_bIgnore.push_back(DeviceMatrixPtr(1, bIgnoreLen, 1, bIngoreStart));
 	}
 }
 
@@ -211,12 +186,6 @@ void GruLayer::BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens)
 void GruLayer::Optimize(OptimizerBase& optimizer)
 {
 	optimizer.Optimize(*_w);
-
-	// TODO: Make ignoring biases easier
-	for (int i = 0; i < _bIgnore.size(); ++i)
-	{
-		_bIgnore[i].ZeroMemory();
-	}
 }
 
 void GruLayer::ResetMemory()

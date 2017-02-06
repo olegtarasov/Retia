@@ -35,7 +35,6 @@ private:
 	// RNN Weigths
 	std::unique_ptr<CuDnnFilter>		_wFilter, _dwFilter;
 	std::unique_ptr<NeuroWeigth>		_w;
-	std::vector<DeviceMatrixPtr>		_bIgnore;
 
 	// Dropout
 	std::unique_ptr<CudaMemoryBlock>	_dropoutStates;
@@ -62,12 +61,10 @@ private:
 	* 6  - bxr
 	* 7  - bxz
 	* 8  - bxh
-	* 
-	*--- NOT USED ---
 	*
-	* bhr
-	* bhz
-	* bhh
+	* 9  - bhr
+	* 10 - bhz
+	* 11 - bhh
 	*/
 	void TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevice);
 };

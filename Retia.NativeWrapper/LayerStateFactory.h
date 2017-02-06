@@ -36,9 +36,9 @@ public:
 				result->AddMatrix(gs->Weights[i]->bxz);
 				result->AddMatrix(gs->Weights[i]->bxh);
 				
-				/*result->AddMatrix(gs->Weights[i]->bhr);
+				result->AddMatrix(gs->Weights[i]->bhr);
 				result->AddMatrix(gs->Weights[i]->bhz);
-				result->AddMatrix(gs->Weights[i]->bhh);*/
+				result->AddMatrix(gs->Weights[i]->bhh);
 			}
 		}
 		

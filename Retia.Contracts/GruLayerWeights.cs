@@ -16,8 +16,8 @@ namespace Retia.Contracts
         public Matrix bxz { get; set; }
         public Matrix bxh { get; set; }
                
-        //public Matrix bhr { get; set; }
-        //public Matrix bhz { get; set; }
-        //public Matrix bhh { get; set; }
+        public Matrix bhr { get; set; }
+        public Matrix bhz { get; set; }
+        public Matrix bhh { get; set; }
     }
 }
