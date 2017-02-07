@@ -21,9 +21,12 @@ namespace Retia.Neural.Layers
         private readonly List<Matrix> _rVals = new List<Matrix>();
         private readonly List<Matrix> _zVals = new List<Matrix>();
 
-        private readonly IMatrixInitializer _matrixInitializer;
+        private readonly int _hSize;
 
-        private NeuroWeight _bh, _br, _bz;
+        private NeuroWeight _whh, _whr, _whz;
+        private NeuroWeight _wxh, _wxr, _wxz;
+        private NeuroWeight _bxh, _bxr, _bxz;
+        private NeuroWeight _bhh, _bhr, _bhz;
         private Matrix _hiddenOnes;
 
         /// <summary>
@@ -43,58 +46,61 @@ namespace Retia.Neural.Layers
             }
         }
 
-        private NeuroWeight _whh, _whr, _whz;
-
-        private NeuroWeight _wxh, _wxr, _wxz;
-
-        public GruLayer(int xSize, int hSize) : this(xSize, hSize, new ProportionalRandomMatrixInitializer())
+        public GruLayer(int xSize, int hSize) : this(xSize, hSize, 
+            new ProportionalRandomMatrixInitializer(),
+            new ProportionalRandomMatrixInitializer(),
+            new ConstantMatrixInitializer {Value = 0.0f})
         {
         }
 
-        public GruLayer(int xSize, int hSize, IMatrixInitializer matrixInitializer)
+        public GruLayer(int xSize, int hSize, 
+            IMatrixInitializer linearWeightInitializer,
+            IMatrixInitializer hiddenWeightInitializer,
+            IMatrixInitializer biasInitializer)
         {
-            _matrixInitializer = matrixInitializer;
+            _hSize = hSize;
 
-            _wxh = _matrixInitializer.CreateMatrix(hSize, xSize);
-            _wxr = _matrixInitializer.CreateMatrix(hSize, xSize);
-            _wxz = _matrixInitializer.CreateMatrix(hSize, xSize);
+            _wxh = linearWeightInitializer.CreateMatrix(hSize, xSize);
+            _wxr = linearWeightInitializer.CreateMatrix(hSize, xSize);
+            _wxz = linearWeightInitializer.CreateMatrix(hSize, xSize);
 
-            _whh = _matrixInitializer.CreateMatrix(hSize, hSize);
-            _whr = _matrixInitializer.CreateMatrix(hSize, hSize);
-            _whz = _matrixInitializer.CreateMatrix(hSize, hSize);
+            _whh = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
+            _whr = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
+            _whz = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
 
-            _bh = _matrixInitializer.CreateMatrix(hSize, 1);
-            _br = _matrixInitializer.CreateMatrix(hSize, 1);
-            _bz = _matrixInitializer.CreateMatrix(hSize, 1);
+            _bxh = biasInitializer.CreateMatrix(hSize, 1);
+            _bxr = biasInitializer.CreateMatrix(hSize, 1);
+            _bxz = biasInitializer.CreateMatrix(hSize, 1);
 
-            //_bh = new Matrix(hSize, 1, 0.0);
-            //_br = new Matrix(hSize, 1, 0.0);
-            //_bz = new Matrix(hSize, 1, 0.0);
+            _bhh = biasInitializer.CreateMatrix(hSize, 1);
+            _bhr = biasInitializer.CreateMatrix(hSize, 1);
+            _bhz = biasInitializer.CreateMatrix(hSize, 1);
 
-            _lastH = new DenseMatrix(hSize, 1);
-            _hiddenOnes = DenseMatrix.Create(_lastH.RowCount, _lastH.ColumnCount, DenseMatrix.One);
-
+            Initialize(1, 1);
+            
             ResetOptimizer();
         }
 
         public GruLayer(BinaryReader reader)
         {
-            _br = NeuroWeight.Load(reader.BaseStream);
-            _bz = NeuroWeight.Load(reader.BaseStream);
-            _bh = NeuroWeight.Load(reader.BaseStream);
-            _wxh = NeuroWeight.Load(reader.BaseStream);
+            _bxr = NeuroWeight.Load(reader.BaseStream);
+            _bxz = NeuroWeight.Load(reader.BaseStream);
+            _bxh = NeuroWeight.Load(reader.BaseStream);
+
+            _bhr = NeuroWeight.Load(reader.BaseStream);
+            _bhz = NeuroWeight.Load(reader.BaseStream);
+            _bhh = NeuroWeight.Load(reader.BaseStream);
+
             _wxr = NeuroWeight.Load(reader.BaseStream);
             _wxz = NeuroWeight.Load(reader.BaseStream);
+            _wxh = NeuroWeight.Load(reader.BaseStream);
+
             _whr = NeuroWeight.Load(reader.BaseStream);
-            _whh = NeuroWeight.Load(reader.BaseStream);
             _whz = NeuroWeight.Load(reader.BaseStream);
+            _whh = NeuroWeight.Load(reader.BaseStream);
+
             _lastH = MatrixFactory.Load(reader.BaseStream);
-
-            _hiddenOnes = DenseMatrix.Create(_lastH.RowCount, _lastH.ColumnCount, DenseMatrix.One);
-        }
-
-        private GruLayer()
-        {
+            _hiddenOnes = DenseMatrix.Create(_hSize, _lastH.ColumnCount, 1.0f);
         }
 
         private GruLayer(GruLayer other) : base(other)
@@ -107,11 +113,16 @@ namespace Retia.Neural.Layers
             _whr = other._whr.Clone();
             _whz = other._whz.Clone();
 
-            _bh = other._bh.Clone();
-            _br = other._br.Clone();
-            _bz = other._bz.Clone();
+            _bxh = other._bxh.Clone();
+            _bxr = other._bxr.Clone();
+            _bxz = other._bxz.Clone();
+
+            _bhh = other._bhh.Clone();
+            _bhr = other._bhr.Clone();
+            _bhz = other._bhz.Clone();
 
             _lastH = other._lastH.CloneMatrix();
+            _hiddenOnes = other._hiddenOnes.CloneMatrix();
 
             Inputs = other.Inputs.Clone();
             Outputs = other.Outputs.Clone();
@@ -119,8 +130,6 @@ namespace Retia.Neural.Layers
             _hNewVals = other._hNewVals.Clone();
             _rVals = other._rVals.Clone();
             _zVals = other._zVals.Clone();
-
-            _hiddenOnes = other._hiddenOnes.CloneMatrix();
         }
 
         public override int InputSize => _wxh.Weight.ColumnCount;
@@ -129,30 +138,25 @@ namespace Retia.Neural.Layers
         // TODO: Clean this shit up
         public override int TotalParamCount => _wxr.Weight.AsColumnMajorArray().Length + _wxz.Weight.AsColumnMajorArray().Length + _wxh.Weight.AsColumnMajorArray().Length +
                                                _whr.Weight.AsColumnMajorArray().Length + _whz.Weight.AsColumnMajorArray().Length + _whh.Weight.AsColumnMajorArray().Length +
-                                               _br.Weight.AsColumnMajorArray().Length + _bz.Weight.AsColumnMajorArray().Length + _bh.Weight.AsColumnMajorArray().Length;
-
-        //[DllImport("FastFuncs.dll", CallingConvention = CallingConvention.Cdecl)]
-        //private static extern unsafe void FastApplySigmoidRZ(double* r, double* z, int n);
-
-        //[DllImport("FastFuncs.dll", CallingConvention = CallingConvention.Cdecl)]
-        //private static extern unsafe void FastApplyTanh(double* matrix, int n);
-
-        //[DllImport("FastFuncs.dll", CallingConvention = CallingConvention.Cdecl)]
-        //private static extern unsafe void FastCalculateH(double* H, double* hCandidate, double* z, double* lastH, int n);
+                                               _bxr.Weight.AsColumnMajorArray().Length + _bxz.Weight.AsColumnMajorArray().Length + _bxh.Weight.AsColumnMajorArray().Length;
 
         public override void Save(Stream stream)
         {
-            _br.Save(stream);
-            _bz.Save(stream);
-            _bh.Save(stream);
+            _bxr.Save(stream);
+            _bxz.Save(stream);
+            _bxh.Save(stream);
 
-            _wxh.Save(stream);
+            _bhr.Save(stream);
+            _bhz.Save(stream);
+            _bhh.Save(stream);
+
             _wxr.Save(stream);
             _wxz.Save(stream);
+            _wxh.Save(stream);
 
             _whr.Save(stream);
-            _whh.Save(stream);
             _whz.Save(stream);
+            _whh.Save(stream);
 
             _lastH.Save(stream);
         }
@@ -165,42 +169,22 @@ namespace Retia.Neural.Layers
 
         public override void Optimize(OptimizerBase optimizer)
         {
-            optimizer.Optimize(_br);
-            optimizer.Optimize(_bz);
-            optimizer.Optimize(_bh);
-            
-            optimizer.Optimize(_wxh);
+            optimizer.Optimize(_bxr);
+            optimizer.Optimize(_bxz);
+            optimizer.Optimize(_bxh);
+
+            optimizer.Optimize(_bhr);
+            optimizer.Optimize(_bhz);
+            optimizer.Optimize(_bhh);
+
             optimizer.Optimize(_wxr);
             optimizer.Optimize(_wxz);
-            
+            optimizer.Optimize(_wxh);
+
             optimizer.Optimize(_whr);
-            optimizer.Optimize(_whh);
             optimizer.Optimize(_whz);
+            optimizer.Optimize(_whh);
         }
-
-        //private unsafe void ApplySigmoid(Matrix r, Matrix z)
-        //{
-        //    var rawR = (double[])r;
-        //    var rawZ = (double[])z;
-        //    var n = r.Cols * r.Rows;
-            
-        //    fixed (double* pR = rawR, pZ = rawZ)
-        //    {
-        //        FastApplySigmoidRZ(pR, pZ, n);
-        //    }
-            
-        //}
-
-        //private unsafe void ApplyTanh(Matrix m)
-        //{
-        //    var rawM = (double[])m;
-        //    var n = m.Cols * m.Rows;
-            
-        //    fixed (double* pM = rawM)
-        //    {
-        //        FastApplyTanh(pM, n);
-        //    }
-        //}
 
         public override void ResetMemory()
         {
@@ -209,9 +193,13 @@ namespace Retia.Neural.Layers
 
         public override void ResetOptimizer()
         {
-            _br.ClearCache();
-            _bz.ClearCache();
-            _bh.ClearCache();
+            _bxr.ClearCache();
+            _bxz.ClearCache();
+            _bxh.ClearCache();
+
+            _bhr.ClearCache();
+            _bhz.ClearCache();
+            _bhh.ClearCache();
 
             _wxr.ClearCache();
             _wxz.ClearCache();
@@ -243,31 +231,14 @@ namespace Retia.Neural.Layers
             {
                 float* arrPtr = pArr + i, hCanArrPtr = pCanArr + i, zArrPtr = pzArr + i, lastHPtr = plastHArr + i;
                 float zEl = *zArrPtr;
-                *arrPtr = zEl * *hCanArrPtr + (1 - zEl) * *lastHPtr;
+                *arrPtr = (1 - zEl) * *hCanArrPtr + zEl * *lastHPtr;
             }
         }
 
-        //unsafe void CalculateH(Matrix H, Matrix hCandidate, Matrix z, Matrix lastH)
-        //{
-
-        //    //var H = (z ^ hNew) + ((_hiddenOnes - z) ^ _lastH);
-        //    var rawH = (double[])H;
-        //    var rawZ = (double[])z;
-        //    var rawHc = (double[])hCandidate;
-        //    var rawLastH = (double[])lastH;
-
-        //    fixed (double* pH = rawH, pZ = rawZ,  pHc = rawHc,  pLastH = rawLastH)
-        //    {
-        //        FastCalculateH(pH,pHc, pZ, pLastH, rawH.Length);
-        //    }
-           
-        //}
-
         protected override void Initialize()
         {
-            _lastH = new DenseMatrix(_hiddenOnes.RowCount, BatchSize);
-            //reset matrix of 1's as well
-            _hiddenOnes = DenseMatrix.Create(_hiddenOnes.RowCount, BatchSize, DenseMatrix.One);
+            _lastH = new DenseMatrix(_hSize, BatchSize);
+            _hiddenOnes = DenseMatrix.Create(_hSize, BatchSize, DenseMatrix.One);
             InitBackPropagation();
         }
 
@@ -279,13 +250,13 @@ namespace Retia.Neural.Layers
                 throw new Exception($"Wrong input batch size!\nExpected: {BatchSize}, got: {input.ColumnCount}");
 
             //var z = Bz + Wxz*input + Whz*lastH;
-            var z = _bz.Weight.TileColumns(BatchSize);
+            var z = (Matrix)(_bxz.Weight.TileColumns(BatchSize) + _bhz.Weight.TileColumns(BatchSize));
             z.Accumulate(_wxz.Weight, input, 1.0f);
             z.Accumulate(_whz.Weight, _lastH, 1.0f);
 
 
             //var r = Br + Wxr*input + Whr*lastH;
-            var r = _br.Weight.TileColumns(BatchSize);
+            var r = (Matrix)(_bxr.Weight.TileColumns(BatchSize) + _bhr.Weight.TileColumns(BatchSize));
             r.Accumulate(_wxr.Weight, input, 1.0f);
             r.Accumulate(_whr.Weight, _lastH, 1.0f);
 
@@ -297,10 +268,11 @@ namespace Retia.Neural.Layers
             //ApplySigmoid(r, z);
 
 
-            var hNew = _bh.Weight.TileColumns(BatchSize);
+            var hNew = _bxh.Weight.TileColumns(BatchSize);
             hNew.Accumulate(_wxh.Weight, input, 1.0f);
 
-            var hProp = (Matrix)(_whh.Weight * _lastH);
+            var hProp = _bhh.Weight.TileColumns(BatchSize);
+            hProp.Accumulate(_whh.Weight, _lastH);
             
             hNew = (Matrix)(hNew + (Matrix)r.PointwiseMultiply(hProp));
             ActivationFuncs.ApplyTanh(hNew);
@@ -322,6 +294,16 @@ namespace Retia.Neural.Layers
 
             _lastH = H;
             return H;
+        }
+
+        private void CheckInitialized()
+        {
+            if (_lastH == null || _hiddenOnes == null
+                || _lastH.RowCount != _hSize || _hiddenOnes.RowCount != _hSize
+                || _lastH.ColumnCount != BatchSize || _hiddenOnes.ColumnCount != BatchSize)
+            {
+                throw new InvalidOperationException("GRU layer is not initialized correctly. Call Initialize().");
+            }
         }
 
         private void CalcBackHadamards(Matrix sH, Matrix sR, Matrix sZ, Matrix sHprop, Matrix sHnext, Matrix z,
@@ -387,9 +369,13 @@ namespace Retia.Neural.Layers
             var yIdentity = DenseMatrix.Create(BatchSize, 1, DenseMatrix.One);
 
 
-            _br.ClearGrad();
-            _bz.ClearGrad();
-            _bh.ClearGrad();
+            _bxr.ClearGrad();
+            _bxz.ClearGrad();
+            _bxh.ClearGrad();
+
+            _bhr.ClearGrad();
+            _bhz.ClearGrad();
+            _bhh.ClearGrad();
 
             _wxr.ClearGrad();
             _wxz.ClearGrad();
@@ -513,15 +499,15 @@ namespace Retia.Neural.Layers
 
                 if (sH.ColumnCount > 1)
                 {
-                    _br.Gradient.Accumulate(sR, hiddenIdentity, 1.0f);
-                    _bz.Gradient.Accumulate(sZ, hiddenIdentity, 1.0f);
-                    _bh.Gradient.Accumulate(sH, hiddenIdentity, 1.0f);
+                    _bxr.Gradient.Accumulate(sR, hiddenIdentity, 1.0f);
+                    _bxz.Gradient.Accumulate(sZ, hiddenIdentity, 1.0f);
+                    _bxh.Gradient.Accumulate(sH, hiddenIdentity, 1.0f);
                 }
                 else
                 {
-                    _br.Gradient.Accumulate(sR);
-                    _bz.Gradient.Accumulate(sZ);
-                    _bh.Gradient.Accumulate(sH);
+                    _bxr.Gradient.Accumulate(sR);
+                    _bxz.Gradient.Accumulate(sZ);
+                    _bxh.Gradient.Accumulate(sH);
                 }
             }
 
@@ -544,56 +530,72 @@ namespace Retia.Neural.Layers
             _wxh.Gradient.Clamp(-limit, limit);
 
 
-            _br.Gradient.Clamp(-limit, limit);
-            _bz.Gradient.Clamp(-limit, limit);
-            _bh.Gradient.Clamp(-limit, limit);
+            _bxr.Gradient.Clamp(-limit, limit);
+            _bxz.Gradient.Clamp(-limit, limit);
+            _bxh.Gradient.Clamp(-limit, limit);
+
+            _bhr.Gradient.Clamp(-limit, limit);
+            _bhz.Gradient.Clamp(-limit, limit);
+            _bhh.Gradient.Clamp(-limit, limit);
         }
 
         public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
         {
             if (!grad)
             {
-                _br.Weight.CopyToArray(destination, ref idx);
-                _bz.Weight.CopyToArray(destination, ref idx);
-                _bh.Weight.CopyToArray(destination, ref idx);
+                _bxr.Weight.CopyToArray(destination, ref idx);
+                _bxz.Weight.CopyToArray(destination, ref idx);
+                _bxh.Weight.CopyToArray(destination, ref idx);
 
-                _wxh.Weight.CopyToArray(destination, ref idx);
+                _bhr.Weight.CopyToArray(destination, ref idx);
+                _bhz.Weight.CopyToArray(destination, ref idx);
+                _bhh.Weight.CopyToArray(destination, ref idx);
+
                 _wxr.Weight.CopyToArray(destination, ref idx);
                 _wxz.Weight.CopyToArray(destination, ref idx);
+                _wxh.Weight.CopyToArray(destination, ref idx);
 
                 _whr.Weight.CopyToArray(destination, ref idx);
-                _whh.Weight.CopyToArray(destination, ref idx);
                 _whz.Weight.CopyToArray(destination, ref idx);
+                _whh.Weight.CopyToArray(destination, ref idx);
             }
             else
             {
-                _br.Gradient.CopyToArray(destination, ref idx);
-                _bz.Gradient.CopyToArray(destination, ref idx);
-                _bh.Gradient.CopyToArray(destination, ref idx);
+                _bxr.Gradient.CopyToArray(destination, ref idx);
+                _bxz.Gradient.CopyToArray(destination, ref idx);
+                _bxh.Gradient.CopyToArray(destination, ref idx);
 
-                _wxh.Gradient.CopyToArray(destination, ref idx);
+                _bhr.Gradient.CopyToArray(destination, ref idx);
+                _bhz.Gradient.CopyToArray(destination, ref idx);
+                _bhh.Gradient.CopyToArray(destination, ref idx);
+
                 _wxr.Gradient.CopyToArray(destination, ref idx);
                 _wxz.Gradient.CopyToArray(destination, ref idx);
+                _wxh.Gradient.CopyToArray(destination, ref idx);
 
                 _whr.Gradient.CopyToArray(destination, ref idx);
-                _whh.Gradient.CopyToArray(destination, ref idx);
                 _whz.Gradient.CopyToArray(destination, ref idx);
+                _whh.Gradient.CopyToArray(destination, ref idx);
             }
         }
 
         public override void FromVectorState(float[] vector, ref int idx)
         {
-            _br.Weight.CopyFromArray(vector, ref idx);
-            _bz.Weight.CopyFromArray(vector, ref idx);
-            _bh.Weight.CopyFromArray(vector, ref idx);
+            _bxr.Weight.CopyFromArray(vector, ref idx);
+            _bxz.Weight.CopyFromArray(vector, ref idx);
+            _bxh.Weight.CopyFromArray(vector, ref idx);
 
-            _wxh.Weight.CopyFromArray(vector, ref idx);
+            _bhr.Weight.CopyFromArray(vector, ref idx);
+            _bhz.Weight.CopyFromArray(vector, ref idx);
+            _bhh.Weight.CopyFromArray(vector, ref idx);
+
             _wxr.Weight.CopyFromArray(vector, ref idx);
             _wxz.Weight.CopyFromArray(vector, ref idx);
+            _wxh.Weight.CopyFromArray(vector, ref idx);
 
             _whr.Weight.CopyFromArray(vector, ref idx);
-            _whh.Weight.CopyFromArray(vector, ref idx);
             _whz.Weight.CopyFromArray(vector, ref idx);
+            _whh.Weight.CopyFromArray(vector, ref idx);
         }
 
 
@@ -609,10 +611,6 @@ namespace Retia.Neural.Layers
 
         public override LayerSpecBase CreateSpec()
         {
-            var br = (Matrix)_br.Weight.Multiply(0.5f);
-            var bz = (Matrix)_bz.Weight.Multiply(0.5f);
-            var bh = (Matrix)_bh.Weight.Multiply(0.5f);
-
             var weights = new GruLayerWeights
                           {
                               Wxr = _wxr.Weight,
@@ -623,16 +621,16 @@ namespace Retia.Neural.Layers
                               Whz = _whz.Weight,
                               Whh = _whh.Weight,
 
-                              bxr = br,
-                              bxz = bz,
-                              bxh = bh,
+                              bxr = _bxr.Weight,
+                              bxz = _bxz.Weight,
+                              bxh = _bxh.Weight,
 
-                              bhr = br,
-                              bhz = bz,
-                              bhh = bh
+                              bhr = _bhr.Weight,
+                              bhz = _bhz.Weight,
+                              bhh = _bhh.Weight
                           };
 
-            return new GruLayerSpec(_wxh.Weight.ColumnCount, BatchSize, SeqLen, 1, _wxh.Weight.RowCount, weights);
+            return new GruLayerSpec(InputSize, BatchSize, SeqLen, 1, _hSize, weights);
         }
     }
 }

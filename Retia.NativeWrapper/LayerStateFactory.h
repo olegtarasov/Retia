@@ -9,17 +9,20 @@ public ref class LayerStateFactory
 public:
 	static ManagedMatrixContainer^ GetLayerState(LayerSpecBase^ spec)
 	{
-		auto result = gcnew ManagedMatrixContainer();
-
 		if (spec->LayerType == LayerType::Linear)
 		{
+			auto result = gcnew ManagedMatrixContainer();
 			auto ls = (LinearLayerSpec^)spec;
 
 			result->AddMatrix(ls->W);
 			result->AddMatrix(ls->b);
+
+			return result;
 		}
-		else if (spec->LayerType == LayerType::Gru)
+		
+		if (spec->LayerType == LayerType::Gru)
 		{
+			auto result = gcnew ManagedMatrixContainer(true);
 			auto gs = (GruLayerSpec^)spec;
 
 			for (int i = 0; i < gs->Layers; i++)
@@ -40,8 +43,10 @@ public:
 				result->AddMatrix(gs->Weights[i]->bhz);
 				result->AddMatrix(gs->Weights[i]->bhh);
 			}
+
+			return result;
 		}
 		
-		return result;
+		return nullptr;
 	}
 };

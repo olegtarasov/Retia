@@ -14,11 +14,6 @@ namespace Retia.Neural.Initializers
             return DenseMatrix.CreateRandom(rows, columns, new Normal(0.0f, Dispersion));
         }
 
-        public float[] CreateArray(int size)
-        {
-            return CreateRandomArray(size, Dispersion);
-        }
-
         public static float[] CreateRandomArray(int size, double dispersion)
         {
             var rnd = SafeRandom.Generator;
