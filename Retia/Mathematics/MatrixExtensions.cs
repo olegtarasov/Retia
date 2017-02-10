@@ -9,6 +9,11 @@ namespace Retia.Mathematics
 {
     public static class MatrixExtensions
     {
+        public static int Length(this Matrix matrix)
+        {
+            return matrix.RowCount * matrix.ColumnCount;
+        }
+
         public static Matrix CloneMatrix(this Matrix matrix)
         {
             return DenseMatrix.OfMatrix(matrix);
@@ -62,6 +67,18 @@ namespace Retia.Mathematics
         public static void Accumulate(this Matrix C, Matrix A, Matrix B, float beta = 0.0f, float alpha = 1.0f, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose)
         {
             Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray());
+        }
+
+        public static void CollapseColumnsAndAccumulate(this Matrix C, Matrix A, Matrix B)
+        {
+            if (A.ColumnCount > 1)
+            {
+                C.Accumulate(A, B, 1.0f);
+            }
+            else
+            {
+                C.Accumulate(A);
+            }
         }
 
         /// <summary>

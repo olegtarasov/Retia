@@ -48,7 +48,7 @@ namespace Retia.Neural.Layers
 
         public override NeuroLayer Clone()
         {
-            return new SoftMaxLayer(_size);
+            return new SoftMaxLayer(this);
         }
 
         public override void Optimize(OptimizerBase optimizer)
@@ -92,7 +92,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Outputs.Clear();
             Inputs.Clear();

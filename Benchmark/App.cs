@@ -6,7 +6,9 @@ using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra.Single;
+using Retia.Neural;
 using Retia.Neural.Layers;
+using Retia.Optimizers;
 
 namespace Benchmark
 {
@@ -65,6 +67,19 @@ namespace Benchmark
             Console.WriteLine("Testing GRU forward");
             var gruLayer = new GruLayer(dataSet.InputSize, dataSet.TargetSize);
             TestLayerForward(gruLayer, dataSet);
+        }
+
+        [Verb]
+        public void CheckGrad()
+        {
+            const int seqLen = 5;
+
+            var net = new LayeredNet(1, seqLen, new GruLayer(6, 3), new LinearLayer(3, 2), new SoftMaxLayer(2))
+                      {
+                          Optimizer = new RMSPropOptimizer()
+                      };
+
+            LayeredNet.CheckGrad(net, seqLen);
         }
 
         private void TestLayerForward(NeuroLayer layer, TestDataSet dataSet, int? outSize = null)

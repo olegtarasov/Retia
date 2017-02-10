@@ -48,7 +48,7 @@ namespace Retia.Neural.Layers
         public override int OutputSize => _weights.Weight.RowCount;
         public override int TotalParamCount => _weights.Weight.AsColumnMajorArray().Length + _bias.Weight.AsColumnMajorArray().Length;
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Inputs.Clear();
             Outputs.Clear();

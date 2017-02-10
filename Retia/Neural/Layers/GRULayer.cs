@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using MathNet.Numerics.LinearAlgebra.Single;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
@@ -13,8 +14,6 @@ namespace Retia.Neural.Layers
 {
     public class GruLayer : NeuroLayer
     {
-        private const double Dispersion = 5e-2;
-
         private readonly List<Matrix> _hNewVals = new List<Matrix>();
         private readonly List<Matrix> _hPropVals = new List<Matrix>();
 
@@ -76,8 +75,6 @@ namespace Retia.Neural.Layers
             _bhr = biasInitializer.CreateMatrix(hSize, 1);
             _bhz = biasInitializer.CreateMatrix(hSize, 1);
 
-            Initialize(1, 1);
-            
             ResetOptimizer();
         }
 
@@ -130,15 +127,17 @@ namespace Retia.Neural.Layers
             _hNewVals = other._hNewVals.Clone();
             _rVals = other._rVals.Clone();
             _zVals = other._zVals.Clone();
+            _hSize = other._hSize;
         }
 
         public override int InputSize => _wxh.Weight.ColumnCount;
         public override int OutputSize => _whh.Weight.RowCount;
 
         // TODO: Clean this shit up
-        public override int TotalParamCount => _wxr.Weight.AsColumnMajorArray().Length + _wxz.Weight.AsColumnMajorArray().Length + _wxh.Weight.AsColumnMajorArray().Length +
-                                               _whr.Weight.AsColumnMajorArray().Length + _whz.Weight.AsColumnMajorArray().Length + _whh.Weight.AsColumnMajorArray().Length +
-                                               _bxr.Weight.AsColumnMajorArray().Length + _bxz.Weight.AsColumnMajorArray().Length + _bxh.Weight.AsColumnMajorArray().Length;
+        public override int TotalParamCount => _wxr.Weight.Length() + _wxz.Weight.Length() + _wxh.Weight.Length() +
+                                               _whr.Weight.Length() + _whz.Weight.Length() + _whh.Weight.Length() +
+                                               _bxr.Weight.Length() + _bxz.Weight.Length() + _bxh.Weight.Length() + 
+                                               _bhr.Weight.Length() + _bhz.Weight.Length() + _bhh.Weight.Length();
 
         public override void Save(Stream stream)
         {
@@ -239,7 +238,7 @@ namespace Retia.Neural.Layers
         {
             _lastH = new DenseMatrix(_hSize, BatchSize);
             _hiddenOnes = DenseMatrix.Create(_hSize, BatchSize, DenseMatrix.One);
-            InitBackPropagation();
+            InitSequence();
         }
 
         public override Matrix Step(Matrix input, bool inTraining = false)
@@ -296,14 +295,64 @@ namespace Retia.Neural.Layers
             return H;
         }
 
-        private void CheckInitialized()
+        private List<Matrix> BackpropNew(List<Matrix> sensitivities, bool needInputSens)
         {
-            if (_lastH == null || _hiddenOnes == null
-                || _lastH.RowCount != _hSize || _hiddenOnes.RowCount != _hSize
-                || _lastH.ColumnCount != BatchSize || _hiddenOnes.ColumnCount != BatchSize)
+            var dh = Enumerable.Range(0, sensitivities.Count).Select(x => (Matrix)null).ToList();
+            var di = Enumerable.Range(0, sensitivities.Count).Select(x => (Matrix)null).ToList();
+
+            var batchOnes = DenseMatrix.Create(BatchSize, 1, 1.0f);
+
+            for (int i = sensitivities.Count - 1; i >= 0; i--)
             {
-                throw new InvalidOperationException("GRU layer is not initialized correctly. Call Initialize().");
+                var dY = sensitivities[i];
+                var dhNext = i == sensitivities.Count - 1 ? new DenseMatrix(_hSize, BatchSize) : dh[i + 1];
+                var z = _zVals[i];
+                var r = _rVals[i];
+                var input = Inputs[i];
+                var hProp = _hPropVals[i];
+                var hPrev = i > 0 ? Outputs[i - 1] : new DenseMatrix(_hSize, BatchSize);
+                var dhSum = (Matrix)(dY + dhNext);
+                var hNew = _hNewVals[i];
+
+                // bxh, Wxh
+                var dbxh = (Matrix)dhSum.PointwiseMultiply(_hiddenOnes - z).PointwiseMultiply(_hiddenOnes - hNew.PointwiseMultiply(hNew)); // h x b
+                _bxh.Gradient.CollapseColumnsAndAccumulate(dbxh, batchOnes); // h x 1
+                _wxh.Gradient.Accumulate(dbxh, input, 1.0f, transposeB: Transpose.Transpose); // h x i
+
+                // bhh, Whh
+                var dbhh = (Matrix)dbxh.PointwiseMultiply(r); // h x b
+                _bhh.Gradient.CollapseColumnsAndAccumulate(dbhh, batchOnes); // h x 1
+                _whh.Gradient.Accumulate(dbhh, hPrev, 1.0f, transposeB: Transpose.Transpose); // h x h
+                
+                // bxr, Wxr
+                var dbxr = (Matrix)dbxh.PointwiseMultiply(hProp).PointwiseMultiply(r.PointwiseMultiply(_hiddenOnes - r)); // h x b
+                _bxr.Gradient.CollapseColumnsAndAccumulate(dbxr, batchOnes); // h x 1
+                _wxr.Gradient.Accumulate(dbxr, input, 1.0f, transposeB: Transpose.Transpose); // h x i
+                
+                // bhr, whr
+                var dbhr = dbxr; // h x b
+                _bhr.Gradient.CollapseColumnsAndAccumulate(dbhr, batchOnes); // h x 1
+                _whr.Gradient.Accumulate(dbhr, hPrev, 1.0f, transposeB: Transpose.Transpose); // h x h
+                
+                // bxz, wxz
+                var dbxz = (Matrix)dhSum.PointwiseMultiply(hPrev - hNew).PointwiseMultiply(z.PointwiseMultiply(_hiddenOnes - z)); // h x b
+                _bxz.Gradient.CollapseColumnsAndAccumulate(dbxz, batchOnes); // h x 1
+                _wxz.Gradient.Accumulate(dbxz, input, 1.0f, transposeB: Transpose.Transpose); // h x i
+                
+                // bhz, whz
+                var dbhz = dbxz; // h x b
+                _bhz.Gradient.CollapseColumnsAndAccumulate(dbhz, batchOnes); // h x 1
+                _whz.Gradient.Accumulate(dbhz, hPrev, 1.0f, transposeB: Transpose.Transpose); // h x h
+                
+                dh[i] = (Matrix)(dhSum.PointwiseMultiply(z) + (_whz.Weight.Transpose() * dbxz) + (_whr.Weight.Transpose() * dbxr) + (_whh.Weight.Transpose() * dbhh));
+
+                if (needInputSens)
+                {
+                    di[i] = (Matrix)(_wxz.Weight.Transpose() * dbxz + _wxr.Weight.Transpose() * dbxr + _wxh.Weight.Transpose() * dbxh);
+                }
             }
+
+            return di;
         }
 
         private void CalcBackHadamards(Matrix sH, Matrix sR, Matrix sZ, Matrix sHprop, Matrix sHnext, Matrix z,
@@ -356,6 +405,8 @@ namespace Retia.Neural.Layers
 
         public override List<Matrix> BackPropagate(List<Matrix> outSens, bool needInputSens = true)
         {
+            return BackpropNew(outSens, needInputSens);
+
             if (Outputs.Count != Inputs.Count)
                 throw new Exception("Backprop was not initialized (empty state sequence)");
             if (Inputs.Count == 0)
@@ -599,7 +650,7 @@ namespace Retia.Neural.Layers
         }
 
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Outputs.Clear();
             _hPropVals.Clear();

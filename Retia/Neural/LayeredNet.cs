@@ -47,6 +47,8 @@ namespace Retia.Neural
 
         protected LayeredNet(LayeredNet other)
         {
+            BatchSize = other.BatchSize;
+            SeqLen = other.SeqLen;
             Layers = other.Layers.Select(x => x.Clone()).ToList();
         }
 
@@ -126,18 +128,16 @@ namespace Retia.Neural
             }
         }
 
-        public static void CheckGrad(string path)
+        public static void CheckGrad(LayeredNet net, int seqLen)
         {
             Console.WriteLine("Starting grad check");
-            int steps = 20;
-            float delta = 1e-5f;
+            float delta = 1e-3f;
 
-            var net = Load(path);
             net.ResetMemory();
 
-            var inputs = new List<Matrix>(steps);
-            var targets = new List<Matrix>(steps);
-            for (int i = 0; i < steps; i++)
+            var inputs = new List<Matrix>(seqLen);
+            var targets = new List<Matrix>(seqLen);
+            for (int i = 0; i < seqLen; i++)
             {
                 var randomInput = (Matrix)DenseMatrix.CreateRandom(net.InputSize, 1, new Normal(0.0f, 2.0f));
                 var randomTarget = (Matrix)DenseMatrix.CreateRandom(net.OutputSize, 1, new Normal(0.0f, 2.0f)); 
@@ -157,7 +157,7 @@ namespace Retia.Neural
                 netN.SetParam(i, netN.GetParam(i) - delta);
 
                 double errP=0.0, errN=0.0;
-                for (int s = 0; s < steps; s++)
+                for (int s = 0; s < seqLen; s++)
                 {
                     var pY=netP.Step(inputs[s]);
                     errP += netP.Error(pY, targets[s]);
@@ -286,10 +286,10 @@ namespace Retia.Neural
                 layer.ResetOptimizer();
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             foreach (var layer in Layers)
-                layer.InitBackPropagation();
+                layer.InitSequence();
         }
 
         private void SetParam(int i, float value)

@@ -25,6 +25,8 @@ namespace Retia.Neural.Layers
 
         protected NeuroLayer(NeuroLayer other)
         {
+            BatchSize = other.BatchSize;
+            SeqLen = other.SeqLen;
             Inputs = other.Inputs.Select(x => x.CloneMatrix()).ToList();
             Outputs = other.Outputs.Select(x => x.CloneMatrix()).ToList();
         }
@@ -50,7 +52,7 @@ namespace Retia.Neural.Layers
 
         public abstract void ResetMemory();
         public abstract void ResetOptimizer();
-        public abstract void InitBackPropagation();
+        public abstract void InitSequence();
         public abstract void ClampGrads(float limit);
         public abstract LayerSpecBase CreateSpec();
 

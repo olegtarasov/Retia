@@ -114,7 +114,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             _masks.Clear();
         }

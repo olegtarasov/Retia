@@ -27,7 +27,7 @@ namespace Retia.Neural
         
 		public abstract void ResetMemory();
 		public abstract void ResetOptimizer();
-		public abstract void InitBackPropagation();
+		public abstract void InitSequence();
 
         public abstract int InputSize { get; }
         public abstract int OutputSize { get; }
@@ -81,7 +81,7 @@ namespace Retia.Neural
                 throw new Exception("Not enough targets or inputs provided!");
 
             var sequenceLen = inputs.Count;
-            InitBackPropagation();
+            InitSequence();
             //var yList = new List<Matrix>(sequenceLen);
             var error = new List<double>(sequenceLen);
             for (int i = 0; i < inputs.Count; i++)

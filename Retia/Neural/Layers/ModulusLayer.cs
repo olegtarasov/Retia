@@ -113,7 +113,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Inputs.Clear();
             Outputs.Clear();

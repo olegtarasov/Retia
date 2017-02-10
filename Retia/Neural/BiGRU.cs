@@ -100,11 +100,11 @@ namespace Retia.Neural
             outNet.ResetOptimizer();
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
-            forward.InitBackPropagation();
-            backward.InitBackPropagation();
-            outNet.InitBackPropagation();
+            forward.InitSequence();
+            backward.InitSequence();
+            outNet.InitSequence();
         }
 
         public override OptimizerBase Optimizer
@@ -164,7 +164,7 @@ namespace Retia.Neural
                 throw new Exception("Not enough targets or inputs provided!");
 
             var sequenceLen = inputs.Count;
-            InitBackPropagation();
+            InitSequence();
             //var yList = new List<Matrix>(sequenceLen);
             var error = new List<double>(sequenceLen);
             //var sw=new Stopwatch();
