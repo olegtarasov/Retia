@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Mathematics;
 
 namespace Retia.Training.Data

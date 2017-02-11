@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -67,7 +67,7 @@ namespace Retia.Neural.Layers
         }
 
 
-        protected override float Derivative(Matrix input, Matrix output, int batch, int i, int o)
+        protected override double Derivative(Matrix input, Matrix output, int batch, int i, int o)
         {
             return i == o ? output[i, batch] * (1 - output[o, batch]) : -output[i, batch] * output[o, batch];
         }
@@ -102,11 +102,11 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(double[] destination, ref int idx, bool grad = false)
         {
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(double[] vector, ref int idx)
         {
         }
 

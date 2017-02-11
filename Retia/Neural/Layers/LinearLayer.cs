@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Mathematics;
@@ -14,8 +14,8 @@ namespace Retia.Neural.Layers
     {
         private const double Dispersion = 5e-2;
 
-        private NeuroWeight _bias;
-        private NeuroWeight _weights;
+        public NeuroWeight _bias;
+        public NeuroWeight _weights;
 
         private LinearLayer(LinearLayer other) : base(other)
         {
@@ -27,7 +27,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public LinearLayer(int xSize, int ySize) : this(xSize, ySize, new RandomMatrixInitializer())
+        public LinearLayer(int xSize, int ySize) : this(xSize, ySize, new RandomMatrixInitializer {Dispersion = 5})
         {
             
         }
@@ -71,7 +71,7 @@ namespace Retia.Neural.Layers
             _weights.Gradient.Clamp(-limit, limit);
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(double[] destination, ref int idx, bool grad = false)
         {
             if (!grad)
             {
@@ -85,7 +85,7 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(double[] vector, ref int idx)
         {
             _bias.Weight.CopyFromArray(vector, ref idx);
             _weights.Weight.CopyFromArray(vector, ref idx);
@@ -171,7 +171,7 @@ namespace Retia.Neural.Layers
 
         public override LayerSpecBase CreateSpec()
         {
-            return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight, _bias.Weight);
+            return null;// new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight, _bias.Weight);
         }
 
         //we need to propagate matched error through weight matrix

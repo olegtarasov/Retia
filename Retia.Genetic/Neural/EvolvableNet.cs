@@ -16,7 +16,7 @@ namespace Retia.Genetic.Neural
                 new LinearLayer(hSize, ySize),
                 new SoftMaxLayer(ySize))
         {
-            Chromosome = new float[Layers.Sum(x => x.TotalParamCount)];
+            Chromosome = new double[Layers.Sum(x => x.TotalParamCount)];
             
             Id = GetId();
         }
@@ -24,7 +24,7 @@ namespace Retia.Genetic.Neural
         private EvolvableNet(EvolvableNet other) : base(other)
         {
             Fitness = other.Fitness;
-            Chromosome = new float[Layers.Sum(x => x.TotalParamCount)];
+            Chromosome = new double[Layers.Sum(x => x.TotalParamCount)];
             other.Chromosome.CopyTo(Chromosome, 0);
 
             //clones have different IDs!
@@ -35,7 +35,7 @@ namespace Retia.Genetic.Neural
 
         public double Fitness { get; set; }
 
-        public float[] Chromosome { get; private set; }
+        public double[] Chromosome { get; private set; }
 
         public int CompareTo(object obj)
         {
@@ -90,7 +90,7 @@ namespace Retia.Genetic.Neural
         {
             if (Chromosome == null)
             {
-                Chromosome = new float[Layers.Sum(x => x.TotalParamCount)];
+                Chromosome = new double[Layers.Sum(x => x.TotalParamCount)];
             }
         }
     }

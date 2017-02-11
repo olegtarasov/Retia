@@ -8,7 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CLAP;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural;

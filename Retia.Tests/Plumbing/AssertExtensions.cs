@@ -1,6 +1,6 @@
 ﻿using System;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Xunit;
 using XunitShould;
 
@@ -8,7 +8,7 @@ namespace Retia.Tests.Plumbing
 {
     public static class AssertExtensions
     {
-        public static void ShouldArrayEqual(this float[] array1, float[] array2)
+        public static void ShouldArrayEqual(this double[] array1, double[] array2)
         {
             if (array1 == null && array2 == null)
             {
@@ -24,7 +24,7 @@ namespace Retia.Tests.Plumbing
             }
         }
 
-        public static void ShouldEqualWithinError(this float val, float expected, float error = 1e-5f)
+        public static void ShouldEqualWithinError(this double val, double expected, double error = 1e-5f)
         {
             Math.Abs(val - expected).ShouldBeLessThan(error);
         }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -38,7 +38,7 @@ namespace Retia.Neural.Layers
             var rawP = p.AsColumnMajorArray();
             int cols = input.ColumnCount;
             int size = rawP.Length;
-            var sums = new float[cols];
+            var sums = new double[cols];
             
             for (int i = 0; i < size; i++)
             {
@@ -123,11 +123,11 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(double[] destination, ref int idx, bool grad = false)
         {
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(double[] vector, ref int idx)
         {
         }
 
@@ -136,7 +136,7 @@ namespace Retia.Neural.Layers
             throw new NotSupportedException("This layer can't be used as last layer.");
         }
 
-        protected override float Derivative(Matrix input, Matrix output, int batch, int i, int o)
+        protected override double Derivative(Matrix input, Matrix output, int batch, int i, int o)
         {
             var sum = Math.Abs(input[o, batch])/output[o, batch];
             //just take denominator from already calculated output to reduce calculations

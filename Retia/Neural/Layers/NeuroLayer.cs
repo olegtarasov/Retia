@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Integration;
@@ -60,12 +60,12 @@ namespace Retia.Neural.Layers
         /// Converts layer state to a vector of doubles.
         /// </summary>
         /// <returns>Layer vector state.</returns>
-        public abstract void ToVectorState(float[] destination, ref int idx, bool grad=false);
+        public abstract void ToVectorState(double[] destination, ref int idx, bool grad = false);
 
         /// <summary>
         /// Modifies layer state from a vector of doubles.
         /// </summary>
-        public abstract void FromVectorState(float[] vector, ref int idx);
+        public abstract void FromVectorState(double[] vector, ref int idx);
 
 
         /// <summary>
@@ -110,10 +110,10 @@ namespace Retia.Neural.Layers
             return 0.0;
         }
 
-        public virtual void SetParam(int i, float value)
+        public virtual void SetParam(int i, double value)
         {
             int refInd = 0;
-            var state = new float[TotalParamCount];
+            var state = new double[TotalParamCount];
             ToVectorState(state, ref refInd);
             state[i] = value;
             refInd = 0;
@@ -144,8 +144,8 @@ namespace Retia.Neural.Layers
 
                 for (int idx = 0; idx < ya.Length; idx++)
                 {
-                    float t = ta[idx];
-                    sa[idx] = float.IsNaN(t) ? 0.0f : (ya[idx] - t) * k;
+                    double t = ta[idx];
+                    sa[idx] = double.IsNaN(t) ? 0.0f : (ya[idx] - t) * k;
                 }
 
                 sensitivities.Add(sensitivity);
@@ -159,10 +159,10 @@ namespace Retia.Neural.Layers
             this.SaveObject(filename);
         }
 
-        public float GetParam(int i, bool grad = false)
+        public double GetParam(int i, bool grad = false)
         {
             int refInd=0;
-            var state = new float[TotalParamCount];
+            var state = new double[TotalParamCount];
             ToVectorState(state, ref refInd, grad);
             return state[i];
         }
@@ -180,7 +180,7 @@ namespace Retia.Neural.Layers
         /// <param name="i">Input index</param>
         /// <param name="o">Output index</param>
         /// <returns>Derivative value</returns>
-        protected virtual float Derivative(Matrix input, Matrix output, int batch, int i, int o)
+        protected virtual double Derivative(Matrix input, Matrix output, int batch, int i, int o)
         {
             return 0.0f;
         }

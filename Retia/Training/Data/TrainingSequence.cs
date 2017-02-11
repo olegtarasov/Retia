@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Mathematics;
 
 namespace Retia.Training.Data

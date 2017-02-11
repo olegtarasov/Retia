@@ -1,5 +1,5 @@
 ﻿using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Mathematics;
 using Retia.RandomGenerator;
 

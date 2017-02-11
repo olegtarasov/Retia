@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
@@ -12,7 +12,7 @@ namespace Retia.Mathematics
             var p = y.CloneMatrix();
             var rawP = p.AsColumnMajorArray();
             var n = rawP.Length;
-            var sums = new float[y.ColumnCount];
+            var sums = new double[y.ColumnCount];
             for (int i = 0; i < n; i++)
             {
                 rawP[i] = (float)Math.Exp(rawP[i] / T);

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -107,11 +107,11 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(double[] destination, ref int idx, bool grad = false)
         {
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(double[] vector, ref int idx)
         {
         }
 

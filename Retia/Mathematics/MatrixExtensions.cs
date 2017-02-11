@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearAlgebra.Storage;
 using MathNet.Numerics.Providers.LinearAlgebra;
 
@@ -35,7 +35,7 @@ namespace Retia.Mathematics
         public static Matrix TileColumns(this Matrix matrix, int count)
         {
             var src = matrix.AsColumnMajorArray();
-            var dst = new float[src.Length * count];
+            var dst = new double[src.Length * count];
 
             for (int i = 0; i < count; i++)
             {
@@ -48,7 +48,7 @@ namespace Retia.Mathematics
         public static Matrix TileRows(this Matrix matrix, int count)
         {
             var src = matrix.AsColumnMajorArray();
-            var dst = new float[src.Length * count];
+            var dst = new double[src.Length * count];
 
             for (int col = 0; col < matrix.ColumnCount; col++)
             {
@@ -118,7 +118,7 @@ namespace Retia.Mathematics
             return result;
         }
 
-        public static void CopyToArray(this Matrix matrix, float[] dest, ref int idx)
+        public static void CopyToArray(this Matrix matrix, double[] dest, ref int idx)
         {
             var ma = matrix.AsColumnMajorArray();
             if (dest.Length - idx < ma.Length)
@@ -130,7 +130,7 @@ namespace Retia.Mathematics
             idx += ma.Length;
         }
 
-        public static void CopyFromArray(this Matrix matrix, float[] src, ref int idx)
+        public static void CopyFromArray(this Matrix matrix, double[] src, ref int idx)
         {
             var ma = matrix.AsColumnMajorArray();
             if (src.Length - idx < ma.Length)

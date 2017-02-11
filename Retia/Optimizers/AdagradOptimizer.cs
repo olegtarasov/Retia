@@ -23,7 +23,7 @@ namespace Retia.Optimizers
             var gradient = weight.Gradient.AsColumnMajorArray();
             var cache = weight.Cache2.AsColumnMajorArray();
 
-            fixed (float* pGrad = gradient, pMem = cache, pWeight = weightMatrix)
+            fixed (double* pGrad = gradient, pMem = cache, pWeight = weightMatrix)
             {
                 ParallelFor.Instance.Execute(AdagradUpdate, weightMatrix.Length, new void*[]{pGrad, pMem, pWeight});
             }

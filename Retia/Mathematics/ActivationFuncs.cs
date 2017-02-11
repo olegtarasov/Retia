@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace Retia.Mathematics
 {
@@ -12,7 +12,7 @@ namespace Retia.Mathematics
             var a1 = matrix1.AsColumnMajorArray();
             var a2 = matrix2.AsColumnMajorArray();
 
-            fixed (float* pArray1 = a1, pArray2 = a2)
+            fixed (double* pArray1 = a1, pArray2 = a2)
             {
                 ParallelFor.Instance.Execute(ApplySigmoid2, a1.Length, new void*[] {pArray1, pArray2});
             }
@@ -38,7 +38,7 @@ namespace Retia.Mathematics
         public static unsafe void ApplyTanh(Matrix matrix)
         {
             var a = matrix.AsColumnMajorArray();
-            fixed (float* pArray = a)
+            fixed (double* pArray = a)
             {
                 ParallelFor.Instance.Execute(ApplyTanh, a.Length, new void*[] {pArray});
             }

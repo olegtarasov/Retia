@@ -1,5 +1,5 @@
 ﻿using System;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace Retia.Mathematics
 {
@@ -17,7 +17,7 @@ namespace Retia.Mathematics
             var n = rawP.Length;
             for (int i = 0; i < n; i++)
             {
-                if(Single.IsNaN(rawT[i]))
+                if(double.IsNaN(rawT[i]))
                     continue;
                 err += rawT[i] * Math.Log(rawP[i]);
             }
@@ -33,19 +33,18 @@ namespace Retia.Mathematics
             double err = 0.0;
             int n = y.ColumnCount * y.RowCount;
             int notNaN = 0;
-            int rows = y.RowCount;
             var rawY = y.AsColumnMajorArray();
             var rawT = target.AsColumnMajorArray();
             for (int i = 0; i < n; i++)
             {
-                if(Single.IsNaN(rawT[i]))
+                if(double.IsNaN(rawT[i]))
                     continue;
                 notNaN++;
                 double delta = rawT[i] - rawY[i];
                 err += delta * delta;
             }
 
-            return notNaN==0?0.0:0.5 * err / notNaN;
+            return notNaN == 0 ? 0.0 : 0.5 * err / notNaN;
         }
     }
 }

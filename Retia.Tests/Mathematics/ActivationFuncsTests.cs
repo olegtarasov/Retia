@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Mathematics;
 using Retia.Tests.Plumbing;
 using Xunit;
@@ -62,7 +62,7 @@ namespace Retia.Tests.Mathematics
             }
         }
 
-        private static float Sigmoid(float x) => 1.0f / (1.0f + (float)Math.Exp(-x));
-        private static float Tanh(float x) => (float)Math.Tanh(x);
+        private static float Sigmoid(double x) => 1.0f / (1.0f + (float)Math.Exp(-x));
+        private static float Tanh(double x) => (float)Math.Tanh(x);
     }
 }

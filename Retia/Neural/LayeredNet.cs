@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -181,7 +181,7 @@ namespace Retia.Neural
         {
             if (_gpuNetwork != null)
             {
-                return _gpuNetwork.TrainSequence(inputs, targets);
+                //return _gpuNetwork.TrainSequence(inputs, targets);
             }
 
             return base.TrainSequence(inputs, targets);
@@ -292,7 +292,7 @@ namespace Retia.Neural
                 layer.InitSequence();
         }
 
-        private void SetParam(int i, float value)
+        private void SetParam(int i, double value)
         {
             if (i >= TotalParamCount)
                 throw new ArgumentException($"Parameter index ({i}) should be less than {TotalParamCount}");
@@ -310,7 +310,7 @@ namespace Retia.Neural
             throw new Exception($"What the fuck is this? Your index={i} is somehow less then TotalParamCount={TotalParamCount} but more than sum of all layer param counts {paramCnt}!");
         }
 
-        private float GetParam(int i, bool grad=false)
+        private double GetParam(int i, bool grad=false)
         {
             if(i>=TotalParamCount)
                 throw new ArgumentException($"Parameter index ({i}) should be less than {TotalParamCount}");

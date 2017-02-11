@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Retia.Helpers;
 using Retia.RandomGenerator;
 
@@ -31,10 +31,10 @@ namespace Retia.Mathematics
                 int rows = reader.ReadInt32();
                 int cols = reader.ReadInt32();
 
-                var arr = new float[rows * cols];
+                var arr = new double[rows * cols];
                 for (int i = 0; i < arr.Length; i++)
                 {
-                    arr[i] = reader.ReadSingle();
+                    arr[i] = reader.ReadDouble();
                 }
 
                 return DenseMatrix.OfColumnMajor(rows, cols, arr);
@@ -81,9 +81,9 @@ namespace Retia.Mathematics
         public static Matrix RandomMatrix(int rows, int cols, float min, float max)
         {
             var random = SafeRandom.Generator;
-            var arr = new float[rows * cols];
+            var arr = new double[rows * cols];
             for (int i = 0; i < arr.Length; i++)
-                arr[i] = (float)random.NextDouble(min, max);
+                arr[i] = random.NextDouble(min, max);
             return new DenseMatrix(rows, cols, arr);
         }
 
@@ -95,7 +95,7 @@ namespace Retia.Mathematics
         public static Matrix RandomMaskMatrix(int rows, int cols, float trueProb)
         {
             var random = SafeRandom.Generator;
-            var arr = new float[rows * cols];
+            var arr = new double[rows * cols];
             for (int i = 0; i < arr.Length; i++)
                 arr[i] = random.NextDouble() < trueProb ? 1.0f : 0.0f;
             return new DenseMatrix(rows, cols, arr);

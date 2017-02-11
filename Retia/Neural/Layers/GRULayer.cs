@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Mathematics;
@@ -216,7 +216,7 @@ namespace Retia.Neural.Layers
             var za = z.AsColumnMajorArray();
             var lastha = lastH.AsColumnMajorArray();
 
-            fixed (float* pArr = ha, pCanArr = hcana, pzArr = za, plastHArr = lastha)
+            fixed (double* pArr = ha, pCanArr = hcana, pzArr = za, plastHArr = lastha)
             {
                 ParallelFor.Instance.Execute(CalculateHSlow, ha.Length, new void*[]{pArr, pCanArr, pzArr, plastHArr});
             }
@@ -590,7 +590,7 @@ namespace Retia.Neural.Layers
             _bhh.Gradient.Clamp(-limit, limit);
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(double[] destination, ref int idx, bool grad = false)
         {
             if (!grad)
             {
@@ -630,7 +630,7 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(double[] vector, ref int idx)
         {
             _bxr.Weight.CopyFromArray(vector, ref idx);
             _bxz.Weight.CopyFromArray(vector, ref idx);
@@ -664,21 +664,21 @@ namespace Retia.Neural.Layers
         {
             var weights = new GruLayerWeights
                           {
-                              Wxr = _wxr.Weight,
-                              Wxz = _wxz.Weight,
-                              Wxh = _wxh.Weight,
+                              //Wxr = _wxr.Weight,
+                              //Wxz = _wxz.Weight,
+                              //Wxh = _wxh.Weight,
 
-                              Whr = _whr.Weight,
-                              Whz = _whz.Weight,
-                              Whh = _whh.Weight,
+                              //Whr = _whr.Weight,
+                              //Whz = _whz.Weight,
+                              //Whh = _whh.Weight,
 
-                              bxr = _bxr.Weight,
-                              bxz = _bxz.Weight,
-                              bxh = _bxh.Weight,
+                              //bxr = _bxr.Weight,
+                              //bxz = _bxz.Weight,
+                              //bxh = _bxh.Weight,
 
-                              bhr = _bhr.Weight,
-                              bhz = _bhz.Weight,
-                              bhh = _bhh.Weight
+                              //bhr = _bhr.Weight,
+                              //bhz = _bhz.Weight,
+                              //bhh = _bhh.Weight
                           };
 
             return new GruLayerSpec(InputSize, BatchSize, SeqLen, 1, _hSize, weights);

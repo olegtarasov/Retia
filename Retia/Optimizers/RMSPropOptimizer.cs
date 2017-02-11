@@ -54,7 +54,7 @@ namespace Retia.Optimizers
             var cacheM = weight.CacheM.AsColumnMajorArray();
             var w = weight.Weight.AsColumnMajorArray();
 
-            fixed (float* pGrad = gradient, pCache1 = cache1, pCache2 = cache2, pCacheM = cacheM, pWeight = w)
+            fixed (double* pGrad = gradient, pCache1 = cache1, pCache2 = cache2, pCacheM = cacheM, pWeight = w)
 	        {
                 ParallelFor.Instance.Execute(GravesRMSPropOptimize, gradient.Length, new void*[]{pGrad, pCache1, pCache2, pCacheM, pWeight});
 	        }
