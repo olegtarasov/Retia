@@ -1,57 +1,47 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Single;
+using Retia.Helpers;
 
 namespace Retia.Mathematics
 {
-    public static class ActivationFuncs
+    public static class ActivationFuncs<T> where T : struct, IEquatable<T>, IFormattable
     {
-        public static unsafe void ApplySigmoid2(Matrix matrix1, Matrix matrix2)
-        {
-            var a1 = matrix1.AsColumnMajorArray();
-            var a2 = matrix2.AsColumnMajorArray();
+        private static bool _isFloat = typeof(T) == typeof(float);
 
-            fixed (float* pArray1 = a1, pArray2 = a2)
+        [DllImport("FastFuncs")]
+        private static extern void ApplySigmoid2D(IntPtr a, IntPtr b, int n);
+
+        [DllImport("FastFuncs")]
+        private static extern void ApplySigmoid2S(IntPtr a, IntPtr b, int n);
+
+        [DllImport("FastFuncs")]
+        private static extern void ApplyTanhD(IntPtr matrix, int n);
+
+        [DllImport("FastFuncs")]
+        private static extern void ApplyTanhS(IntPtr matrix, int n);
+
+        public static void ApplySigmoid2(Matrix<T> matrix1, Matrix<T> matrix2)
+        {
+            using (var ptrs = new MatrixPointers<T>(matrix1, matrix2))
             {
-                ParallelFor.Instance.Execute(ApplySigmoid2, a1.Length, new void*[] {pArray1, pArray2});
+                if (_isFloat)
+                    ApplySigmoid2S(ptrs[0], ptrs[1], matrix1.Length());
+                else
+                    ApplySigmoid2D(ptrs[0], ptrs[1], matrix1.Length());
             }
         }
 
-        private static unsafe void ApplySigmoid2(int startIdx, int endIdx, void*[] ptrs)
+        public static void ApplyTanh(Matrix<T> matrix)
         {
-            float* startPtr1 = (float*)ptrs[0], startPtr2 = (float*)ptrs[1];
-
-            for (int i = startIdx; i < endIdx; i++)
+            using (var ptrs = new MatrixPointers<T>(matrix))
             {
-                ApplySigmoid(startPtr1 + i);
-                ApplySigmoid(startPtr2 + i);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static unsafe void ApplySigmoid(float* ptr)
-        {
-            *ptr = 1.0f / (1 + (float)Math.Exp(-(*ptr)));
-        }
-
-        public static unsafe void ApplyTanh(Matrix matrix)
-        {
-            var a = matrix.AsColumnMajorArray();
-            fixed (float* pArray = a)
-            {
-                ParallelFor.Instance.Execute(ApplyTanh, a.Length, new void*[] {pArray});
-            }
-        }
-
-        private static unsafe void ApplyTanh(int startIdx, int endIdx, void*[] ptrs)
-        {
-            float* startPtr = (float*)ptrs[0];
-
-            for (int i = startIdx; i < endIdx; i++)
-            {
-                float* ptr = startPtr + i;
-                *ptr = (float)Math.Tanh(*ptr);
+                if (_isFloat)
+                    ApplyTanhS(ptrs[0], matrix.Length());
+                else
+                    ApplyTanhD(ptrs[0], matrix.Length());
             }
         }
     }

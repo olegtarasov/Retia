@@ -1,10 +1,11 @@
-﻿using MathNet.Numerics.LinearAlgebra.Single;
+﻿using System;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 
 namespace Retia.Neural.Initializers
 {
-    public interface IMatrixInitializer
+    public interface IMatrixInitializer<T> where T : struct, IEquatable<T>, IFormattable
     {
-        Matrix CreateMatrix(int rows, int columns);
+        Matrix<T> CreateMatrix(int rows, int columns);
     }
 }

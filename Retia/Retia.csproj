@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\CollectionExtensions.cs" />
+    <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
     <Compile Include="Integration\ConsoleProgressWriter.cs" />
     <Compile Include="Integration\ICloneable.cs" />
@@ -130,6 +131,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\Out\$(Platform)\$(Configuration)\FastFuncs.dll">
+      <Link>FastFuncs.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NugetRelativeRefs.xslt" />
   </ItemGroup>
   <ItemGroup>
