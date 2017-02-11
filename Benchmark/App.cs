@@ -75,19 +75,19 @@ namespace Benchmark
         {
             Control.UseNativeMKL(MklConsistency.Auto, MklPrecision.Single, MklAccuracy.High);
 
-            //const int seqLen = 5;
+            const int seqLen = 5;
 
             //var net = new LayeredNet(1, seqLen, new GruLayer(6, 3), new LinearLayer(3, 2), new SoftMaxLayer(2))
-            //          {
-            //              Optimizer = new RMSPropOptimizer()
-            //          };
+            //{
+            //    Optimizer = new RMSPropOptimizer()
+            //};
 
             //LayeredNet.CheckGrad(net, seqLen);
 
             const double delta = 1e-5d;
 
             var dataSet = new TestDataSet(3, 1, 1, 1);
-            var layer = new LinearLayer(dataSet.InputSize, dataSet.TargetSize);
+            var layer = new GruLayer(dataSet.InputSize, dataSet.TargetSize);
             layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
             layer.InitSequence();
 
@@ -103,17 +103,17 @@ namespace Benchmark
 
             for (int i = 0; i < layer.TotalParamCount; i++)
             {
-                var pLayer = (LinearLayer)layer.Clone();
-                var nLayer = (LinearLayer)layer.Clone();
+                var pLayer = layer.Clone();
+                var nLayer = layer.Clone();
 
                 pLayer.InitSequence();
                 nLayer.InitSequence();
 
-                AssertMatricesEqual(pLayer._bias.Weight, layer._bias.Weight);
-                AssertMatricesEqual(pLayer._weights.Weight, layer._weights.Weight);
+                //AssertMatricesEqual(pLayer._bias.Weight, layer._bias.Weight);
+                //AssertMatricesEqual(pLayer._weights.Weight, layer._weights.Weight);
 
-                AssertMatricesEqual(nLayer._bias.Weight, layer._bias.Weight);
-                AssertMatricesEqual(nLayer._weights.Weight, layer._weights.Weight);
+                //AssertMatricesEqual(nLayer._bias.Weight, layer._bias.Weight);
+                //AssertMatricesEqual(nLayer._weights.Weight, layer._weights.Weight);
 
                 pLayer.SetParam(i, pLayer.GetParam(i) + delta);
                 nLayer.SetParam(i, nLayer.GetParam(i) - delta);
@@ -129,7 +129,7 @@ namespace Benchmark
                 double real = layer.GetParam(i, true);
                 double d = num - real;
 
-                if (Math.Abs(d) > 1e-5)
+                if (Math.Abs(d) > 1e-7)
                 {
                     Console.WriteLine("Fuck");
                 }
@@ -167,7 +167,7 @@ namespace Benchmark
 
                 for (int j = 0; j < oa.Length; j++)
                 {
-                    ra[j] = (oa[j] - ta[j]) / (float)oa.Length;
+                    ra[j] = (oa[j] - ta[j]) / oa.Length;
                 }
 
                 result.Add(r);

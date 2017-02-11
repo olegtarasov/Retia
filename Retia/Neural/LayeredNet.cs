@@ -131,7 +131,7 @@ namespace Retia.Neural
         public static void CheckGrad(LayeredNet net, int seqLen)
         {
             Console.WriteLine("Starting grad check");
-            float delta = 1e-3f;
+            double delta = 1e-5d;
 
             net.ResetMemory();
 
