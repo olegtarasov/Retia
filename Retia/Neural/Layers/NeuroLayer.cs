@@ -19,6 +19,8 @@ namespace Retia.Neural.Layers
         protected List<Matrix<T>> Inputs = new List<Matrix<T>>();
         protected List<Matrix<T>> Outputs = new List<Matrix<T>>();
 
+        protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
+
         protected NeuroLayer()
         {
         }
@@ -40,7 +42,7 @@ namespace Retia.Neural.Layers
 
         public abstract void Save(Stream s);
 
-        public abstract void Optimize(OptimizerBase optimizer);
+        public abstract void Optimize(OptimizerBase<T> optimizer);
 
         /// <summary>
         ///     Forward layer step
@@ -126,34 +128,7 @@ namespace Retia.Neural.Layers
         /// <param name="targets">Sequence of targets</param>
         public virtual List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
         {
-            if (Outputs.Count != targets.Count || targets.Count == 0)
-                throw new Exception("Not enough targets provided or not enough output states stored!");
-
-            var sensitivities = new List<Matrix<T>>(SeqLen);
-            float k = 1.0f / BatchSize;
-
-            for (int i = 0; i < SeqLen; i++)
-            {
-                var y = Outputs[i];
-                var target = targets[i];
-                var sensitivity = Matrix<T>.Build.Dense(y.RowCount, y.ColumnCount);
-
-                // TODO: NAN support
-                // TODO: Improve conversion
-                var sens = (y - target).Divide((T)Convert.ChangeType(BatchSize, typeof(T)));
-
-                //for (int idx = 0; idx < ya.Length; idx++)
-                //{
-                //    T t = ta[idx];
-                    
-                //    //sa[idx] = float.IsNaN(t) ? 0.0f : (ya[idx] - t) * k;
-                //    sa[idx] = (ya[idx] - t) * k;
-                //}
-
-                sensitivities.Add(sensitivity);
-            }
-
-            return sensitivities;
+            return MathProvider.ErrorPropagate(Outputs, targets, SeqLen, BatchSize);
         }
 
         public void Save(string filename)

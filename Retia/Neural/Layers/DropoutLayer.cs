@@ -12,12 +12,12 @@ namespace Retia.Neural.Layers
     public class DropoutLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
-        private readonly T _dropout = 0.5f;
+        private readonly float _dropout;
 
         private readonly List<Matrix<T>> _masks = new List<Matrix<T>>();
         private Matrix<T> _scale;
 
-        public DropoutLayer(int size, T dropout = 0.5f)
+        public DropoutLayer(int size, float dropout = 0.5f)
         {
             _size = size;
             _dropout = dropout;
@@ -61,7 +61,7 @@ namespace Retia.Neural.Layers
             return new DropoutLayer<T>(this);
         }
 
-        public override void Optimize(OptimizerBase optimizer)
+        public override void Optimize(OptimizerBase<T> optimizer)
         {
         }
 
@@ -141,7 +141,7 @@ namespace Retia.Neural.Layers
             }*/
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(T[] vector, ref int idx)
         {
             /*
             int maskSize = MaskSize;
@@ -164,7 +164,7 @@ namespace Retia.Neural.Layers
 
         protected override void Initialize()
         {
-            _scale = Matrix<T>.Build.Dense(_size, BatchSize, _dropout);
+            _scale = Matrix<T>.Build.Dense(_size, BatchSize, MathProvider.Scalar(_dropout));
         }
     }
 }

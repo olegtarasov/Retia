@@ -63,35 +63,19 @@ namespace Retia.Mathematics
             return Matrix<T>.Build.Dense(matrix.RowCount * count, matrix.ColumnCount, dst);
         }
 
-        /// <summary>
-        ///     this = beta*this + alpha*AB;
-        /// </summary>
-        public static void Accumulate(this Matrix<float> C, Matrix<float> A, Matrix<float> B, float beta = 0.0f, float alpha = 1.0f, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose) 
+        public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, float beta = 0.0f, float alpha = 1.0f, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose) where T : struct, IEquatable<T>, IFormattable
         {
-            Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray());
-        }
-
-        /// <summary>
-        ///     this = beta*this + alpha*AB;
-        /// </summary>
-        public static void Accumulate(this Matrix<double> C, Matrix<double> A, Matrix<double> B, double beta = 0.0d, double alpha = 1.0d, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose) 
-        {
-            Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray());
-        }
-
-        public static void CollapseColumnsAndAccumulate(this Matrix<float> C, Matrix<float> A, Matrix<float> B)
-        {
-            if (A.ColumnCount > 1)
+            if (typeof(T) == typeof(float))
             {
-                C.Accumulate(A, B, 1.0f);
+                Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray() as float[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as float[], B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray() as float[]);
             }
             else
             {
-                C.Accumulate(A);
+                Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, (double)alpha, A.AsColumnMajorArray() as double[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as double[], B.RowCount, B.ColumnCount, (double)beta, C.AsColumnMajorArray() as double[]);
             }
         }
 
-        public static void CollapseColumnsAndAccumulate(this Matrix<double> C, Matrix<double> A, Matrix<double> B)
+        public static void CollapseColumnsAndAccumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B) where T : struct, IEquatable<T>, IFormattable
         {
             if (A.ColumnCount > 1)
             {
@@ -106,11 +90,14 @@ namespace Retia.Mathematics
         /// <summary>
         ///     this = alpha*A + this
         /// </summary>
-        public static void Accumulate(this Matrix<float> x, Matrix<float> A, float alpha = 1.0f)
+        public static void Accumulate<T>(this Matrix<T> x, Matrix<T> A, float alpha = 1.0f) where T : struct, IEquatable<T>, IFormattable
         {
             if (A.ColumnCount == 1)
             {
-                SumVec(A, x, alpha);
+                if (typeof(T) == typeof(float))
+                    SumVec(A as Matrix<float>, x as Matrix<float>, alpha);
+                else
+                    SumVec(A as Matrix<double>, x as Matrix<double>, alpha);
             }
             else
             {
@@ -118,32 +105,16 @@ namespace Retia.Mathematics
                 var xa = x.AsColumnMajorArray();
                 if (alpha != 1.0f)
                 {
-                    Control.LinearAlgebraProvider.ScaleArray(alpha, aa, aa);
+                    if (typeof(T) == typeof(float))
+                        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as float[], aa as float[]);
+                    else
+                        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as double[], aa as double[]);
                 }
                 
-                Control.LinearAlgebraProvider.AddArrays(xa, aa, xa);
-            }
-        }
-
-        /// <summary>
-        ///     this = alpha*A + this
-        /// </summary>
-        public static void Accumulate(this Matrix<double> x, Matrix<double> A, float alpha = 1.0f)
-        {
-            if (A.ColumnCount == 1)
-            {
-                SumVec(A, x, alpha);
-            }
-            else
-            {
-                var aa = A.AsColumnMajorArray();
-                var xa = x.AsColumnMajorArray();
-                if (alpha != 1.0f)
-                {
-                    Control.LinearAlgebraProvider.ScaleArray(alpha, aa, aa);
-                }
-
-                Control.LinearAlgebraProvider.AddArrays(xa, aa, xa);
+                if (typeof(T) == typeof(float))
+                    Control.LinearAlgebraProvider.AddArrays(xa as float[], aa as float[], xa as float[]);
+                else
+                    Control.LinearAlgebraProvider.AddArrays(xa as double[], aa as double[], xa as double[]);
             }
         }
 

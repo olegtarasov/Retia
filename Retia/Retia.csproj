@@ -65,8 +65,11 @@
     <Compile Include="Integration\ProgressEventArgs.cs" />
     <Compile Include="Integration\ProgressTracker.cs" />
     <Compile Include="Mathematics\ActivationFuncs.cs" />
+    <Compile Include="Mathematics\DoubleMathProvider.cs" />
     <Compile Include="Mathematics\Fir.cs" />
     <Compile Include="Mathematics\ForThread.cs" />
+    <Compile Include="Mathematics\MathProvider.cs" />
+    <Compile Include="Mathematics\MathProviderBase.cs" />
     <Compile Include="Mathematics\MatrixExtensions.cs" />
     <Compile Include="Mathematics\MatrixFactory.cs" />
     <Compile Include="Mathematics\ParallelFor.cs" />
