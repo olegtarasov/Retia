@@ -1,80 +1,75 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using CLAP;
-using MathNet.Numerics;
-using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Single;
-using MathNet.Numerics.Providers.Common.Mkl;
-using Retia.Neural;
-using Retia.Neural.Initializers;
-using Retia.Neural.Layers;
-using Retia.Optimizers;
+using Retia.Mathematics;
+
+//using df = System.Double;
+using df = System.Single;
 
 namespace Benchmark
 {
     public class App
     {
-        [Verb]
-        public void DotMatrix([DefaultValue(10)] int count, [DefaultValue(4096)] int dimension, [DefaultValue(false)] bool gpu)
-        {
-            Console.WriteLine("========= Math.NET matrices");
-            var dist = new Normal();
+        //[Verb]
+        //public void DotMatrix([DefaultValue(10)] int count, [DefaultValue(4096)] int dimension, [DefaultValue(false)] bool gpu)
+        //{
+        //    Console.WriteLine("========= Math.NET matrices");
+        //    var dist = new Normal();
 
-            if (gpu)
-            {
-                Control.UseNativeCUDA();
-            }
-            else
-            {
-                Control.UseNativeMKL();
-            }
+        //    if (gpu)
+        //    {
+        //        Control.UseNativeCUDA();
+        //    }
+        //    else
+        //    {
+        //        Control.UseNativeMKL();
+        //    }
 
-            var mat = Enumerable.Range(0, count * 2).Select(x => DenseMatrix.CreateRandom(dimension, dimension, dist)).ToArray();
-            var watch = new Stopwatch();
-            watch.Start();
+        //    var mat = Enumerable.Range(0, count * 2).Select(x => DenseMatrix.CreateRandom(dimension, dimension, dist)).ToArray();
+        //    var watch = new Stopwatch();
+        //    watch.Start();
 
-            for (int i = 0; i < count; i++)
-            {
-                var w = new Stopwatch();
-                w.Start();
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        var w = new Stopwatch();
+        //        w.Start();
 
-                var m1 = mat[i * 2];
-                var m2 = mat[i * 2 + 1];
+        //        var m1 = mat[i * 2];
+        //        var m2 = mat[i * 2 + 1];
 
-                var result = m1 * m2;
-                w.Stop();
+        //        var result = m1 * m2;
+        //        w.Stop();
 
-                Console.WriteLine($"{i + 1} completed in {w.Elapsed.TotalSeconds} s.");
-            }
-            watch.Stop();
+        //        Console.WriteLine($"{i + 1} completed in {w.Elapsed.TotalSeconds} s.");
+        //    }
+        //    watch.Stop();
 
-            Console.WriteLine($"Total time: {watch.Elapsed.TotalSeconds} s.");
-        }
+        //    Console.WriteLine($"Total time: {watch.Elapsed.TotalSeconds} s.");
+        //}
 
-        [Verb]
-        public void TestGpuLayers()
-        {
-            var dataSet = new TestDataSet(3, 4, 2, 5);
+        //[Verb]
+        //public void TestGpuLayers()
+        //{
+        //    var dataSet = new TestDataSet(3, 4, 2, 5);
 
-            Console.WriteLine("Testing softmax forward");
-            var softmaxLayer = new SoftMaxLayer(dataSet.InputSize);
-            TestLayerForward(softmaxLayer, dataSet, dataSet.InputSize);
+        //    Console.WriteLine("Testing softmax forward");
+        //    var softmaxLayer = new SoftMaxLayer(dataSet.InputSize);
+        //    TestLayerForward(softmaxLayer, dataSet, dataSet.InputSize);
 
-            Console.WriteLine("Testing linear forward");
-            var linLayer = new LinearLayer(dataSet.InputSize, dataSet.TargetSize);
-            TestLayerForward(linLayer, dataSet);
+        //    Console.WriteLine("Testing linear forward");
+        //    var linLayer = new LinearLayer(dataSet.InputSize, dataSet.TargetSize);
+        //    TestLayerForward(linLayer, dataSet);
 
-            Console.WriteLine("Testing GRU forward");
-            var gruLayer = new GruLayer(dataSet.InputSize, dataSet.TargetSize);
-            TestLayerForward(gruLayer, dataSet);
-        }
+        //    Console.WriteLine("Testing GRU forward");
+        //    var gruLayer = new GruLayer(dataSet.InputSize, dataSet.TargetSize);
+        //    TestLayerForward(gruLayer, dataSet);
+        //}
 
         [Verb]
         public void CheckGrad()
         {
-            Control.UseNativeMKL(MklConsistency.Auto, MklPrecision.Single, MklAccuracy.High);
+            //Control.UseNativeMKL(MklConsistency.Auto, MklPrecision.Double, MklAccuracy.Low);
 
             //const int seqLen = 5;
 
@@ -85,49 +80,113 @@ namespace Benchmark
 
             //LayeredNet.CheckGrad(net, seqLen);
 
-            const float delta = 1e-4f;
+            //const float delta = 1e-4f;
 
-            var dataSet = new TestDataSet(3, 2, 5, 1);
-            var layer = new LinearLayer(dataSet.InputSize, dataSet.TargetSize, new ConstantMatrixInitializer {Value = 1e-2f});
-            layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
-            layer.InitSequence();
+            //var dataSet = new TestDataSet(3, 2, 5, 1);
+            //var layer = new LinearLayer(dataSet.InputSize, dataSet.TargetSize, new ConstantMatrixInitializer {Value = 1e-2f});
+            //layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
+            //layer.InitSequence();
 
-            var samples = dataSet.GetNextSamples(dataSet.SampleCount);
+            //var samples = dataSet.GetNextSamples(dataSet.SampleCount);
+
+            //var outputs = new List<Matrix>();
+            //for (int i = 0; i < samples.Inputs.Count; i++)
+            //{
+            //    outputs.Add(layer.Step(samples.Inputs[i], true));
+            //}
+
+            //layer.BackPropagate(ErrorPropagate(outputs, samples.Targets));
+
+            //for (int i = 0; i < layer.TotalParamCount; i++)
+            //{
+            //    var pLayer = layer.Clone();
+            //    var nLayer = layer.Clone();
+
+            //    pLayer.InitSequence();
+            //    nLayer.InitSequence();
+
+            //    pLayer.SetParam(i, pLayer.GetParam(i) + delta);
+            //    nLayer.SetParam(i, nLayer.GetParam(i) - delta);
+
+            //    float pErr = 0.0f, nErr = 0.0f;
+            //    for (int j = 0; j < samples.Inputs.Count; j++)
+            //    {
+            //        pErr += pLayer.LayerError(pLayer.Step(samples.Inputs[j]), samples.Targets[j]);
+            //        nErr += nLayer.LayerError(nLayer.Step(samples.Inputs[j]), samples.Targets[j]);
+            //    }
+
+            //    float num = (pErr - nErr) / (2.0f * delta);
+            //    float real = layer.GetParam(i, true);
+            //    float d = num - real;
+
+            //    if (Math.Abs(d) > 1e-4)
+            //    {
+            //        Console.WriteLine("Fuck");
+            //    }
+            //}
+
+            SimpleTest();
+        }
+
+        private void SimpleTest()
+        {
+            const int inSize = 5;
+            const int outSize = 3;
+            const int batchSize = 1;
+            const int seqLen = 5;
+            const df delta = 1e-5f;
+
+            var w = Matrix.RandomMatrix(outSize, inSize, 1.0f);
+            var b = Matrix.RandomMatrix(outSize, 1, 1.0f);
+
+            var inputs = Enumerable.Range(0, seqLen).Select(x => Matrix.RandomMatrix(inSize, 1, 1.0f)).ToList();
+            var targets = Enumerable.Range(0, seqLen).Select(x => Matrix.RandomMatrix(outSize, 1, 1.0f)).ToList();
 
             var outputs = new List<Matrix>();
-            for (int i = 0; i < samples.Inputs.Count; i++)
+            for (int i = 0; i < seqLen; i++)
             {
-                outputs.Add(layer.Step(samples.Inputs[i], true));
+                var output = b.Clone(); // batches
+                output.Accumulate(w, inputs[i], 1.0f);
+
+                outputs.Add(output);
             }
 
-            layer.BackPropagate(ErrorPropagate(outputs, samples.Targets));
+            var sens = ErrorPropagate(outputs, targets);
+            var gw = new Matrix(w.Rows, w.Cols);
+            var gb = new Matrix(b.Rows, b.Cols);
 
-            for (int i = 0; i < layer.TotalParamCount; i++)
+            for (int i = seqLen - 1; i >= 0; i--)
             {
-                var pLayer = layer.Clone();
-                var nLayer = layer.Clone();
+                var curSens = sens[i];
 
-                pLayer.InitSequence();
-                nLayer.InitSequence();
+                gw.Accumulate(curSens, inputs[i], 1.0f, transposeB: TransposeOptions.Transpose);
+                gb.Accumulate(curSens);
+            }
 
-                pLayer.SetParam(i, pLayer.GetParam(i) + delta);
-                nLayer.SetParam(i, nLayer.GetParam(i) - delta);
+            // Check w
+            for (int i = 0; i < w.Length; i++)
+            {
+                var pw = w.Clone();
+                var nw = w.Clone();
 
-                float pErr = 0.0f, nErr = 0.0f;
-                for (int j = 0; j < samples.Inputs.Count; j++)
+                ((df[])pw)[i] += delta;
+                ((df[])nw)[i] -= delta;
+
+                df pErr = 0.0f, nErr = 0.0f;
+                for (int s = 0; s < seqLen; s++)
                 {
-                    pErr += pLayer.LayerError(pLayer.Step(samples.Inputs[j]), samples.Targets[j]);
-                    nErr += nLayer.LayerError(nLayer.Step(samples.Inputs[j]), samples.Targets[j]);
+                    var pOut = (Matrix)b.Clone();
+                    pOut.Accumulate(pw, inputs[s], 1.0f);
+                    pErr += ErrorFunctions.MeanSquare(pOut, targets[s]);
+
+                    var nOut = (Matrix)b.Clone();
+                    nOut.Accumulate(nw, inputs[s], 1.0f);
+                    nErr += ErrorFunctions.MeanSquare(nOut, targets[s]);
                 }
 
-                float num = (pErr - nErr) / (2.0f * delta);
-                float real = layer.GetParam(i, true);
-                float d = num - real;
-
-                if (Math.Abs(d) > 1e-4)
-                {
-                    Console.WriteLine("Fuck");
-                }
+                df num = (pErr - nErr) / (2.0f * delta);
+                df grad = ((df[])gw)[i];
+                df d = Math.Abs(grad - num) / Math.Max(Math.Abs(grad), Math.Abs(num));
             }
         }
 
@@ -137,14 +196,14 @@ namespace Benchmark
 
             for (int i = 0; i < outputs.Count; i++)
             {
-                var r = new DenseMatrix(outputs[0].RowCount, outputs[0].ColumnCount);
-                var oa = outputs[i].AsColumnMajorArray();
-                var ta = targets[i].AsColumnMajorArray();
-                var ra = r.AsColumnMajorArray();
+                var r = new Matrix(outputs[0].Rows, outputs[0].Cols);
+                var oa = (df[])outputs[i];
+                var ta = (df[])targets[i];
+                var ra = (df[])r;
 
                 for (int j = 0; j < oa.Length; j++)
                 {
-                    ra[j] = (oa[j] - ta[j]) / (float)oa.Length;
+                    ra[j] = (oa[j] - ta[j]) / (df)oa.Length;
                 }
 
                 result.Add(r);
@@ -153,57 +212,57 @@ namespace Benchmark
             return result;
         }
 
-        private void TestLayerForward(NeuroLayer layer, TestDataSet dataSet, int? outSize = null)
-        {
-            layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
+        //private void TestLayerForward(NeuroLayer layer, TestDataSet dataSet, int? outSize = null)
+        //{
+        //    layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
 
-            int finalOutSize = outSize.GetValueOrDefault(dataSet.TargetSize);
-            var gpuTester = new LayerTester(layer.CreateSpec());
+        //    int finalOutSize = outSize.GetValueOrDefault(dataSet.TargetSize);
+        //    var gpuTester = new LayerTester(layer.CreateSpec());
 
-            for (int i = 0; i < 3; i++)
-            {
-                var seq = dataSet.GetNextSamples(dataSet.SampleCount);
-                var cpuOut = new List<Matrix>();
-                foreach (var input in seq.Inputs)
-                {
-                    cpuOut.Add(layer.Step(input));
-                }
+        //    for (int i = 0; i < 3; i++)
+        //    {
+        //        var seq = dataSet.GetNextSamples(dataSet.SampleCount);
+        //        var cpuOut = new List<Matrix>();
+        //        foreach (var input in seq.Inputs)
+        //        {
+        //            cpuOut.Add(layer.Step(input));
+        //        }
 
-                var gpuOut = Enumerable.Range(0, dataSet.SampleCount).Select(x => (Matrix)new DenseMatrix(finalOutSize, dataSet.BatchSize)).ToList();
-                gpuTester.TestForward(seq.Inputs, gpuOut);
+        //        var gpuOut = Enumerable.Range(0, dataSet.SampleCount).Select(x => (Matrix)new DenseMatrix(finalOutSize, dataSet.BatchSize)).ToList();
+        //        gpuTester.TestForward(seq.Inputs, gpuOut);
 
-                //Console.WriteLine("CPU output:");
-                //foreach (var matrix in cpuOut)
-                //{
-                //    Console.WriteLine(matrix.ToMatrixString());
-                //    Console.WriteLine("---------------");
-                //}
+        //        //Console.WriteLine("CPU output:");
+        //        //foreach (var matrix in cpuOut)
+        //        //{
+        //        //    Console.WriteLine(matrix.ToMatrixString());
+        //        //    Console.WriteLine("---------------");
+        //        //}
 
-                //Console.WriteLine("GPU output:");
-                //foreach (var matrix in gpuOut)
-                //{
-                //    Console.WriteLine(matrix.ToMatrixString());
-                //    Console.WriteLine("---------------");
-                //}
+        //        //Console.WriteLine("GPU output:");
+        //        //foreach (var matrix in gpuOut)
+        //        //{
+        //        //    Console.WriteLine(matrix.ToMatrixString());
+        //        //    Console.WriteLine("---------------");
+        //        //}
 
-                for (int j = 0; j < dataSet.SampleCount; j++)
-                {
-                    var cpuArr = cpuOut[j].AsColumnMajorArray();
-                    var gpuArr = gpuOut[j].AsColumnMajorArray();
+        //        for (int j = 0; j < dataSet.SampleCount; j++)
+        //        {
+        //            var cpuArr = cpuOut[j].AsColumnMajorArray();
+        //            var gpuArr = gpuOut[j].AsColumnMajorArray();
 
-                    for (int k = 0; k < cpuArr.Length; k++)
-                    {
-                        if (Math.Abs(cpuArr[k] - gpuArr[k]) > 1e-4f)
-                        {
-                            Console.WriteLine($"FAILED on iteration {i}");
-                        }
-                    }
-                }
+        //            for (int k = 0; k < cpuArr.Length; k++)
+        //            {
+        //                if (Math.Abs(cpuArr[k] - gpuArr[k]) > 1e-4f)
+        //                {
+        //                    Console.WriteLine($"FAILED on iteration {i}");
+        //                }
+        //            }
+        //        }
 
-                layer.ResetMemory();
-            }
+        //        layer.ResetMemory();
+        //    }
 
-            gpuTester.Dispose();
-        }
+        //    gpuTester.Dispose();
+        //}
     }
 }
