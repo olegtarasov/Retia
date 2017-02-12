@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CLAP;
+using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.Providers.Common.Mkl;
 using Retia.Neural;
+using Retia.Neural.Initializers;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
+
+using df = System.Double;
 
 namespace Benchmark
 {
@@ -28,11 +34,13 @@ namespace Benchmark
         //    var gruLayer = new GruLayer(dataSet.InputSize, dataSet.TargetSize);
         //    TestLayerForward(gruLayer, dataSet);
         //}
-
+        
         [Verb]
         public void CheckGrad()
         {
-            const int seqLen = 5;
+            Control.UseNativeMKL(MklConsistency.Auto, MklPrecision.Single, MklAccuracy.High);
+
+            //const int seqLen = 5;
 
             //var net = new LayeredNet(1, seqLen, new GruLayer(6, 3), new LinearLayer(3, 2), new SoftMaxLayer(2))
             //          {
@@ -40,6 +48,73 @@ namespace Benchmark
             //          };
 
             //LayeredNet.CheckGrad(net, seqLen);
+
+            const df delta = 1e-5f;
+
+            var dataSet = new TestDataSet<df>(3, 2, 5, 10);
+            var layer = new LinearLayer<df>(dataSet.InputSize, dataSet.TargetSize, new ConstantMatrixInitializer<df> { Value = 1e-2f });
+            layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
+            layer.InitSequence();
+
+            var samples = dataSet.GetNextSamples(dataSet.SampleCount);
+
+            var outputs = new List<Matrix<df>>();
+            for (int i = 0; i < samples.Inputs.Count; i++)
+            {
+                outputs.Add(layer.Step(samples.Inputs[i], true));
+            }
+
+            layer.BackPropagate(ErrorPropagate(outputs, samples.Targets));
+
+            for (int i = 0; i < layer.TotalParamCount; i++)
+            {
+                var pLayer = layer.Clone();
+                var nLayer = layer.Clone();
+
+                pLayer.InitSequence();
+                nLayer.InitSequence();
+
+                pLayer.SetParam(i, pLayer.GetParam(i) + delta);
+                nLayer.SetParam(i, nLayer.GetParam(i) - delta);
+
+                double pErr = 0.0, nErr = 0.0;
+                for (int j = 0; j < samples.Inputs.Count; j++)
+                {
+                    pErr += pLayer.LayerError(pLayer.Step(samples.Inputs[j]), samples.Targets[j]);
+                    nErr += nLayer.LayerError(nLayer.Step(samples.Inputs[j]), samples.Targets[j]);
+                }
+
+                double num = (pErr - nErr) / (2.0f * delta);
+                double real = layer.GetParam(i, true);
+                double d = num - real;
+
+                if (Math.Abs(d) > 1e-7)
+                {
+                    Console.WriteLine("Fuck");
+                }
+            }
+        }
+
+        private List<Matrix<df>> ErrorPropagate(List<Matrix<df>> outputs, List<Matrix<df>> targets)
+        {
+            var result = new List<Matrix<df>>();
+
+            for (int i = 0; i < outputs.Count; i++)
+            {
+                var r = Matrix<df>.Build.Dense(outputs[0].RowCount, outputs[0].ColumnCount);
+                var oa = outputs[i].AsColumnMajorArray();
+                var ta = targets[i].AsColumnMajorArray();
+                var ra = r.AsColumnMajorArray();
+
+                for (int j = 0; j < oa.Length; j++)
+                {
+                    ra[j] = (oa[j] - ta[j]) / (df)oa.Length;
+                }
+
+                result.Add(r);
+            }
+
+            return result;
         }
 
         //private void TestLayerForward(NeuroLayer layer, TestDataSet dataSet, int? outSize = null)

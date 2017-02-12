@@ -8,7 +8,7 @@ namespace Retia.Mathematics
         {
             return typeof(T) == typeof(double) 
                 ? new DoubleMathProvider() as MathProviderBase<T> 
-                : null;
+                : new SingleMathProvider() as MathProviderBase<T>;
         });
 
         public static MathProviderBase<T> Instance => _instance.Value;

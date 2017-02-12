@@ -1,8 +1,6 @@
 ﻿using System;
 using MathNet.Numerics.LinearAlgebra;
 
-using Retia.Mathematics;
-
 namespace Retia.Neural.Initializers
 {
     public class ConstantMatrixInitializer<T> : IMatrixInitializer<T> where T : struct, IEquatable<T>, IFormattable

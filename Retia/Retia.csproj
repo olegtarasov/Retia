@@ -73,6 +73,7 @@
     <Compile Include="Mathematics\MatrixExtensions.cs" />
     <Compile Include="Mathematics\MatrixFactory.cs" />
     <Compile Include="Mathematics\ParallelFor.cs" />
+    <Compile Include="Mathematics\SingleMathProvider.cs" />
     <Compile Include="Mathematics\SoftMax.cs" />
     <Compile Include="Neural\BiGRU.cs" />
     <Compile Include="Mathematics\ErrorFunctions.cs" />
