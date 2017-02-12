@@ -46,7 +46,7 @@ namespace Retia.Neural.Layers
 
         public override int InputSize => _weights.Weight.ColumnCount;
         public override int OutputSize => _weights.Weight.RowCount;
-        public override int TotalParamCount => _weights.Weight.AsColumnMajorArray().Length + _bias.Weight.AsColumnMajorArray().Length;
+        public override int TotalParamCount => _weights.Weight.Length() + _bias.Weight.Length();
 
         public override void InitSequence()
         {
@@ -91,7 +91,7 @@ namespace Retia.Neural.Layers
             _weights.Weight.CopyFromArray(vector, ref idx);
         }
 
-        public override double LayerError(Matrix y, Matrix target)
+        public override float LayerError(Matrix y, Matrix target)
         {
             return ErrorFunctions.MeanSquare(y, target);
         }

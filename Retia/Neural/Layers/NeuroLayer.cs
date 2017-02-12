@@ -105,9 +105,9 @@ namespace Retia.Neural.Layers
         /// <param name="y">Layer output</param>
         /// <param name="target">Layer target</param>
         /// <returns></returns>
-        public virtual double LayerError(Matrix y, Matrix target)
+        public virtual float LayerError(Matrix y, Matrix target)
         {
-            return 0.0;
+            return 0.0f;
         }
 
         public virtual void SetParam(int i, float value)

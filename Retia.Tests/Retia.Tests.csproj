@@ -69,6 +69,7 @@
     <Compile Include="Genetic\GeneticTestsBase.cs" />
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
     <Compile Include="Mathematics\ActivationFuncsTests.cs" />
+    <Compile Include="Mathematics\DoubleFloatTests.cs" />
     <Compile Include="Mathematics\MatrixTests.cs" />
     <Compile Include="Mathematics\MatrixTests.Data.cs" />
     <Compile Include="Mathematics\ParallelForTests.cs" />

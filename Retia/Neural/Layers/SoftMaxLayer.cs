@@ -33,7 +33,7 @@ namespace Retia.Neural.Layers
         public override int OutputSize => _size;
         public override int TotalParamCount => 0;
 
-        public override double LayerError(Matrix y, Matrix target)
+        public override float LayerError(Matrix y, Matrix target)
         {
             return ErrorFunctions.CrossEntropy(y, target);
         }
