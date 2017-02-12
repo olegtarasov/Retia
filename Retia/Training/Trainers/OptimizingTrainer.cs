@@ -9,10 +9,10 @@ using Retia.Training.Testers;
 
 namespace Retia.Training.Trainers
 {
-    public class OptimizingTrainer: TrainerBase<OptimizingTrainerOptions, OptimizationReportEventArgs> 
+    public class OptimizingTrainer<T>: TrainerBase<T, OptimizingTrainerOptions, OptimizationReportEventArgs> where T : struct, IEquatable<T>, IFormattable
     {
-        protected readonly NeuralNet _network;
-        private readonly OptimizerBase _optimizer;
+        protected readonly NeuralNet<T> _network;
+        private readonly OptimizerBase<T> _optimizer;
         private readonly double _initialLr;
 
         private List<double> _errors;
@@ -21,7 +21,7 @@ namespace Retia.Training.Trainers
 
         private double _dErr = 0;
 
-        public OptimizingTrainer(NeuralNet network, OptimizerBase optimizer, IDataProvider dataProvider, ITester tester, OptimizingTrainerOptions options) : base(dataProvider, tester, options)
+        public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataProvider<T> dataProvider, ITester<T> tester, OptimizingTrainerOptions options) : base(dataProvider, tester, options)
         {
             _network = network;
             _optimizer = optimizer;
@@ -33,12 +33,12 @@ namespace Retia.Training.Trainers
             }
         }
 
-        public override NeuralNet TestableNetwork => _network;
+        public override NeuralNet<T> TestableNetwork => _network;
 
-        protected virtual TrainingSequence GetTrainSamples()
+        protected virtual TrainingSequence<T> GetTrainSamples()
         {
             // We can get TrainingSetOnDataSetReset during this call
-            TrainingSequence result;
+            TrainingSequence<T> result;
 
             result = DataProvider.TrainingSet.GetNextSamples(Options.SequenceLength);
 
@@ -79,7 +79,7 @@ namespace Retia.Training.Trainers
             _lastError = filteredError;
         }
 
-        protected override void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs e)
+        protected override void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs<T> e)
         {
             if (e.OldSet != null)
             {

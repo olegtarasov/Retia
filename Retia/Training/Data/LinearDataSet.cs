@@ -2,30 +2,30 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Integration;
 using Retia.Mathematics;
 
 namespace Retia.Training.Data
 {
-	public class LinearDataSet : IDataSet, IStreamWritable, ICloneable<LinearDataSet>
-	{
+	public class LinearDataSet<T> : IDataSet<T>, IStreamWritable, ICloneable<LinearDataSet<T>> where T : struct, IEquatable<T>, IFormattable
+    {
 	    private int _curIdx = 0;
 
-	    public LinearDataSet(List<Sample> samples)
+	    public LinearDataSet(List<Sample<T>> samples)
 		{
 			if (samples == null) throw new ArgumentNullException(nameof(samples));
 			if (samples.Count == 0) throw new InvalidOperationException("Samples are empty!");
 
-			Samples = new List<Sample>(samples);
+			Samples = new List<Sample<T>>(samples);
 		}
 
-	    private LinearDataSet(LinearDataSet other)
+	    private LinearDataSet(LinearDataSet<T> other)
 		{
-			Samples = new List<Sample>(other.Samples);
+			Samples = new List<Sample<T>>(other.Samples);
 		}
 
-	    public List<Sample> Samples { get; }
+	    public List<Sample<T>> Samples { get; }
 
 	    public int SampleCount => Samples.Count;
 
@@ -33,21 +33,21 @@ namespace Retia.Training.Data
 	    public int TargetSize => Samples[0].Target.RowCount;
 	    public int BatchSize => Samples[0].Input.ColumnCount;
 
-	    public static LinearDataSet Load(Stream stream)
+	    public static LinearDataSet<T> Load(Stream stream)
 		{
 			using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
 			{
-				var samples = new List<Sample>();
+				var samples = new List<Sample<T>>();
 				int cnt = reader.ReadInt32();
 
 				for (int i = 0; i < cnt; i++)
-					samples.Add(Sample.Load(stream));
+					samples.Add(Sample<T>.Load(stream));
 
-				return new LinearDataSet(samples);
+				return new LinearDataSet<T>(samples);
 			}
 		}
 
-	    public Sample GetNextSample()
+	    public Sample<T> GetNextSample()
 		{
 			if (_curIdx >= Samples.Count)
 			{
@@ -76,12 +76,12 @@ namespace Retia.Training.Data
 			}
 		}
 
-	    public LinearDataSet Clone()
+	    public LinearDataSet<T> Clone()
 		{
-			return new LinearDataSet(this);
+			return new LinearDataSet<T>(this);
 		}
 
-	    public TrainingSequence GetNextSamples(int count)
+	    public TrainingSequence<T> GetNextSamples(int count)
 	    {
 	        if (count < Samples.Count)
 	        {
@@ -95,8 +95,8 @@ namespace Retia.Training.Data
 	            return null;
 	        }
 
-            var inputs = new List<Matrix>(count);
-            var targets = new List<Matrix>(count);
+            var inputs = new List<Matrix<T>>(count);
+            var targets = new List<Matrix<T>>(count);
 	        for (int i = 0; i < count; i++)
 	        {
 	            var sample = Samples[_curIdx + i];
@@ -106,7 +106,7 @@ namespace Retia.Training.Data
 
 	        _curIdx += count;
 
-	        return new TrainingSequence(inputs, targets);
+	        return new TrainingSequence<T>(inputs, targets);
 	    }
 
 	    public event EventHandler DataSetReset;
@@ -116,7 +116,7 @@ namespace Retia.Training.Data
 	        DataSetReset?.Invoke(this, EventArgs.Empty);
 	    }
 
-	    IDataSet ICloneable<IDataSet>.Clone()
+	    IDataSet<T> ICloneable<IDataSet<T>>.Clone()
 		{
 			return Clone();
 		}

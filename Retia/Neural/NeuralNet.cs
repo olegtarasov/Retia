@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Integration;
 using Retia.Mathematics;
@@ -10,20 +10,21 @@ using Retia.Optimizers;
 
 namespace Retia.Neural
 {
-    public abstract class NeuralNet : ICloneable<NeuralNet>, IFileWritable
+    public abstract class NeuralNet<T> : ICloneable<NeuralNet<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
-        public virtual OptimizerBase Optimizer { get; set; }
+        protected MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
+        public virtual OptimizerBase<T> Optimizer { get; set; }
 
 		public abstract void Save(Stream s);
-		public abstract NeuralNet Clone();
+		public abstract NeuralNet<T> Clone();
 
 		public abstract void Optimize();
 
-        public abstract List<Matrix> BackPropagate(List<Matrix> targets, bool needInputSense = false);
+        public abstract List<Matrix<T>> BackPropagate(List<Matrix<T>> targets, bool needInputSense = false);
 
-        public abstract double Error(Matrix y, Matrix target);
+        public abstract double Error(Matrix<T> y, Matrix<T> target);
 
-        public abstract Matrix Step(Matrix input, bool inTraining = false);
+        public abstract Matrix<T> Step(Matrix<T> input, bool inTraining = false);
         
 		public abstract void ResetMemory();
 		public abstract void ResetOptimizer();
@@ -37,7 +38,7 @@ namespace Retia.Neural
         {
         }
 
-		protected NeuralNet(NeuralNet other)
+		protected NeuralNet(NeuralNet<T> other)
 		{
 			Optimizer = other.Optimizer.Clone();
 		}
@@ -47,9 +48,9 @@ namespace Retia.Neural
 			this.SaveObject(filename);
         }
 
-        public virtual List<Matrix> ProcessSequence(List<Matrix> inputs)
+        public virtual List<Matrix<T>> ProcessSequence(List<Matrix<T>> inputs)
         {
-            var yList = new List<Matrix>(inputs.Count);
+            var yList = new List<Matrix<T>>(inputs.Count);
             foreach (var input in inputs)
             {
                 var y = Step(input);
@@ -58,9 +59,9 @@ namespace Retia.Neural
             return yList;
         }
 
-        public virtual List<Matrix> TestSequence(List<Matrix> inputs, List<Matrix>targets, out List<double> errors)
+        public virtual List<Matrix<T>> TestSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<double> errors)
         {
-            var yList = new List<Matrix>(inputs.Count);
+            var yList = new List<Matrix<T>>(inputs.Count);
             errors=new List<double>(inputs.Count);
 
             for (int i = 0; i < inputs.Count; i++)
@@ -75,7 +76,7 @@ namespace Retia.Neural
             return yList;
         }
 
-	    public virtual double TrainSequence(List<Matrix> inputs, List<Matrix> targets)
+	    public virtual double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
 	    {
             if (inputs.Count != targets.Count || targets.Count == 0)
                 throw new Exception("Not enough targets or inputs provided!");
@@ -99,7 +100,7 @@ namespace Retia.Neural
 
         #region Candidates for removal
 
-        public virtual List<Matrix[]> InternalState { get; set; }
+        public virtual List<Matrix<T>[]> InternalState { get; set; }
 
         #endregion
     }

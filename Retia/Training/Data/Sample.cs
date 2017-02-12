@@ -1,17 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 
 namespace Retia.Training.Data
 {
-	public class Sample
-	{
+	public class Sample<T> where T : struct, IEquatable<T>, IFormattable
+    {
 		public Sample()
 		{
 		}
 
-		public Sample(Matrix input, Matrix target)
+		public Sample(Matrix<T> input, Matrix<T> target)
 		{
 			Input = input;
 			Target = target;
@@ -19,14 +20,14 @@ namespace Retia.Training.Data
 
 		public Sample(int inputSize, int targetSize, int batchSize)
 		{
-			Input = new DenseMatrix(inputSize, batchSize);
-			Target = new DenseMatrix(targetSize, batchSize);
+			Input = Matrix<T>.Build.Dense(inputSize, batchSize);
+			Target = Matrix<T>.Build.Dense(targetSize, batchSize);
 		}
 
-		public Matrix Input { get; set; }
-		public Matrix Target { get; set; }
+		public Matrix<T> Input { get; set; }
+		public Matrix<T> Target { get; set; }
 
-		public bool EqualsTo(Sample other)
+		public bool EqualsTo(Sample<T> other)
 		{
 			if (ReferenceEquals(this, other) || (ReferenceEquals(Input, other.Input) && ReferenceEquals(Target, other.Target)))
 			{
@@ -42,9 +43,9 @@ namespace Retia.Training.Data
 			MatrixFactory.Save(Target, stream);
 		}
 
-		public static Sample Load(Stream stream)
+		public static Sample<T> Load(Stream stream)
 		{
-			return new Sample(MatrixFactory.Load(stream), MatrixFactory.Load(stream));
+			return new Sample<T>(MatrixFactory.Load<T>(stream), MatrixFactory.Load<T>(stream));
 		}
 	}
 }

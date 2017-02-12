@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -13,7 +13,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural
 {
-    public class LayeredNet : NeuralNet, IDisposable
+    public class LayeredNet<T> : NeuralNet<T>, IDisposable where T : struct, IEquatable<T>, IFormattable
     {
         private const byte LayerMagic = 0xBA;
         //public static uint cnt = 0;
@@ -21,11 +21,11 @@ namespace Retia.Neural
         private static readonly byte[] _magic = {0xDE, 0xAD, 0xCA, 0xFE};
 
         protected readonly int BatchSize, SeqLen;
-        protected readonly List<NeuroLayer> Layers = new List<NeuroLayer>();
+        protected readonly List<NeuroLayer<T>> Layers = new List<NeuroLayer<T>>();
 
         private GpuNetwork _gpuNetwork;
 
-        public LayeredNet(int batchSize, int seqLen, params NeuroLayer[] layers)
+        public LayeredNet(int batchSize, int seqLen, params NeuroLayer<T>[] layers)
         {
             if (layers.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(layers));
 
@@ -45,7 +45,7 @@ namespace Retia.Neural
             
         }
 
-        protected LayeredNet(LayeredNet other)
+        protected LayeredNet(LayeredNet<T> other)
         {
             BatchSize = other.BatchSize;
             SeqLen = other.SeqLen;
@@ -71,25 +71,25 @@ namespace Retia.Neural
         }
 
 
-        protected NeuroLayer OutLayer => Layers[Layers.Count - 1];
-        protected NeuroLayer InLayer => Layers[0];
+        protected NeuroLayer<T> OutLayer => Layers[Layers.Count - 1];
+        protected NeuroLayer<T> InLayer => Layers[0];
 
-        public static LayeredNet Load(string path)
+        public static LayeredNet<T> Load(string path)
         {
             return StreamHelpers.LoadObject(path, Load);
         }
 
-        public static LayeredNet Load(Stream stream)
+        public static LayeredNet<T> Load(Stream stream)
         {
-            return Load<LayeredNet>(stream);
+            return Load<LayeredNet<T>>(stream);
         }
 
-        public static T Load<T>(string path) where T : LayeredNet
+        public static TNet Load<TNet>(string path) where TNet : LayeredNet<T>
         {
-            return StreamHelpers.LoadObject(path, Load<T>);
+            return StreamHelpers.LoadObject(path, Load<TNet>);
         }
 
-        public static T Load<T>(Stream stream) where T : LayeredNet
+        public static TNet Load<TNet>(Stream stream) where TNet : LayeredNet<T>
         {
             using (var reader = stream.NonGreedyReader())
             {
@@ -100,7 +100,7 @@ namespace Retia.Neural
                 }
 
                 int layerCount = reader.ReadInt32();
-                var layers = new NeuroLayer[layerCount];
+                var layers = new NeuroLayer<T>[layerCount];
                 for (int i = 0; i < layerCount; i++)
                 {
                     if (reader.ReadByte() != LayerMagic)
@@ -120,68 +120,69 @@ namespace Retia.Neural
                         throw new InvalidOperationException($"Can't find layer type {typeName}");
                     }
 
-                    var layer = (NeuroLayer)Activator.CreateInstance(layerType, reader);
+                    var layer = (NeuroLayer<T>)Activator.CreateInstance(layerType, reader);
                     layers[i] = layer;
                 }
 
-                return (T)Activator.CreateInstance(typeof(T), new object[] {layers});
+                return (TNet)Activator.CreateInstance(typeof(TNet), new object[] {layers});
             }
         }
 
-        public static void CheckGrad(LayeredNet net, int seqLen)
-        {
-            Console.WriteLine("Starting grad check");
-            float delta = 1e-3f;
+        //public static void CheckGrad(LayeredNet<T> net, int seqLen)
+        //{
+        //    Console.WriteLine("Starting grad check");
+        //    float delta = 1e-3f;
 
-            net.ResetMemory();
+        //    net.ResetMemory();
 
-            var inputs = new List<Matrix>(seqLen);
-            var targets = new List<Matrix>(seqLen);
-            for (int i = 0; i < seqLen; i++)
-            {
-                var randomInput = (Matrix)DenseMatrix.CreateRandom(net.InputSize, 1, new Normal(0.0f, 2.0f));
-                var randomTarget = (Matrix)DenseMatrix.CreateRandom(net.OutputSize, 1, new Normal(0.0f, 2.0f)); 
-                randomTarget = SoftMax.SoftMaxNorm(randomTarget);
-                inputs.Add(randomInput);
-                targets.Add(randomTarget);
-            }
+        //    var inputs = new List<Matrix<T>>(seqLen);
+        //    var targets = new List<Matrix<T>>(seqLen);
+        //    for (int i = 0; i < seqLen; i++)
+        //    {
+        //        var randomInput = MatrixFactory.RandomMatrix<T>(net.InputSize, 1, 2.0f);
+        //        var randomTarget = MatrixFactory.RandomMatrix<T>(net.OutputSize, 1, 2.0f); 
+        //        randomTarget = MathProvider<T>.Instance.SoftMaxNorm(randomTarget);
+        //        inputs.Add(randomInput);
+        //        targets.Add(randomTarget);
+        //    }
 
-            var controlNet = new LayeredNet(net);
-            controlNet.TrainSequence(inputs, targets);
-            var hasErr = false;
-            for (int i = 0; i < net.TotalParamCount; i++)
-            {
-                var netP = new LayeredNet(net);
-                var netN = new LayeredNet(net);
-                netP.SetParam(i, netP.GetParam(i) + delta);
-                netN.SetParam(i, netN.GetParam(i) - delta);
+        //    var controlNet = new LayeredNet<T>(net);
+        //    controlNet.TrainSequence(inputs, targets);
+        //    var hasErr = false;
+        //    for (int i = 0; i < net.TotalParamCount; i++)
+        //    {
+        //        var netP = new LayeredNet<T>(net);
+        //        var netN = new LayeredNet<T>(net);
+        //        netP.SetParam(i, netP.GetParam(i) + delta);
+        //        netN.SetParam(i, netN.GetParam(i) - delta);
 
-                double errP=0.0, errN=0.0;
-                for (int s = 0; s < seqLen; s++)
-                {
-                    var pY=netP.Step(inputs[s]);
-                    errP += netP.Error(pY, targets[s]);
+        //        double errP=0.0, errN=0.0;
+        //        for (int s = 0; s < seqLen; s++)
+        //        {
+        //            var pY=netP.Step(inputs[s]);
+        //            errP += netP.Error(pY, targets[s]);
 
-                    var nY = netN.Step(inputs[s]);
-                    errN += netN.Error(nY, targets[s]);
-                }
-                var numGrad = (errP - errN)/(2*delta);
-                var grad = controlNet.GetParam(i, true);
-                var d = grad - numGrad;
-                if (Math.Abs(d) > 1e-7)
-                {
-                    Console.WriteLine($"Grad err={d} in param {i}");
-                    hasErr = true;
-                }
-            }
-            Console.WriteLine(hasErr ? "Grad check complete with ERRORS!" : "Grad check OK!");
-        }
+        //            var nY = netN.Step(inputs[s]);
+        //            errN += netN.Error(nY, targets[s]);
+        //        }
+        //        var numGrad = (errP - errN)/(2*delta);
+        //        var grad = controlNet.GetParam(i, true);
+        //        var d = grad - numGrad;
+        //        if (Math.Abs(d) > 1e-7)
+        //        {
+        //            Console.WriteLine($"Grad err={d} in param {i}");
+        //            hasErr = true;
+        //        }
+        //    }
+        //    Console.WriteLine(hasErr ? "Grad check complete with ERRORS!" : "Grad check OK!");
+        //}
 
-        public override double TrainSequence(List<Matrix> inputs, List<Matrix> targets)
+        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
             if (_gpuNetwork != null)
             {
-                return _gpuNetwork.TrainSequence(inputs, targets);
+                // TODO: GPU
+                //return _gpuNetwork.TrainSequence(inputs, targets);
             }
 
             return base.TrainSequence(inputs, targets);
@@ -219,9 +220,9 @@ namespace Retia.Neural
             }
         }
 
-        public override NeuralNet Clone()
+        public override NeuralNet<T> Clone()
         {
-            return new LayeredNet(this);
+            return new LayeredNet<T>(this);
         }
 
         public override void Optimize()
@@ -236,14 +237,14 @@ namespace Retia.Neural
                 layer.Optimize(Optimizer);
         }
 
-        public override double Error(Matrix y, Matrix target)
+        public override double Error(Matrix<T> y, Matrix<T> target)
         {
             return OutLayer.LayerError(y, target);
         }
 
-        public override List<Matrix> BackPropagate(List<Matrix> targets, bool needInputSens = false)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> targets, bool needInputSens = false)
         {  
-            List<Matrix> prop = OutLayer.ErrorPropagate(targets);
+            List<Matrix<T>> prop = OutLayer.ErrorPropagate(targets);
             if (Layers.Count < 2)
                 return prop;
             for (int i = Layers.Count - 2; i > 0; i--)
@@ -254,7 +255,7 @@ namespace Retia.Neural
             return InLayer.BackPropagate(prop, needInputSens);
         }
 
-        public override Matrix Step(Matrix input, bool inTraining = false)
+        public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
             var prop = input;
             foreach (var layer in Layers)
@@ -292,7 +293,7 @@ namespace Retia.Neural
                 layer.InitSequence();
         }
 
-        private void SetParam(int i, float value)
+        private void SetParam(int i, T value)
         {
             if (i >= TotalParamCount)
                 throw new ArgumentException($"Parameter index ({i}) should be less than {TotalParamCount}");
@@ -310,7 +311,7 @@ namespace Retia.Neural
             throw new Exception($"What the fuck is this? Your index={i} is somehow less then TotalParamCount={TotalParamCount} but more than sum of all layer param counts {paramCnt}!");
         }
 
-        private float GetParam(int i, bool grad=false)
+        private T GetParam(int i, bool grad=false)
         {
             if(i>=TotalParamCount)
                 throw new ArgumentException($"Parameter index ({i}) should be less than {TotalParamCount}");
@@ -336,7 +337,7 @@ namespace Retia.Neural
             foreach (var layer in Layers)
             {
                 var lastGru = lastSpec as GruLayerSpec;
-                if (layer is GruLayer && lastGru != null)
+                if (layer is GruLayer<T> && lastGru != null)
                 {
                     var spec = (GruLayerSpec)layer.CreateSpec();
                     if (lastGru.HSize == spec.HSize)
@@ -360,13 +361,18 @@ namespace Retia.Neural
             return result;
         }
 
+        public void Dispose()
+        {
+            _gpuNetwork?.Dispose();
+        }
+
         #region Candidates for removal
 
-        public override List<Matrix[]> InternalState
+        public override List<Matrix<T>[]> InternalState
         {
             get
             {
-                var result = new List<Matrix[]>(Layers.Count);
+                var result = new List<Matrix<T>[]>(Layers.Count);
                 foreach (var layer in Layers)
                 {
                     result.Add(layer.InternalState);
@@ -384,11 +390,6 @@ namespace Retia.Neural
                     layer.InternalState = state;
                 }
             }
-        }
-
-        public void Dispose()
-        {
-            _gpuNetwork?.Dispose();
         }
 
         #endregion

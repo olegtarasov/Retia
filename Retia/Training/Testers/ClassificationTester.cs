@@ -8,7 +8,7 @@ using Retia.Training.Data;
 
 namespace Retia.Training.Testers
 {
-    public class ClassificationTester : TesterBase<ConfusionMatrix>
+    public class ClassificationTester<T> : TesterBase<T, ConfusionMatrix> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly List<string> _classNames = null;
 
@@ -21,7 +21,7 @@ namespace Retia.Training.Testers
             _classNames = classNames;
         }
 
-        protected override ConfusionMatrix TestInternal(NeuralNet network, IDataSet testSet)
+        protected override ConfusionMatrix TestInternal(NeuralNet<T> network, IDataSet<T> testSet)
         {
             var errors = new List<double>();
             int sampleCount = testSet.SampleCount;
@@ -48,7 +48,7 @@ namespace Retia.Training.Testers
                 var sample = testSet.GetNextSample();
                 var target = sample.Target;
                 var stepResult = network.Step(sample.Input);
-                var predicted = SoftMax.SoftMaxChoice(stepResult);
+                var predicted = MathProvider.SoftMaxChoice(stepResult);
 
                 int targetClass = -1;
 
@@ -56,7 +56,8 @@ namespace Retia.Training.Testers
                 {
                     for (int classIdx = 0; classIdx < classCount; classIdx++)
                     {
-                        if ((int)target[classIdx, colIdx] == 1)
+                        // TODO: Hacky convertion
+                        if ((int)(object)target[classIdx, colIdx] == 1)
                         {
                             targetClass = classIdx;
                             break;
@@ -71,7 +72,7 @@ namespace Retia.Training.Testers
                     confusionMatrix.Prediction(targetClass, predicted[colIdx]);
                 }
 
-                errors.Add(ErrorFunctions.CrossEntropy(SoftMax.SoftMaxNorm(stepResult), sample.Target));
+                errors.Add(MathProvider.CrossEntropy(MathProvider.SoftMaxNorm(stepResult), sample.Target));
             }
 
             confusionMatrix.CalculateResult(sampleCount * batchSize);

@@ -9,18 +9,19 @@ using Retia.Training.Testers;
 
 namespace Retia.Training.Trainers
 {
-    public abstract class TrainerBase<TOptions, TReport> : ILogReporter, ITrainingReporter<TReport> 
+    public abstract class TrainerBase<T, TOptions, TReport> : ILogReporter, ITrainingReporter<TReport>
+        where T : struct, IEquatable<T>, IFormattable
         where TOptions : TrainerOptionsBase
         where TReport : TrainReportEventArgsBase
     {
-        protected readonly IDataProvider DataProvider;
+        protected readonly IDataProvider<T> DataProvider;
         protected readonly TOptions Options;
 
-        private readonly ITester _tester;
+        private readonly ITester<T> _tester;
         private readonly ManualResetEventSlim _pauseHandle = new ManualResetEventSlim(true);
 
 
-        protected TrainerBase(IDataProvider dataProvider, ITester tester, TOptions options)
+        protected TrainerBase(IDataProvider<T> dataProvider, ITester<T> tester, TOptions options)
         {
             DataProvider = dataProvider;
             Options = options;
@@ -33,7 +34,7 @@ namespace Retia.Training.Trainers
             DataProvider.TestSetChanged += DataProviderOnTestSetChanged;
         }
 
-        public abstract NeuralNet TestableNetwork { get; }
+        public abstract NeuralNet<T> TestableNetwork { get; }
 
         public bool IsTraining { get; private set; }
         public long Epoch { get; protected set; }
@@ -82,11 +83,11 @@ namespace Retia.Training.Trainers
         public event Action SequenceTrained;
         public event Action EpochReached;
 
-        protected virtual void DataProviderOnTestSetChanged(object sender, DataSetChangedArgs dataSetChangedArgs)
+        protected virtual void DataProviderOnTestSetChanged(object sender, DataSetChangedArgs<T> dataSetChangedArgs)
         {
         }
 
-        protected virtual void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs e)
+        protected virtual void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs<T> e)
         {
         }
 

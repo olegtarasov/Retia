@@ -1,16 +1,21 @@
 ﻿using System;
+using Retia.Mathematics;
 using Retia.Neural;
 using Retia.Training.Data;
 
 namespace Retia.Training.Testers
 {
-    public abstract class TesterBase<T> : ITester where T : TestResultBase
+    public abstract class TesterBase<T, TResult> : ITester<T>
+        where TResult : TestResultBase 
+        where T : struct, IEquatable<T>, IFormattable
     {
-        public event EventHandler<T> TestReport;
+        protected MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
 
-        protected abstract T TestInternal(NeuralNet network, IDataSet testSet);
+        public event EventHandler<TResult> TestReport;
 
-        public TestResultBase Test(NeuralNet network, IDataSet testSet)
+        protected abstract TResult TestInternal(NeuralNet<T> network, IDataSet<T> testSet);
+
+        public TestResultBase Test(NeuralNet<T> network, IDataSet<T> testSet)
         {
             network.ResetMemory();
             var result = TestInternal(network, testSet);
@@ -19,7 +24,7 @@ namespace Retia.Training.Testers
             return result;
         }
 
-        protected virtual void OnTestReport(T e)
+        protected virtual void OnTestReport(TResult e)
         {
             TestReport?.Invoke(this, e);
         }

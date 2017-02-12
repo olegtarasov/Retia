@@ -3,12 +3,12 @@ using Retia.Integration;
 
 namespace Retia.Training.Data
 {
-	public interface IDataSet : ICloneable<IDataSet>, IStreamWritable
-	{
+	public interface IDataSet<T> : ICloneable<IDataSet<T>>, IStreamWritable where T : struct, IEquatable<T>, IFormattable
+    {
 	    event EventHandler DataSetReset;
 
-		Sample GetNextSample();
-	    TrainingSequence GetNextSamples(int count);
+		Sample<T> GetNextSample();
+	    TrainingSequence<T> GetNextSamples(int count);
 		void Reset();
 
 		int SampleCount { get; }

@@ -6,7 +6,7 @@ using Retia.Training.Data;
 
 namespace Benchmark
 {
-    public class TestDataSet : IDataSet
+    public class TestDataSet<T> : IDataSet<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _inputSize;
         private readonly int _outputSize;
@@ -21,7 +21,7 @@ namespace Benchmark
             _seqLength = seqLength;
         }
 
-        public IDataSet Clone()
+        public IDataSet<T> Clone()
         {
             throw new NotSupportedException();
         }
@@ -33,16 +33,16 @@ namespace Benchmark
 
         public event EventHandler DataSetReset;
 
-        public Sample GetNextSample()
+        public Sample<T> GetNextSample()
         {
-            return new Sample(MatrixFactory.RandomMatrix(_inputSize, _batchSize, 1.0f), MatrixFactory.RandomMatrix(_outputSize, _batchSize, 1.0f));
+            return new Sample<T>(MatrixFactory.RandomMatrix<T>(_inputSize, _batchSize, 1.0f), MatrixFactory.RandomMatrix<T>(_outputSize, _batchSize, 1.0f));
         }
 
-        public TrainingSequence GetNextSamples(int count)
+        public TrainingSequence<T> GetNextSamples(int count)
         {
-            return new TrainingSequence(
-                Enumerable.Range(0, count).Select(x => MatrixFactory.RandomMatrix(_inputSize, _batchSize, 1.0f)).ToList(),
-                Enumerable.Range(0, count).Select(x => MatrixFactory.RandomMatrix(_outputSize, _batchSize, 1.0f)).ToList());
+            return new TrainingSequence<T>(
+                Enumerable.Range(0, count).Select(x => MatrixFactory.RandomMatrix<T>(_inputSize, _batchSize, 1.0f)).ToList(),
+                Enumerable.Range(0, count).Select(x => MatrixFactory.RandomMatrix<T>(_outputSize, _batchSize, 1.0f)).ToList());
         }
 
         public void Reset()

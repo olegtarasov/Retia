@@ -17,6 +17,9 @@ namespace Retia.Mathematics
         [DllImport("FastFuncs")]
         private static extern void CalculateHD(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
 
+        [DllImport("FastFuncs")]
+        private static extern void GravesRMSPropUpdateD(double weightDecay, double learningRate, double decayRate, double momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
+
         public override List<int> SoftMaxChoice(Matrix<double> p, double T = 1)
         {
             var probs = new List<int>(p.ColumnCount);
@@ -120,6 +123,16 @@ namespace Retia.Mathematics
         protected override void CalculateHInternal(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int len)
         {
             CalculateHD(H, hCandidate, z, lastH, len);
+        }
+
+        protected override void GravesRMSPropUpdateInternal(float weightDecay, float learningRate, float decayRate, float momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int len)
+        {
+            GravesRMSPropUpdateD(weightDecay, learningRate, decayRate, momentum, weightMatrix, grad1_cache, grad2_cache, momentum_cache, gradient, len);
+        }
+
+        public override double NaN()
+        {
+            return double.NaN;
         }
     }
 }

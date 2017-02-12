@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
+using Retia.Neural;
 using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
@@ -26,7 +27,19 @@ namespace Retia.Mathematics
 
         public abstract T Scalar(double scalar);
 
+        public abstract T NaN();
+
         protected abstract void CalculateHInternal(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int len);
+
+        protected abstract void GravesRMSPropUpdateInternal(float weightDecay, float learningRate, float decayRate, float momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int len);
+
+        public void GravesRMSPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<T> weight)
+        {
+            using (var ptrs = new MatrixPointers<T>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
+            {
+                GravesRMSPropUpdateInternal(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
+            }
+        }
 
         public void CalculateH(Matrix<T> H, Matrix<T> hCandidate, Matrix<T> z, Matrix<T> lastH)
         {
@@ -93,7 +106,7 @@ namespace Retia.Mathematics
                 throw new Exception("Matrix dimensions must agree!");
 
             int notNan;
-            double error = MeanSquareInternal(y.AsColumnMajorArray(), target.AsColumnMajorArray(), out notNan)
+            double error = MeanSquareInternal(y.AsColumnMajorArray(), target.AsColumnMajorArray(), out notNan);
 
             return notNan == 0 ? 0.0 : 0.5 * error / notNan;
         }
