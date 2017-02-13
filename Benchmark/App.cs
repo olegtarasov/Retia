@@ -27,11 +27,11 @@ namespace Benchmark
             TestLayerForward(softmaxLayer, dataSet, dataSet.InputSize);
 
             Console.WriteLine("Testing linear forward");
-            var linLayer = new LinearLayer<float>(dataSet.InputSize, dataSet.TargetSize);
+            var linLayer = new LinearLayer<float>(dataSet.InputSize, dataSet.TargetSize, new RandomMatrixInitializer<float>());
             TestLayerForward(linLayer, dataSet);
 
             Console.WriteLine("Testing GRU forward");
-            var gruLayer = new GruLayer<float>(dataSet.InputSize, dataSet.TargetSize);
+            var gruLayer = new GruLayer<float>(dataSet.InputSize, dataSet.TargetSize, new ProportionalRandomMatrixInitializer<float>(), new ProportionalRandomMatrixInitializer<float>(), new RandomMatrixInitializer<float>());
             TestLayerForward(gruLayer, dataSet);
         }
 

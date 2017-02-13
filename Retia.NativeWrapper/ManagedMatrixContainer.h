@@ -23,7 +23,7 @@ public:
 	{		
 		if (rowMajor)
 		{
-			_arrayMap = gcnew Dictionary<Matrix<float>^, array<float>^>();
+			_arrayMap = gcnew List<Tuple<Matrix<float>^, array<float>^>^>();
 		}
 	}
 
@@ -45,7 +45,7 @@ public:
 		if (_rowMajor)
 		{
 			arr = matrix->ToRowMajorArray();
-			_arrayMap->Add(matrix, arr);
+			_arrayMap->Add(gcnew Tuple<Matrix<float>^, array<float>^>(matrix, arr));
 		}
 		else
 		{
@@ -66,8 +66,8 @@ public:
 
 		for each (auto pair in _arrayMap)
 		{
-			auto storage = DenseColumnMajorMatrixStorage<float>::OfRowMajorArray(pair.Key->RowCount, pair.Key->ColumnCount, pair.Value);
-			storage->CopyTo(pair.Key->Storage, MathNet::Numerics::LinearAlgebra::ExistingData::Clear);
+			auto storage = DenseColumnMajorMatrixStorage<float>::OfRowMajorArray(pair->Item1->RowCount, pair->Item1->ColumnCount, pair->Item2);
+			storage->CopyTo(pair->Item1->Storage, MathNet::Numerics::LinearAlgebra::ExistingData::Clear);
 		}
 	}
 
@@ -80,8 +80,8 @@ public:
 
 		for each (auto pair in _arrayMap)
 		{
-			auto newArr = pair.Key->ToRowMajorArray();
-			Array::Copy(newArr, 0, pair.Value, 0, newArr->Length);
+			auto newArr = pair->Item1->ToRowMajorArray();
+			Array::Copy(newArr, 0, pair->Item2, 0, newArr->Length);
 		}
 	}
 
@@ -91,5 +91,5 @@ private:
 	List<GCHandle>^		_handles;
 	bool				_rowMajor;
 
-	Dictionary<Matrix<float>^, array<float>^>^ _arrayMap = nullptr;
+	List<Tuple<Matrix<float>^, array<float>^>^>^ _arrayMap = nullptr;
 };
