@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Data;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Neural;
 using Retia.Optimizers;
 using Xunit;
@@ -20,8 +20,8 @@ namespace Retia.Tests.Optimizers
         //[Fact]
         public void CanOptimize()
         {
-            var weight = new NeuroWeight(new DenseMatrix(2, 1));
-            var optimizer = new RMSPropOptimizer(5e-4f, 0.99f, 0.0f, 0.0f);
+            var weight = new NeuroWeight<float>(Matrix<float>.Build.Dense(2, 1));
+            var optimizer = new RMSPropOptimizer<float>(5e-4f, 0.99f, 0.0f, 0.0f);
 
             _output.WriteLine($"Rosenbrock: {Rosenbrock(weight.Weight)}");
             _output.WriteLine(weight.Weight.ToMatrixString());
@@ -34,13 +34,13 @@ namespace Retia.Tests.Optimizers
             }
         }
 
-        private float Rosenbrock(Matrix matrix)
+        private float Rosenbrock(Matrix<float> matrix)
         {
             var arr = matrix.AsColumnMajorArray();
             return (float)(100 * Math.Pow(arr[1] - Math.Pow(arr[0], 2), 2) + Math.Pow(1 - arr[0], 2));
         }
 
-        private void RosenbrockGrad(Matrix matrix, Matrix grad)
+        private void RosenbrockGrad(Matrix<float> matrix, Matrix<float> grad)
         {
             var mArr = matrix.AsColumnMajorArray();
             var gArr = grad.AsColumnMajorArray();

@@ -172,7 +172,12 @@ namespace Retia.Neural.Layers
 
         public override LayerSpecBase CreateSpec()
         {
-            return null;//new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight, _bias.Weight);
+            if (typeof(T) != typeof(float))
+            {
+                throw new InvalidOperationException("Only float for GPU!");
+            }
+
+            return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight as Matrix<float>, _bias.Weight as Matrix<float>);
         }
     }
 }

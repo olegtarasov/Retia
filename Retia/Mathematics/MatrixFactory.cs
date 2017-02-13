@@ -138,13 +138,7 @@ namespace Retia.Mathematics
 
         public static Matrix<T> RandomMatrix<T>(int rows, int cols, float min, float max) where T : struct, IEquatable<T>, IFormattable
         {
-            return Matrix<T>.Build.Random(rows, cols, new ContinuousUniform(min, max));
-
-            //var random = SafeRandom.Generator;
-            //var arr = new float[rows * cols];
-            //for (int i = 0; i < arr.Length; i++)
-            //    arr[i] = (float)random.NextDouble(min, max);
-            //return DenseMatrix(rows, cols, arr);
+            return MathProvider<T>.Instance.RandomMatrix(rows, cols, min, max);
         }
 
         public static Matrix<T> RandomMatrix<T>(int rows, int cols, float dispersion) where T : struct, IEquatable<T>, IFormattable

@@ -126,35 +126,10 @@ namespace Retia.Neural.Layers
         public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
             //masks are dynamically generated during training, not needed in gen alg
-
-            /*
-            int maskSize = MaskSize;
-
-            if (maskSize == 0)
-            {
-                return;
-            }
-
-            for (int i = 0; i < _masks.Count; i++)
-            {
-                _masks[i].CopyToArray(destination, ref idx);
-            }*/
         }
 
         public override void FromVectorState(T[] vector, ref int idx)
         {
-            /*
-            int maskSize = MaskSize;
-            if (maskSize == 0 || vector.Length == 0)
-            {
-                return;
-            }
-
-            int maskCount = vector.Length / MaskSize;
-            for (int i = 0; i < maskCount; i++)
-            {
-                _masks[i].CopyFromArray(vector, ref idx);
-            }*/
         }
 
         public override LayerSpecBase CreateSpec()

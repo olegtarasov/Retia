@@ -1,35 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Integration;
 using Retia.Mathematics;
 
 namespace Retia.Training.Batching
 {
-	public class SequenceBatcher : SequenceBatcher<float[]>
-	{
-		public SequenceBatcher(int size) : base(size, (arr, i) => arr[i])
-		{
-		}
-	}
-
-    public class SequenceBatcher<T>
-	{
+	public class SequenceBatcher<T> where T : struct, IEquatable<T>, IFormattable
+    {
 		private readonly int _size;
-		private readonly Func<T, int, float> _mapper;
+		//private readonly Func<T[], int, T> _mapper;
 
-		public SequenceBatcher(int size, Func<T, int, float> mapper)
+		public SequenceBatcher(int size/*, Func<T, int, T> mapper*/)
 		{
-			if (mapper == null)
-			{
-				throw new ArgumentNullException(nameof(mapper));
-			}
+			//if (mapper == null)
+			//{
+			//	throw new ArgumentNullException(nameof(mapper));
+			//}
 
 			_size = size;
-			_mapper = mapper;
+			//_mapper = mapper;
 		}
 
-		public List<Matrix> BatchSamples(List<T> samples, BatchDimension dimension, IProgressWriter progressWriter = null)
+		public List<Matrix<T>> BatchSamples(List<T[]> samples, BatchDimension dimension, IProgressWriter progressWriter = null)
 		{
 			int batchSize, batchCount;
 			switch (dimension.Type)
@@ -49,9 +42,9 @@ namespace Retia.Training.Batching
 			return BatchSamples(samples, batchCount, batchSize, progressWriter);
 		}
 
-		private List<Matrix> BatchSamples(List<T> samples, int batchCount, int batchSize, IProgressWriter progressWriter)
+		private List<Matrix<T>> BatchSamples(List<T[]> samples, int batchCount, int batchSize, IProgressWriter progressWriter)
 		{
-			var result = new List<Matrix>();
+			var result = new List<Matrix<T>>();
 			
 			var tracker = new ProgressTracker(batchSize);
 
@@ -62,14 +55,14 @@ namespace Retia.Training.Batching
 				    progressWriter?.SetProgress(sampleIdx, batchCount, "Batching");
 				}
 
-				var matrix = new DenseMatrix(_size, batchSize);
+				var matrix = Matrix<T>.Build.Dense(_size, batchSize);
 				for (int col = 0; col < batchSize; col++)
 				{
 					var input = samples[sampleIdx + col * batchCount];
 					
 					for (int i = 0; i < _size; i++)
 					{
-						matrix[i, col] = _mapper(input, i);
+						matrix[i, col] = input[i];
 					}
 				}
 

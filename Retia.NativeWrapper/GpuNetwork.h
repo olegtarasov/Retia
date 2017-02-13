@@ -14,7 +14,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace Retia::Contracts;
-using namespace MathNet::Numerics::LinearAlgebra::Single;
+using namespace MathNet::Numerics::LinearAlgebra;
 
 namespace Retia::NativeWrapper {
 
@@ -39,7 +39,7 @@ namespace Retia::NativeWrapper {
 			delete _network;
 		}
 
-		double TrainSequence(List<Matrix^>^ inputs, List<Matrix^>^ targets)
+		double TrainSequence(List<Matrix<float>^>^ inputs, List<Matrix<float>^>^ targets)
 		{
 			if (inputs->Count != targets->Count)
 				throw gcnew InvalidOperationException("Input and target sequences don't have the same length!");

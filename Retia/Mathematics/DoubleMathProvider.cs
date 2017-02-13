@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
@@ -171,6 +172,32 @@ namespace Retia.Mathematics
         protected override bool AlmostEqual(double a, double b)
         {
             return Math.Abs(a - b) < 10e-10;
+        }
+
+        public override double[] Array(params float[] input)
+        {
+            return input.Select(x => (double)x).ToArray();
+        }
+
+        public override void ClampMatrix(Matrix<double> matrix, double min, double max)
+        {
+            var arr = matrix.AsColumnMajorArray();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] > max)
+                    arr[i] = max;
+                if (arr[i] < min)
+                    arr[i] = min;
+            }
+        }
+
+        public override Matrix<double> RandomMatrix(int rows, int cols, float min, float max)
+        {
+            var random = SafeRandom.Generator;
+            var arr = new double[rows * cols];
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = random.NextDouble(min, max);
+            return Matrix<double>.Build.Dense(rows, cols, arr);
         }
     }
 }

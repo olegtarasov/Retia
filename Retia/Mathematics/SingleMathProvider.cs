@@ -172,5 +172,31 @@ namespace Retia.Mathematics
         {
             return Math.Abs(a - b) < 10e-7f;
         }
+
+        public override float[] Array(params float[] input)
+        {
+            return input;
+        }
+
+        public override void ClampMatrix(Matrix<float> matrix, float min, float max)
+        {
+            var arr = matrix.AsColumnMajorArray();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                if (arr[i] > max)
+                    arr[i] = max;
+                if (arr[i] < min)
+                    arr[i] = min;
+            }
+        }
+
+        public override Matrix<float> RandomMatrix(int rows, int cols, float min, float max)
+        {
+            var random = SafeRandom.Generator;
+            var arr = new float[rows * cols];
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = (float)random.NextDouble(min, max);
+            return Matrix<float>.Build.Dense(rows, cols, arr);
+        }
     }
 }

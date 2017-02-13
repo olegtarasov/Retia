@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 using Retia.Training.Batching;
 using Xunit;
@@ -20,7 +20,7 @@ namespace Retia.Tests.Training.Batching
 			const int batchSize = 5;
 
 			var samples = GetSamples();
-			var batcher = new SequenceBatcher(samples[0].Length);
+			var batcher = new SequenceBatcher<float>(samples[0].Length);
 			var result = batcher.BatchSamples(samples, new BatchDimension(BatchDimensionType.BatchSize, batchSize));
 
 			CheckBatches(result, batchCount, batchSize);
@@ -33,13 +33,13 @@ namespace Retia.Tests.Training.Batching
 			const int batchSize = 4;
 
 			var samples = GetSamples();
-			var batcher = new SequenceBatcher(samples[0].Length);
+			var batcher = new SequenceBatcher<float>(samples[0].Length);
 			var result = batcher.BatchSamples(samples, new BatchDimension(BatchDimensionType.BatchCount, batchCount));
 
 			CheckBatches(result, batchCount, batchSize);
 		}
 
-		private static void CheckBatches(List<Matrix> result, int batchCount, int batchSize)
+		private static void CheckBatches(List<Matrix<float>> result, int batchCount, int batchSize)
 		{
 			result.Count.ShouldEqual(batchCount);
 			

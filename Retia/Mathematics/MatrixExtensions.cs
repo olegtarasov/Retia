@@ -21,17 +21,7 @@ namespace Retia.Mathematics
 
         public static void Clamp<T>(this Matrix<T> matrix, T min, T max) where T : struct, IEquatable<T>, IFormattable
         {
-            matrix.PointwiseMaximum(max);
-            matrix.PointwiseMinimum(min);
-            //var arr = matrix.AsColumnMajorArray();
-            //for (int i = 0; i < arr.Length; i++)
-            //{
-            //    var value = Convert.ToSingle(arr[i]);
-            //    if (value < min)
-            //        arr[i] = min;
-            //    else if (value > max)
-            //        arr[i] = max;
-            //}
+            MathProvider<T>.Instance.ClampMatrix(matrix, min, max);
         }
 
         public static Matrix<T> TileColumns<T>(this Matrix<T> matrix, int count) where T : struct, IEquatable<T>, IFormattable

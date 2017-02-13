@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 using Retia.Tests.Plumbing;
 using Retia.Training.Data;
@@ -17,7 +17,7 @@ namespace Retia.Tests.Training
 			using (var file = new DisposableFile())
 			{
 				var set = GetTrainingSet();
-				var loaded = file.WriteAndReadData(set, LinearDataSet.Load);
+				var loaded = file.WriteAndReadData(set, LinearDataSet<float>.Load);
 
 				CheckTestSetsEqual(loaded, set);
 			}
@@ -48,7 +48,7 @@ namespace Retia.Tests.Training
 			set.Samples[0].EqualsTo(next).ShouldBeTrue();
 		}
 
-		private void CheckTestSetsEqual(LinearDataSet loaded, LinearDataSet set)
+		private void CheckTestSetsEqual(LinearDataSet<float> loaded, LinearDataSet<float> set)
 		{
 			loaded.ShouldNotBeNull();
 			loaded.SampleCount.ShouldEqual(set.Samples.Count);
@@ -63,12 +63,12 @@ namespace Retia.Tests.Training
 			}
 		}
 
-		private LinearDataSet GetTrainingSet()
+		private LinearDataSet<float> GetTrainingSet()
 		{
 			var date = DateTime.UtcNow;
 
 			return
-				new LinearDataSet(Enumerable.Range(0, 10).Select(x => new Sample((Matrix)DenseMatrix.Build.Random(10, 10), (Matrix)DenseMatrix.Build.Random(10, 10))).ToList());
+				new LinearDataSet<float>(Enumerable.Range(0, 10).Select(x => new Sample<float>(Matrix<float>.Build.Random(10, 10), Matrix<float>.Build.Random(10, 10))).ToList());
 		}
 	}
 }

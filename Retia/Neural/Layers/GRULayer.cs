@@ -637,24 +637,29 @@ namespace Retia.Neural.Layers
 
         public override LayerSpecBase CreateSpec()
         {
+            if (typeof(T) != typeof(float))
+            {
+                throw new InvalidOperationException("Only float for GPU!");
+            }
+
             var weights = new GruLayerWeights
                           {
-                              //Wxr = _wxr.Weight,
-                              //Wxz = _wxz.Weight,
-                              //Wxh = _wxh.Weight,
-
-                              //Whr = _whr.Weight,
-                              //Whz = _whz.Weight,
-                              //Whh = _whh.Weight,
-
-                              //bxr = _bxr.Weight,
-                              //bxz = _bxz.Weight,
-                              //bxh = _bxh.Weight,
-
-                              //bhr = _bhr.Weight,
-                              //bhz = _bhz.Weight,
-                              //bhh = _bhh.Weight
-                          };
+                              Wxr = _wxr.Weight as Matrix<float>,
+                              Wxz = _wxz.Weight as Matrix<float>,
+                              Wxh = _wxh.Weight as Matrix<float>,
+                                                
+                              Whr = _whr.Weight as Matrix<float>,
+                              Whz = _whz.Weight as Matrix<float>,
+                              Whh = _whh.Weight as Matrix<float>,
+                                                
+                              bxr = _bxr.Weight as Matrix<float>,
+                              bxz = _bxz.Weight as Matrix<float>,
+                              bxh = _bxh.Weight as Matrix<float>,
+                                                
+                              bhr = _bhr.Weight as Matrix<float>,
+                              bhz = _bhz.Weight as Matrix<float>,
+                              bhh = _bhh.Weight as Matrix<float>
+            };
 
             return new GruLayerSpec(InputSize, BatchSize, SeqLen, 1, _hSize, weights);
         }

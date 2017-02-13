@@ -68,10 +68,13 @@
   <ItemGroup>
     <Compile Include="Genetic\GeneticTestsBase.cs" />
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
-    <Compile Include="Mathematics\ActivationFuncsTests.cs" />
-    <Compile Include="Mathematics\MatrixTests.cs" />
-    <Compile Include="Mathematics\MatrixTests.Data.cs" />
-    <Compile Include="Mathematics\ParallelForTests.cs" />
+    <Compile Include="Mathematics\DoubleMathProviderTests.cs" />
+    <Compile Include="Mathematics\DoubleMatrixTests.cs" />
+    <Compile Include="Mathematics\MathProviderTestsBase.cs" />
+    <Compile Include="Mathematics\MatrixTestsBase.cs" />
+    <Compile Include="Mathematics\MatrixTestsBase.Data.cs" />
+    <Compile Include="Mathematics\SingleMathProviderTests.cs" />
+    <Compile Include="Mathematics\SingleMatrixTests.cs" />
     <Compile Include="Optimizers\RMSPropOptimizerTests.cs" />
     <Compile Include="Plumbing\AssertExtensions.cs" />
     <Compile Include="Plumbing\DisposableFile.cs" />

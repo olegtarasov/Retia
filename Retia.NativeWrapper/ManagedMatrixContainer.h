@@ -6,7 +6,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace System::Runtime::InteropServices;
-using namespace MathNet::Numerics::LinearAlgebra::Single;
+using namespace MathNet::Numerics::LinearAlgebra;
 using namespace MathNet::Numerics::LinearAlgebra::Storage;
 
 public ref class ManagedMatrixContainer
@@ -23,7 +23,7 @@ public:
 	{		
 		if (rowMajor)
 		{
-			_arrayMap = gcnew Dictionary<Matrix^, array<float>^>();
+			_arrayMap = gcnew Dictionary<Matrix<float>^, array<float>^>();
 		}
 	}
 
@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	void AddMatrix(Matrix^ matrix)
+	void AddMatrix(Matrix<float>^ matrix)
 	{
 		// When we use AsColumnMajorArray, we get underlying matrix array.
 		// When we use ToRowMajorArray(), we get a row-major copy and need to store the array for synchronization.
@@ -91,5 +91,5 @@ private:
 	List<GCHandle>^		_handles;
 	bool				_rowMajor;
 
-	Dictionary<Matrix^, array<float>^>^ _arrayMap = nullptr;
+	Dictionary<Matrix<float>^, array<float>^>^ _arrayMap = nullptr;
 };

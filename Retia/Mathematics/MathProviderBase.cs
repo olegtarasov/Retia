@@ -17,6 +17,8 @@ namespace Retia.Mathematics
 
         public abstract T NaN();
 
+        public abstract T[] Array(params float[] input);
+
         public abstract void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<T> weight);
 
         public abstract void CalculateH(Matrix<T> H, Matrix<T> hCandidate, Matrix<T> z, Matrix<T> lastH);
@@ -34,6 +36,10 @@ namespace Retia.Mathematics
         protected abstract Matrix<T> PropagateSingleError(Matrix<T> y, Matrix<T> target, int batchSize);
 
         protected abstract bool AlmostEqual(T a, T b);
+
+        public abstract void ClampMatrix(Matrix<T> matrix, T min, T max);
+
+        public abstract Matrix<T> RandomMatrix(int rows, int cols, float min, float max);
 
         public List<Matrix<T>> ErrorPropagate(List<Matrix<T>> outputs, List<Matrix<T>> targets, int seqLen, int batchSize)
         {
