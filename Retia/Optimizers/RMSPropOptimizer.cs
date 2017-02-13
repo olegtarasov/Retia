@@ -49,7 +49,7 @@ namespace Retia.Optimizers
 	    public override void Optimize(NeuroWeight<T> weight)
         {
             //RMSPropOptimize(weight);
-            MathProvider.GravesRMSPropUpdate(_weightDecay, LearningRate, _decayRate, _momentum, weight);
+            MathProvider.GravesRmsPropUpdate(_weightDecay, LearningRate, _decayRate, _momentum, weight);
         }
 
 		public override OptimizerBase<T> Clone()

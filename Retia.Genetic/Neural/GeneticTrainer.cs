@@ -10,19 +10,19 @@ using Retia.Training.Trainers;
 
 namespace Retia.Genetic.Neural
 {
-    public class GeneticTrainer : TrainerBase<GeneticTrainerOptions, GeneticReportEventArgs>
+    public class GeneticTrainer : TrainerBase<float, GeneticTrainerOptions, GeneticReportEventArgs>
     {
         private readonly Evolver<EvolvableNet> _evolver;
         private EvolvableNet _alpha;
 
         private TimeSpan _wtc, _ctw;
 
-        public GeneticTrainer(ITester tester, Evolver<EvolvableNet> evolver, GeneticTrainerOptions options) : base(null, tester, options)
+        public GeneticTrainer(ITester<float> tester, Evolver<EvolvableNet> evolver, GeneticTrainerOptions options) : base(null, tester, options)
         {
 	        _evolver = evolver;
         }
 
-        public override NeuralNet TestableNetwork => _alpha;
+        public override NeuralNet<float> TestableNetwork => _alpha;
 
 	    protected override GeneticReportEventArgs GetTrainingReport(bool userTest)
         {

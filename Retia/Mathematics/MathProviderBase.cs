@@ -11,43 +11,29 @@ namespace Retia.Mathematics
     {
         public abstract List<int> SoftMaxChoice(Matrix<T> p, double T = 1.0);
 
-        protected abstract void ApplySigmoid2(IntPtr matrix1, IntPtr matrix2, int len);
-
-        protected abstract void ApplyTanh(IntPtr matrix, int len);
-
-        protected abstract double CrossEntropyInternal(T[] rawP, T[] rawT);
-
-        protected abstract double MeanSquareInternal(T[] rawY, T[] rawT, out int notNan);
-
-        protected abstract void SoftMaxNormInternal(T[] y, T[] result, int rows, int columns, double T);
-
-        protected abstract Matrix<T> PropagateSingleError(Matrix<T> y, Matrix<T> target, int batchSize);
-
         public abstract T Scalar(float scalar);
 
         public abstract T Scalar(double scalar);
 
         public abstract T NaN();
 
-        protected abstract void CalculateHInternal(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int len);
+        public abstract void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<T> weight);
 
-        protected abstract void GravesRMSPropUpdateInternal(float weightDecay, float learningRate, float decayRate, float momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int len);
+        public abstract void CalculateH(Matrix<T> H, Matrix<T> hCandidate, Matrix<T> z, Matrix<T> lastH);
+        
+        public abstract Matrix<T> SoftMaxNorm(Matrix<T> y, double T = 1.0);
 
-        public void GravesRMSPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<T> weight)
-        {
-            using (var ptrs = new MatrixPointers<T>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
-            {
-                GravesRMSPropUpdateInternal(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
-            }
-        }
+        public abstract void ApplySigmoid2(Matrix<T> matrix1, Matrix<T> matrix2);
 
-        public void CalculateH(Matrix<T> H, Matrix<T> hCandidate, Matrix<T> z, Matrix<T> lastH)
-        {
-            using (var ptrs = new MatrixPointers<T>(H, hCandidate, z, lastH))
-            {
-                CalculateHInternal(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
-            }
-        }
+        public abstract void ApplyTanh(Matrix<T> matrix);
+
+        public abstract double CrossEntropy(Matrix<T> p, Matrix<T> target);
+
+        public abstract double MeanSquare(Matrix<T> y, Matrix<T> target);
+
+        protected abstract Matrix<T> PropagateSingleError(Matrix<T> y, Matrix<T> target, int batchSize);
+
+        protected abstract bool AlmostEqual(T a, T b);
 
         public List<Matrix<T>> ErrorPropagate(List<Matrix<T>> outputs, List<Matrix<T>> targets, int seqLen, int batchSize)
         {
@@ -66,49 +52,35 @@ namespace Retia.Mathematics
             return sensitivities;
         }
 
-
-        public Matrix<T> SoftMaxNorm(Matrix<T> y, double T = 1.0)
+        public bool MatricesEqual(Matrix<T> matrix, Matrix<T> other)
         {
-            var p = y.CloneMatrix();
-            
-            SoftMaxNormInternal(y.AsColumnMajorArray(), p.AsColumnMajorArray(), y.RowCount, y.ColumnCount, T);
-
-            return p;
-        }
-
-        public void ApplySigmoid2(Matrix<T> matrix1, Matrix<T> matrix2)
-        {
-            using (var ptrs = new MatrixPointers<T>(matrix1, matrix2))
+            if (ReferenceEquals(matrix, other))
             {
-                ApplySigmoid2(ptrs[0], ptrs[1], matrix1.Length());
+                return true;
             }
-        }
 
-        public void ApplyTanh(Matrix<T> matrix)
-        {
-            using (var ptrs = new MatrixPointers<T>(matrix))
+            var m1 = matrix.AsColumnMajorArray();
+            var m2 = other.AsColumnMajorArray();
+
+            if (ReferenceEquals(m1, m2))
             {
-                ApplyTanh(ptrs[0], matrix.Length());
+                return true;
             }
-        }
 
-        public double CrossEntropy(Matrix<T> p, Matrix<T> target)
-        {
-            if (p.ColumnCount != target.ColumnCount || p.RowCount != target.RowCount)
-                throw new Exception("Matrix dimensions must agree!");
-            
-            return -CrossEntropyInternal(p.AsColumnMajorArray(), target.AsColumnMajorArray()) / p.ColumnCount;
-        }
+            if (m1.Length != m2.Length)
+            {
+                return false;
+            }
 
-        public double MeanSquare(Matrix<T> y, Matrix<T> target)
-        {
-            if (y.ColumnCount != target.ColumnCount || y.RowCount != target.RowCount)
-                throw new Exception("Matrix dimensions must agree!");
+            for (int i = 0; i < m1.Length; i++)
+            {
+                if (!AlmostEqual(m1[i], m2[i]))
+                {
+                    return false;
+                }
+            }
 
-            int notNan;
-            double error = MeanSquareInternal(y.AsColumnMajorArray(), target.AsColumnMajorArray(), out notNan);
-
-            return notNan == 0 ? 0.0 : 0.5 * error / notNan;
+            return true;
         }
     }
 }

@@ -63,23 +63,34 @@ namespace Retia.Mathematics
             return Matrix<T>.Build.Dense(matrix.RowCount * count, matrix.ColumnCount, dst);
         }
 
-        public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, float beta = 0.0f, float alpha = 1.0f, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose) where T : struct, IEquatable<T>, IFormattable
+        /// <summary>
+        ///     C = AB + (useC ? 1 : 0)*C
+        /// </summary>
+        public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose, bool useC = true) where T : struct, IEquatable<T>, IFormattable
         {
-            if (typeof(T) == typeof(float))
-            {
-                Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray() as float[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as float[], B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray() as float[]);
-            }
-            else
-            {
-                Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, (double)alpha, A.AsColumnMajorArray() as double[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as double[], B.RowCount, B.ColumnCount, (double)beta, C.AsColumnMajorArray() as double[]);
-            }
+            ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).MatrixMultiplyWithUpdate(transposeA, transposeB, Matrix<T>.One, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, useC ? Matrix<T>.One : Matrix<T>.Zero, C.AsColumnMajorArray());
         }
+
+        ///// <summary>
+        /////     C = alpha*AB + beta*C
+        ///// </summary>
+        //public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, float beta = 0.0f, float alpha = 1.0f, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose) where T : struct, IEquatable<T>, IFormattable
+        //{
+        //    if (typeof(T) == typeof(float))
+        //    {
+        //        Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray() as float[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as float[], B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray() as float[]);
+        //    }
+        //    else
+        //    {
+        //        Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, (double)alpha, A.AsColumnMajorArray() as double[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as double[], B.RowCount, B.ColumnCount, (double)beta, C.AsColumnMajorArray() as double[]);
+        //    }
+        //}
 
         public static void CollapseColumnsAndAccumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B) where T : struct, IEquatable<T>, IFormattable
         {
             if (A.ColumnCount > 1)
             {
-                C.Accumulate(A, B, 1.0f);
+                C.Accumulate(A, B);
             }
             else
             {
@@ -90,31 +101,25 @@ namespace Retia.Mathematics
         /// <summary>
         ///     this = alpha*A + this
         /// </summary>
-        public static void Accumulate<T>(this Matrix<T> x, Matrix<T> A, float alpha = 1.0f) where T : struct, IEquatable<T>, IFormattable
+        public static void Accumulate<T>(this Matrix<T> x, Matrix<T> A/*, float alpha = 1.0f*/) where T : struct, IEquatable<T>, IFormattable
         {
             if (A.ColumnCount == 1)
             {
-                if (typeof(T) == typeof(float))
-                    SumVec(A as Matrix<float>, x as Matrix<float>, alpha);
-                else
-                    SumVec(A as Matrix<double>, x as Matrix<double>, alpha);
+                SumVec(A, x/*, alpha*/);
             }
             else
             {
                 var aa = A.AsColumnMajorArray();
                 var xa = x.AsColumnMajorArray();
-                if (alpha != 1.0f)
-                {
-                    if (typeof(T) == typeof(float))
-                        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as float[], aa as float[]);
-                    else
-                        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as double[], aa as double[]);
-                }
+                //if (alpha != 1.0f)
+                //{
+                //    if (typeof(T) == typeof(float))
+                //        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as float[], aa as float[]);
+                //    else
+                //        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as double[], aa as double[]);
+                //}
                 
-                if (typeof(T) == typeof(float))
-                    Control.LinearAlgebraProvider.AddArrays(xa as float[], aa as float[], xa as float[]);
-                else
-                    Control.LinearAlgebraProvider.AddArrays(xa as double[], aa as double[], xa as double[]);
+                ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).AddArrays(xa, aa, xa);
             }
         }
 
@@ -157,72 +162,15 @@ namespace Retia.Mathematics
             idx += ma.Length;
         }
 
-        public static bool EqualsTo(this Matrix<float> matrix, Matrix<float> other)
+        public static bool EqualsTo<T>(this Matrix<T> matrix, Matrix<T> other) where T : struct, IEquatable<T>, IFormattable
         {
-            if (ReferenceEquals(matrix, other))
-            {
-                return true;
-            }
-
-            var m1 = matrix.AsColumnMajorArray();
-            var m2 = other.AsColumnMajorArray();
-
-            if (ReferenceEquals(m1, m2))
-            {
-                return true;
-            }
-
-            if (m1.Length != m2.Length)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < m1.Length; i++)
-            {
-                if (Math.Abs(m1[i] - m2[i]) > 1e-5f)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public static bool EqualsTo(this Matrix<double> matrix, Matrix<double> other)
-        {
-            if (ReferenceEquals(matrix, other))
-            {
-                return true;
-            }
-
-            var m1 = matrix.AsColumnMajorArray();
-            var m2 = other.AsColumnMajorArray();
-
-            if (ReferenceEquals(m1, m2))
-            {
-                return true;
-            }
-
-            if (m1.Length != m2.Length)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < m1.Length; i++)
-            {
-                if (Math.Abs(m1[i] - m2[i]) > 1e-5f)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return MathProvider<T>.Instance.MatricesEqual(matrix, other);
         }
 
         /// <summary>
-        ///     result=alpha*x + y;
+        ///     result=x + y;
         /// </summary>
-        private static void SumVec(Matrix<float> x, Matrix<float> y, float alpha)
+        private static void SumVec<T>(Matrix<T> x, Matrix<T> y/*, float alpha*/) where T : struct, IEquatable<T>, IFormattable
         {
             if (y.ColumnCount > 1 || x.ColumnCount > 1)
                 throw new Exception("Vector BLAS function is called with matrix argument!");
@@ -231,22 +179,7 @@ namespace Retia.Mathematics
                 throw new Exception("Vector dimensions must agree!");
 
             var ya = y.AsColumnMajorArray();
-            Control.LinearAlgebraProvider.AddVectorToScaledVector(ya, alpha, x.AsColumnMajorArray(), ya);
-        }
-
-        /// <summary>
-        ///     result=alpha*x + y;
-        /// </summary>
-        private static void SumVec(Matrix<double> x, Matrix<double> y, double alpha)
-        {
-            if (y.ColumnCount > 1 || x.ColumnCount > 1)
-                throw new Exception("Vector BLAS function is called with matrix argument!");
-
-            if (y.RowCount != x.RowCount)
-                throw new Exception("Vector dimensions must agree!");
-
-            var ya = y.AsColumnMajorArray();
-            Control.LinearAlgebraProvider.AddVectorToScaledVector(ya, alpha, x.AsColumnMajorArray(), ya);
+            ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).AddVectorToScaledVector(ya, Matrix<T>.One, x.AsColumnMajorArray(), ya);
         }
     }
 }

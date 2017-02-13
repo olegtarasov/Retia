@@ -225,14 +225,14 @@ namespace Retia.Neural.Layers
 
             //var z = Bz + Wxz*input + Whz*lastH;
             var z = (_bxz.Weight.TileColumns(BatchSize) + _bhz.Weight.TileColumns(BatchSize));
-            z.Accumulate(_wxz.Weight, input, 1.0f);
-            z.Accumulate(_whz.Weight, _lastH, 1.0f);
+            z.Accumulate(_wxz.Weight, input);
+            z.Accumulate(_whz.Weight, _lastH);
 
 
             //var r = Br + Wxr*input + Whr*lastH;
             var r = (_bxr.Weight.TileColumns(BatchSize) + _bhr.Weight.TileColumns(BatchSize));
-            r.Accumulate(_wxr.Weight, input, 1.0f);
-            r.Accumulate(_whr.Weight, _lastH, 1.0f);
+            r.Accumulate(_wxr.Weight, input);
+            r.Accumulate(_whr.Weight, _lastH);
 
             //Sigmoid(z);
             //Sigmoid(r);
@@ -243,7 +243,7 @@ namespace Retia.Neural.Layers
 
 
             var hNew = _bxh.Weight.TileColumns(BatchSize);
-            hNew.Accumulate(_wxh.Weight, input, 1.0f);
+            hNew.Accumulate(_wxh.Weight, input);
 
             var hProp = _bhh.Weight.TileColumns(BatchSize);
             hProp.Accumulate(_whh.Weight, _lastH);
@@ -292,32 +292,32 @@ namespace Retia.Neural.Layers
                 // bxh, Wxh
                 var dbxh = dhSum.PointwiseMultiply(_hiddenOnes - z).PointwiseMultiply(_hiddenOnes - hNew.PointwiseMultiply(hNew)); // h x b
                 _bxh.Gradient.CollapseColumnsAndAccumulate(dbxh, batchOnes); // h x 1
-                _wxh.Gradient.Accumulate(dbxh, input, 1.0f, transposeB: Transpose.Transpose); // h x i
+                _wxh.Gradient.Accumulate(dbxh, input, transposeB: Transpose.Transpose); // h x i
 
                 // bhh, Whh
                 var dbhh = dbxh.PointwiseMultiply(r); // h x b
                 _bhh.Gradient.CollapseColumnsAndAccumulate(dbhh, batchOnes); // h x 1
-                _whh.Gradient.Accumulate(dbhh, hPrev, 1.0f, transposeB: Transpose.Transpose); // h x h
+                _whh.Gradient.Accumulate(dbhh, hPrev, transposeB: Transpose.Transpose); // h x h
                 
                 // bxr, Wxr
                 var dbxr = dbxh.PointwiseMultiply(hProp).PointwiseMultiply(r.PointwiseMultiply(_hiddenOnes - r)); // h x b
                 _bxr.Gradient.CollapseColumnsAndAccumulate(dbxr, batchOnes); // h x 1
-                _wxr.Gradient.Accumulate(dbxr, input, 1.0f, transposeB: Transpose.Transpose); // h x i
+                _wxr.Gradient.Accumulate(dbxr, input, transposeB: Transpose.Transpose); // h x i
                 
                 // bhr, whr
                 var dbhr = dbxr; // h x b
                 _bhr.Gradient.CollapseColumnsAndAccumulate(dbhr, batchOnes); // h x 1
-                _whr.Gradient.Accumulate(dbhr, hPrev, 1.0f, transposeB: Transpose.Transpose); // h x h
+                _whr.Gradient.Accumulate(dbhr, hPrev, transposeB: Transpose.Transpose); // h x h
                 
                 // bxz, wxz
                 var dbxz = dhSum.PointwiseMultiply(hPrev - hNew).PointwiseMultiply(z.PointwiseMultiply(_hiddenOnes - z)); // h x b
                 _bxz.Gradient.CollapseColumnsAndAccumulate(dbxz, batchOnes); // h x 1
-                _wxz.Gradient.Accumulate(dbxz, input, 1.0f, transposeB: Transpose.Transpose); // h x i
+                _wxz.Gradient.Accumulate(dbxz, input, transposeB: Transpose.Transpose); // h x i
                 
                 // bhz, whz
                 var dbhz = dbxz; // h x b
                 _bhz.Gradient.CollapseColumnsAndAccumulate(dbhz, batchOnes); // h x 1
-                _whz.Gradient.Accumulate(dbhz, hPrev, 1.0f, transposeB: Transpose.Transpose); // h x h
+                _whz.Gradient.Accumulate(dbhz, hPrev, transposeB: Transpose.Transpose); // h x h
                 
                 dh[i] = (dhSum.PointwiseMultiply(z) + (_whz.Weight.Transpose() * dbxz) + (_whr.Weight.Transpose() * dbxr) + (_whh.Weight.Transpose() * dbhh));
 

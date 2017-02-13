@@ -122,7 +122,7 @@ namespace Retia.Neural.Layers
                 throw new Exception($"Wrong input batch size!\nExpected: {BatchSize}, got: {input.ColumnCount}");
 
             var output = _bias.Weight.TileColumns(input.ColumnCount);
-            output.Accumulate(_weights.Weight, input, 1.0f);
+            output.Accumulate(_weights.Weight, input);
             if (inTraining)
             {
                 Inputs.Add(input);
@@ -153,15 +153,15 @@ namespace Retia.Neural.Layers
             {
                 var sNext = outSens[i];
                 var x = Inputs[i];
-                _weights.Gradient.Accumulate(sNext, x, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
+                _weights.Gradient.Accumulate(sNext, x, transposeB: Transpose.Transpose);
                 if (BatchSize > 1)
-                    _bias.Gradient.Accumulate(sNext, yIdentity, 1.0f);
+                    _bias.Gradient.Accumulate(sNext, yIdentity);
                 else
                     _bias.Gradient.Accumulate(sNext);
                 if (needInputSens)
                 {
                     var dInput = Matrix<T>.Build.Dense(x.RowCount, BatchSize);
-                    dInput.Accumulate(_weights.Weight, sNext, 1.0f, 1.0f, Transpose.Transpose);
+                    dInput.Accumulate(_weights.Weight, sNext, Transpose.Transpose);
                     inputSensList.Insert(0, dInput);
                 }
                 else

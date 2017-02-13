@@ -7,14 +7,14 @@ using Retia.Neural.Layers;
 
 namespace Retia.Genetic.Neural
 {
-    public class EvolvableNet : LayeredNet, IEvolvable, IComparable
+    public class EvolvableNet : LayeredNet<float>, IEvolvable, IComparable
     {
         private static long maxId = 0;
 
         public EvolvableNet(int xSize, int hSize, int ySize) 
-            : base(1, 1, new GruLayer(xSize, hSize),
-                new LinearLayer(hSize, ySize),
-                new SoftMaxLayer(ySize))
+            : base(1, 1, new GruLayer<float>(xSize, hSize),
+                new LinearLayer<float>(hSize, ySize),
+                new SoftMaxLayer<float>(ySize))
         {
             Chromosome = new float[Layers.Sum(x => x.TotalParamCount)];
             
@@ -75,7 +75,7 @@ namespace Retia.Genetic.Neural
             return maxId;
         }
 
-        public override NeuralNet Clone()
+        public override NeuralNet<float> Clone()
         {
             return new EvolvableNet(this);
         }

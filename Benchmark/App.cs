@@ -38,7 +38,7 @@ namespace Benchmark
         [Verb]
         public void CheckGrad()
         {
-            Control.UseNativeMKL(MklConsistency.Auto, MklPrecision.Single, MklAccuracy.High);
+            Control.UseNativeMKL();
 
             //const int seqLen = 5;
 
@@ -52,7 +52,7 @@ namespace Benchmark
             const df delta = 1e-5f;
 
             var dataSet = new TestDataSet<df>(3, 2, 5, 10);
-            var layer = new LinearLayer<df>(dataSet.InputSize, dataSet.TargetSize, new ConstantMatrixInitializer<df> { Value = 1e-2f });
+            var layer = new LinearLayer<df>(dataSet.InputSize, dataSet.TargetSize);
             layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
             layer.InitSequence();
 
