@@ -6,6 +6,7 @@ using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.Common.Mkl;
+using Retia.Mathematics;
 using Retia.Neural;
 using Retia.Neural.Initializers;
 using Retia.Neural.Layers;
@@ -74,23 +75,29 @@ namespace Benchmark
                 pLayer.InitSequence();
                 nLayer.InitSequence();
 
+                pLayer.ResetMemory();
+                nLayer.ResetMemory();
+
                 pLayer.SetParam(i, pLayer.GetParam(i) + delta);
                 nLayer.SetParam(i, nLayer.GetParam(i) - delta);
 
                 double pErr = 0.0, nErr = 0.0;
                 for (int j = 0; j < samples.Inputs.Count; j++)
                 {
-                    pErr += pLayer.LayerError(pLayer.Step(samples.Inputs[j]), samples.Targets[j]);
-                    nErr += nLayer.LayerError(nLayer.Step(samples.Inputs[j]), samples.Targets[j]);
-                }
+                    var pOut = pLayer.Step(samples.Inputs[j]);
+                    var nOut = nLayer.Step(samples.Inputs[j]);
 
+                    pErr += MathProvider<df>.Instance.MeanSquare(pOut, samples.Targets[j]);
+                    nErr += MathProvider<df>.Instance.MeanSquare(nOut, samples.Targets[j]); 
+                }
+               
                 double num = (pErr - nErr) / (2.0f * delta);
                 double real = layer.GetParam(i, true);
                 double d = num - real;
 
                 if (Math.Abs(d) > 1e-7)
                 {
-                    Console.WriteLine("Fuck");
+                    Console.WriteLine($"Deviation of grad {i}: {d}");
                 }
             }
         }
