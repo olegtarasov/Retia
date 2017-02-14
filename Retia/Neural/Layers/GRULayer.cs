@@ -319,11 +319,11 @@ namespace Retia.Neural.Layers
                 _bhz.Gradient.CollapseColumnsAndAccumulate(dbhz, batchOnes); // h x 1
                 _whz.Gradient.Accumulate(dbhz, hPrev, transposeB: Transpose.Transpose); // h x h
                 
-                dh[i] = (dhSum.PointwiseMultiply(z) + (_whz.Weight.Transpose() * dbxz) + (_whr.Weight.Transpose() * dbxr) + (_whh.Weight.Transpose() * dbhh));
+                dh[i] = dhSum.PointwiseMultiply(z) + _whz.Weight.Transpose() * dbhz + _whr.Weight.Transpose() * dbhr + _whh.Weight.Transpose() * dbhh;
 
                 if (needInputSens)
                 {
-                    di[i] = (_wxz.Weight.Transpose() * dbxz + _wxr.Weight.Transpose() * dbxr + _wxh.Weight.Transpose() * dbxh);
+                    di[i] = _wxz.Weight.Transpose() * dbxz + _wxr.Weight.Transpose() * dbxr + _wxh.Weight.Transpose() * dbxh;
                 }
             }
 

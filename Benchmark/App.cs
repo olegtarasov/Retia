@@ -52,7 +52,7 @@ namespace Benchmark
             const df delta = 1e-5f;
 
             var dataSet = new TestDataSet<df>(3, 2, 5, 10);
-            var layer = new LinearLayer<df>(dataSet.InputSize, dataSet.TargetSize);
+            var layer = new GruLayer<df>(dataSet.InputSize, dataSet.TargetSize);
             layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
             layer.InitSequence();
 
