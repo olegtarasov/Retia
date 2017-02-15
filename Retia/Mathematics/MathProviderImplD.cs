@@ -22,6 +22,8 @@ namespace Retia.Mathematics
 
         [DllImport("FastFuncs", EntryPoint="GravesRMSPropUpdateD")] private static extern void GravesRMSPropUpdate(Float weightDecay, Float learningRate, Float decayRate, Float momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
 
+        [DllImport("FastFuncs", EntryPoint = "AdagradUpdateD")] private static extern void AdagradUpdate(Float learningRate, IntPtr weightMatrix, IntPtr mem, IntPtr gradient, int n);
+
         public override List<int> SoftMaxChoice(Matrix<Float> p, double T = 1)
         {
             var probs = new List<int>(p.ColumnCount);
@@ -197,6 +199,14 @@ namespace Retia.Mathematics
             for (int i = 0; i < arr.Length; i++)
                 arr[i] = (Float)random.NextDouble(min, max);
             return Matrix<Float>.Build.Dense(rows, cols, arr);
+        }
+
+        public override void AdagradUpdate(Float learningRate, NeuroWeight<Float> weight)
+        {
+            using (var ptrs = new MatrixPointers<Float>(weight.Weight, weight.Cache2, weight.Gradient))
+            {
+                AdagradUpdate(learningRate, ptrs[0], ptrs[1], ptrs[2], weight.Weight.Length());
+            }
         }
     }
 }

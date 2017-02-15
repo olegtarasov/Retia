@@ -19,6 +19,8 @@ namespace Retia.Mathematics
 
         public abstract T[] Array(params float[] input);
 
+        public abstract void AdagradUpdate(T learningRate, NeuroWeight<T> weight);
+
         public abstract void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<T> weight);
 
         public abstract void CalculateH(Matrix<T> H, Matrix<T> hCandidate, Matrix<T> z, Matrix<T> lastH);

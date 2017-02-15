@@ -1,59 +1,36 @@
-//using System;
-//using System.Runtime.InteropServices;
-//using Retia.Contracts;
-//using Retia.Mathematics;
-//using Retia.Neural;
+using System;
+using System.Runtime.InteropServices;
+using Retia.Contracts;
+using Retia.Mathematics;
+using Retia.Neural;
 
-//namespace Retia.Optimizers
-//{
-//	public class AdagradOptimizer : OptimizerBase
-//    {
-//        public AdagradOptimizer(float learningRate = 0.1f) : base(learningRate)
-//        {
-//            LearningRate = learningRate;
-//        }
+namespace Retia.Optimizers
+{
+    public class AdagradOptimizer<T> : OptimizerBase<T> where T : struct, IEquatable<T>, IFormattable
+    {
+        public AdagradOptimizer(float learningRate = 0.1f) : base(learningRate)
+        {
+            LearningRate = learningRate;
+        }
 
-//		private AdagradOptimizer(AdagradOptimizer other) : base(other)
-//		{
-//		}
+        private AdagradOptimizer(AdagradOptimizer<T> other) : base(other)
+        {
+        }
 
-//        public override unsafe void Optimize(NeuroWeight weight)
-//        {
-//            var weightMatrix = weight.Weight.AsColumnMajorArray();
-//            var gradient = weight.Gradient.AsColumnMajorArray();
-//            var cache = weight.Cache2.AsColumnMajorArray();
+        public override void Optimize(NeuroWeight<T> weight)
+        {
+            MathProvider.AdagradUpdate(MathProvider.Scalar(LearningRate), weight);
+        }
 
-//            fixed (float* pGrad = gradient, pMem = cache, pWeight = weightMatrix)
-//            {
-//                ParallelFor.Instance.Execute(AdagradUpdate, weightMatrix.Length, new void*[]{pGrad, pMem, pWeight});
-//            }
-//        }
+        public override OptimizerBase<T> Clone()
+        {
+            return new AdagradOptimizer<T>(this);
+        }
 
-//        private unsafe void AdagradUpdate(int startIdx, int endIdx, void*[] ptrs)
-//        {
-//            float* pGrad = (float*)ptrs[0], pMem = (float*)ptrs[1], pWeight = (float*)ptrs[2];
+        public override OptimizerSpecBase CreateSpec()
+        {
+            throw new NotSupportedException();
+        }
+    }
 
-//            for (int i = startIdx; i < endIdx; i++)
-//            {
-//                float* gradPtr = pGrad + i, memPtr = pMem + i, weightPtr = pWeight + i;
-
-//                float grad = *gradPtr;
-//                float grad2 = grad * grad;
-//                *memPtr += grad2;
-//                float k = LearningRate / ((float)Math.Sqrt(*memPtr) + 1e-8f);
-//                *weightPtr += -k * grad;
-//            }
-//        }
-
-//        public override OptimizerBase Clone()
-//		{
-//			return new AdagradOptimizer(this);
-//		}
-
-//        public override OptimizerSpecBase CreateSpec()
-//        {
-//            throw new NotSupportedException();
-//        }
-//    }
-
-//}
+}
