@@ -52,6 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeGeneration\DoubleAttribute.cs" />
+    <Compile Include="CodeGeneration\GenerateDoubleClasses.cs">
+      <DependentUpon>GenerateDoubleClasses.csx</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\CollectionExtensions.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
@@ -129,6 +133,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="CodeGeneration\GenerateDoubleClasses.csx">
+      <Generator>ScriptyGenerator</Generator>
+      <LastGenOutput>GenerateDoubleClasses.log</LastGenOutput>
+    </None>
+    <None Include="CodeGeneration\GenerateDoubleClasses.log">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GenerateDoubleClasses.csx</DependentUpon>
+    </None>
     <None Include="NugetRelativeRefs.targets" />
     <None Include="packages.config" />
   </ItemGroup>
@@ -167,7 +180,9 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets'))" />
+    <Error Condition="!Exists('..\packages\Scripty.MsBuild.0.6.0\build\Scripty.MsBuild.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Scripty.MsBuild.0.6.0\build\Scripty.MsBuild.targets'))" />
   </Target>
+  <Import Project="..\packages\Scripty.MsBuild.0.6.0\build\Scripty.MsBuild.targets" Condition="Exists('..\packages\Scripty.MsBuild.0.6.0\build\Scripty.MsBuild.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
