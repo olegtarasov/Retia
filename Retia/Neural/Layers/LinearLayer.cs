@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Mathematics;
@@ -10,14 +10,12 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class LinearLayer : NeuroLayer
+    public class LinearLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
     {
-        private const double Dispersion = 5e-2;
+        private NeuroWeight<T> _bias;
+        private NeuroWeight<T> _weights;
 
-        private NeuroWeight _bias;
-        private NeuroWeight _weights;
-
-        private LinearLayer(LinearLayer other) : base(other)
+        private LinearLayer(LinearLayer<T> other) : base(other)
         {
             _weights = other._weights.Clone();
             _bias = other._bias.Clone();
@@ -27,12 +25,12 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public LinearLayer(int xSize, int ySize) : this(xSize, ySize, new RandomMatrixInitializer())
+        public LinearLayer(int xSize, int ySize) : this(xSize, ySize, new RandomMatrixInitializer<T>())
         {
             
         }
 
-        public LinearLayer(int xSize, int ySize, IMatrixInitializer matrixInitializer)
+        public LinearLayer(int xSize, int ySize, IMatrixInitializer<T> matrixInitializer)
         {
             _weights = matrixInitializer.CreateMatrix(ySize, xSize);
             _bias = matrixInitializer.CreateMatrix(ySize, 1);
@@ -40,15 +38,15 @@ namespace Retia.Neural.Layers
 
         public LinearLayer(BinaryReader reader)
         {
-            _bias = NeuroWeight.Load(reader.BaseStream);
-            _weights = NeuroWeight.Load(reader.BaseStream);
+            _bias = NeuroWeight<T>.Load(reader.BaseStream);
+            _weights = NeuroWeight<T>.Load(reader.BaseStream);
         }
 
         public override int InputSize => _weights.Weight.ColumnCount;
         public override int OutputSize => _weights.Weight.RowCount;
         public override int TotalParamCount => _weights.Weight.AsColumnMajorArray().Length + _bias.Weight.AsColumnMajorArray().Length;
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Inputs.Clear();
             Outputs.Clear();
@@ -67,11 +65,14 @@ namespace Retia.Neural.Layers
 
         public override void ClampGrads(float limit)
         {
-            _bias.Gradient.Clamp(-limit, limit);
-            _weights.Gradient.Clamp(-limit, limit);
+            T min = MathProvider.Scalar(-limit);
+            T max = MathProvider.Scalar(limit);
+
+            _bias.Gradient.Clamp(min, max);
+            _weights.Gradient.Clamp(min, max);
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
             if (!grad)
             {
@@ -85,15 +86,15 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(T[] vector, ref int idx)
         {
             _bias.Weight.CopyFromArray(vector, ref idx);
             _weights.Weight.CopyFromArray(vector, ref idx);
         }
 
-        public override double LayerError(Matrix y, Matrix target)
+        public override double LayerError(Matrix<T> y, Matrix<T> target)
         {
-            return ErrorFunctions.MeanSquare(y, target);
+            return MathProvider.MeanSquare(y, target);
         }
 
         public override void Save(Stream s)
@@ -102,18 +103,18 @@ namespace Retia.Neural.Layers
             _weights.Save(s);
         }
 
-        public override NeuroLayer Clone()
+        public override NeuroLayer<T> Clone()
         {
-            return new LinearLayer(this);
+            return new LinearLayer<T>(this);
         }
 
-        public override void Optimize(OptimizerBase optimizer)
+        public override void Optimize(OptimizerBase<T> optimizer)
         {
             optimizer.Optimize(_weights);
             optimizer.Optimize(_bias);
         }
 
-        public override Matrix Step(Matrix input, bool inTraining = false)
+        public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
             if (input.RowCount != _weights.Weight.ColumnCount)
                 throw new Exception($"Wrong input matrix row size provided!\nExpected: {_weights.Weight.ColumnCount}, got: {input.RowCount}");
@@ -121,7 +122,7 @@ namespace Retia.Neural.Layers
                 throw new Exception($"Wrong input batch size!\nExpected: {BatchSize}, got: {input.ColumnCount}");
 
             var output = _bias.Weight.TileColumns(input.ColumnCount);
-            output.Accumulate(_weights.Weight, input, 1.0f);
+            output.Accumulate(_weights.Weight, input);
             if (inTraining)
             {
                 Inputs.Add(input);
@@ -130,12 +131,12 @@ namespace Retia.Neural.Layers
             return output;
         }
 
-        public override List<Matrix> ErrorPropagate(List<Matrix> targets)
+        public override List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
         {
             return BackPropagate(base.ErrorPropagate(targets));
         }
 
-        public override List<Matrix> BackPropagate(List<Matrix> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             _weights.ClearGrad();
             _bias.ClearGrad();
@@ -145,35 +146,38 @@ namespace Retia.Neural.Layers
             if (outSens.Count != Inputs.Count)
                 throw new Exception("Not enough sensitivies in list!");
 
-            var yIdentity = DenseMatrix.Create(BatchSize, 1, DenseMatrix.One);
-            var inputSensList = new List<Matrix>(SeqLen);
+            var yIdentity = Matrix<T>.Build.Dense(BatchSize, 1, Matrix<T>.One);
+            var inputSensList = new List<Matrix<T>>(SeqLen);
 
             for (int i = SeqLen - 1; i >= 0; i--)
             {
                 var sNext = outSens[i];
                 var x = Inputs[i];
-                _weights.Gradient.Accumulate(sNext, x, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
+                _weights.Gradient.Accumulate(sNext, x, transposeB: Transpose.Transpose);
                 if (BatchSize > 1)
-                    _bias.Gradient.Accumulate(sNext, yIdentity, 1.0f);
+                    _bias.Gradient.Accumulate(sNext, yIdentity);
                 else
                     _bias.Gradient.Accumulate(sNext);
                 if (needInputSens)
                 {
-                    var dInput = new DenseMatrix(x.RowCount, BatchSize);
-                    dInput.Accumulate(_weights.Weight, sNext, 1.0f, 1.0f, Transpose.Transpose);
+                    var dInput = Matrix<T>.Build.Dense(x.RowCount, BatchSize);
+                    dInput.Accumulate(_weights.Weight, sNext, Transpose.Transpose);
                     inputSensList.Insert(0, dInput);
                 }
                 else
-                    inputSensList.Insert(0, new DenseMatrix(x.RowCount, BatchSize));
+                    inputSensList.Insert(0, Matrix<T>.Build.Dense(x.RowCount, BatchSize));
             }
             return inputSensList;
         }
 
         public override LayerSpecBase CreateSpec()
         {
-            return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight, _bias.Weight);
-        }
+            if (typeof(T) != typeof(float))
+            {
+                throw new InvalidOperationException("Only float for GPU!");
+            }
 
-        //we need to propagate matched error through weight matrix
+            return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight as Matrix<float>, _bias.Weight as Matrix<float>);
+        }
     }
 }

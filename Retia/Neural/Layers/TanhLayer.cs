@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -12,11 +12,11 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class TanhLayer : NeuroLayer
+    public class TanhLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
 
-        private TanhLayer(TanhLayer other) : base(other)
+        private TanhLayer(TanhLayer<T> other) : base(other)
         {
             _size = other._size;
         }
@@ -42,26 +42,21 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override NeuroLayer Clone()
+        public override NeuroLayer<T> Clone()
         {
-            return new TanhLayer(_size);
+            return new TanhLayer<T>(_size);
         }
 
-        public override void Optimize(OptimizerBase optimizer)
+        public override void Optimize(OptimizerBase<T> optimizer)
         {
         }
 
-        private double sigmoid(double x)
-        {
-            return 1.0/(1.0+Math.Exp(-x));
-        }
-
-        public override Matrix Step(Matrix input, bool inTraining = false)
+        public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
             var output = input.CloneMatrix();
 
-            ActivationFuncs.ApplyTanh(output);
-            
+            MathProvider.ApplyTanh(output);
+
             if (inTraining)
             {
                 Outputs.Add(output);
@@ -70,21 +65,21 @@ namespace Retia.Neural.Layers
             return output;
         }
 
-        public override List<Matrix> BackPropagate(List<Matrix> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             if (Outputs.Count == 0)
                 throw new Exception("Empty inputs history, nothing to propagate!");
             if (outSens.Count != Outputs.Count)
                 throw new Exception("Not enough sensitivies in list!");
 
-            var iSens = new List<Matrix>();
+            var iSens = new List<Matrix<T>>();
             for (int t = 0; t < outSens.Count; t++)
             {
                 var output = Outputs[t];
                 var osens = outSens[t];
                 var fder = //output ^ (new Matrix(osens.Rows, osens.Cols, 1.0) - output);
-                    DenseMatrix.Create(osens.RowCount, osens.ColumnCount, DenseMatrix.One) - output.PointwisePower(2);
-                var isens = (Matrix)fder.PointwiseMultiply(osens);
+                    Matrix<T>.Build.Dense(osens.RowCount, osens.ColumnCount, Matrix<T>.One) - output.PointwiseMultiply(output);
+                var isens = fder.PointwiseMultiply(osens);
                 iSens.Add(isens);
             }
             return iSens;
@@ -98,7 +93,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Outputs.Clear();
         }
@@ -107,11 +102,11 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(T[] vector, ref int idx)
         {
         }
 

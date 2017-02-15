@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 using Retia.RandomGenerator;
 
 namespace Retia.Training.Data
 {
-    public class SetDataProvider: DataProviderBase
+    public class SetDataProvider<T> : DataProviderBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         public int BatchSize
         {
@@ -17,14 +17,14 @@ namespace Retia.Training.Data
 
         public int SequenceLen { get; set; }
 
-        private readonly List<List<Matrix>> _trainingInputs = new List<List<Matrix>>();
-        private readonly List<List<Matrix>> _trainingTargets = new List<List<Matrix>>();
-        private readonly List<List<Matrix>> _testInputs = new List<List<Matrix>>();
-        private readonly List<List<Matrix>> _testTargets = new List<List<Matrix>>();
+        private readonly List<List<Matrix<T>>> _trainingInputs = new List<List<Matrix<T>>>();
+        private readonly List<List<Matrix<T>>> _trainingTargets = new List<List<Matrix<T>>>();
+        private readonly List<List<Matrix<T>>> _testInputs = new List<List<Matrix<T>>>();
+        private readonly List<List<Matrix<T>>> _testTargets = new List<List<Matrix<T>>>();
         private int batchSize;
         
 
-        public SetDataProvider(IEnumerable<List<Matrix>> trainingInputs, IEnumerable<List<Matrix>> trainingOutputs,  IEnumerable<List<Matrix>> testInputs = null, IEnumerable<List<Matrix>> testOutputs = null)
+        public SetDataProvider(IEnumerable<List<Matrix<T>>> trainingInputs, IEnumerable<List<Matrix<T>>> trainingOutputs,  IEnumerable<List<Matrix<T>>> testInputs = null, IEnumerable<List<Matrix<T>>> testOutputs = null)
         {
             _trainingInputs.AddRange(trainingInputs);
             _trainingTargets.AddRange(trainingOutputs);
@@ -45,18 +45,18 @@ namespace Retia.Training.Data
                 indexes.RemoveAt(rnd.Next(indexes.Count));
             return indexes;
         }
-        private static List<Matrix> GenerateBatch(List<List<Matrix>> sequences, int maxSequenceLen)
+        private static List<Matrix<T>> GenerateBatch(List<List<Matrix<T>>> sequences, int maxSequenceLen)
         {
             var ioCount = sequences[0][0].RowCount;
-            var result = new List<Matrix>();
+            var result = new List<Matrix<T>>();
             for (int i = 0; i < maxSequenceLen; i++)
             {
-                var batchedMatrix = new DenseMatrix(ioCount, sequences.Count);
+                var batchedMatrix = Matrix<T>.Build.Dense(ioCount, sequences.Count);
                 for (int b = 0; b < sequences.Count; b++)
                 {
                     var sequence = sequences[b];
                     for (int j = 0; j < ioCount; j++)
-                        batchedMatrix[j, b] = i < sequence.Count ? sequence[i][j, 0] : float.NaN;
+                        batchedMatrix[j, b] = i < sequence.Count ? sequence[i][j, 0] : MathProvider.NaN();
                 }
                 result.Add(batchedMatrix);
             }
@@ -64,14 +64,14 @@ namespace Retia.Training.Data
         }
 
 
-        private static List<Sample> GenerateSamples(List<List<Matrix>> inputs, List<List<Matrix>> targets, int bsize, int seqLen)
+        private static List<Sample<T>> GenerateSamples(List<List<Matrix<T>>> inputs, List<List<Matrix<T>>> targets, int bsize, int seqLen)
         {
             if (bsize > inputs.Count)
                 throw new NotSupportedException("Generating of repeated sequences in batches is not supported");
             if(inputs.Count!=targets.Count)
                 throw new Exception("Inputs count != targets count");
-            var batchSeqI = new List<List<Matrix>>();
-            var batchSeqO = new List<List<Matrix>>();
+            var batchSeqI = new List<List<Matrix<T>>>();
+            var batchSeqO = new List<List<Matrix<T>>>();
 
             if (bsize == inputs.Count)
             {
@@ -89,23 +89,23 @@ namespace Retia.Training.Data
             }
             var batchI= GenerateBatch(batchSeqI, seqLen);
             var batchO = GenerateBatch(batchSeqO, seqLen);
-            var result = new List<Sample>();
+            var result = new List<Sample<T>>();
             for (int i = 0; i < batchI.Count; i++)
-                result.Add(new Sample(batchI[i], batchO[i]));
+                result.Add(new Sample<T>(batchI[i], batchO[i]));
             return result;
         } 
 
-        public override IDataSet CreateTrainingSet()
+        public override IDataSet<T> CreateTrainingSet()
         {
-            TrainingSet = new LinearDataSet(GenerateSamples(_trainingInputs, _trainingTargets, batchSize, SequenceLen));
+            TrainingSet = new LinearDataSet<T>(GenerateSamples(_trainingInputs, _trainingTargets, batchSize, SequenceLen));
             return TrainingSet;
         }
 
-        public override IDataSet CreateTestSet()
+        public override IDataSet<T> CreateTestSet()
         {
             // TODO: add some check or refactor. Implicit null return value is not good.
             if (_testInputs.Count > 0 && _testTargets.Count > 0)
-                TestSet = new LinearDataSet(GenerateSamples(_testInputs, _testTargets, batchSize, SequenceLen));
+                TestSet = new LinearDataSet<T>(GenerateSamples(_testInputs, _testTargets, batchSize, SequenceLen));
 
             return TestSet;
         }

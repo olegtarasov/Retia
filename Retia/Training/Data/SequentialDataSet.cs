@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Integration;
 using Retia.Mathematics;
 
 namespace Retia.Training.Data
 {
-	public class SequentialDataSet : IDataSet, IStreamWritable
-	{
-	    private readonly List<Matrix> _matrices;
+	public class SequentialDataSet<T> : IDataSet<T>, IStreamWritable where T : struct, IEquatable<T>, IFormattable
+    {
+	    private readonly List<Matrix<T>> _matrices;
 	    private int _curIdx = 0;
 
-	    public SequentialDataSet(List<Matrix> matrices)
+	    public SequentialDataSet(List<Matrix<T>> matrices)
 		{
 			if (matrices == null) throw new ArgumentNullException(nameof(matrices));
 			//Todo: Temporary disabled to allow empty test sets
@@ -22,9 +22,9 @@ namespace Retia.Training.Data
 			_matrices = matrices;
 		}
 
-	    private SequentialDataSet(SequentialDataSet other)
+	    private SequentialDataSet(SequentialDataSet<T> other)
 		{
-			_matrices = new List<Matrix>(other._matrices);
+			_matrices = new List<Matrix<T>>(other._matrices);
 			_curIdx = other._curIdx;
 		}
 
@@ -35,23 +35,23 @@ namespace Retia.Training.Data
 
 	    public int SampleCount => _matrices.Count - 1;
 
-	    public static SequentialDataSet Load(Stream stream)
+	    public static SequentialDataSet<T> Load(Stream stream)
 		{
 			using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
 			{
 				int count = reader.ReadInt32();
-				var list = new List<Matrix>(count);
+				var list = new List<Matrix<T>>(count);
 
 				for (int i = 0; i < count; i++)
 				{
-					list.Add(MatrixFactory.Load(stream));
+					list.Add(MatrixFactory.Load<T>(stream));
 				}
 
-				return new SequentialDataSet(list);
+				return new SequentialDataSet<T>(list);
 			}
 		}
 
-	    public Sample GetNextSample()
+	    public Sample<T> GetNextSample()
 		{
 			if (_curIdx == _matrices.Count - 1)
 			{
@@ -60,7 +60,7 @@ namespace Retia.Training.Data
 			    return null;
 			}
 
-			var result = new Sample(_matrices[_curIdx], _matrices[_curIdx + 1]);
+			var result = new Sample<T>(_matrices[_curIdx], _matrices[_curIdx + 1]);
 			_curIdx++;
 
 			return result;
@@ -71,9 +71,9 @@ namespace Retia.Training.Data
             _curIdx = 0;
 		}
 
-	    public IDataSet Clone()
+	    public IDataSet<T> Clone()
 		{
-			return new SequentialDataSet(this);
+			return new SequentialDataSet<T>(this);
 		}
 
 	    public void Save(Stream stream)
@@ -83,12 +83,12 @@ namespace Retia.Training.Data
 				writer.Write(_matrices.Count);
 				foreach (var matrix in _matrices)
 				{
-					MatrixFactory.Save(matrix, stream);
+					MatrixFactory.Save<T>(matrix, stream);
 				}
 			}
 		}
 
-	    public TrainingSequence GetNextSamples(int count)
+	    public TrainingSequence<T> GetNextSamples(int count)
 	    {
 	        if (count + 1 > _matrices.Count)
 	        {
@@ -102,8 +102,8 @@ namespace Retia.Training.Data
 	            return null;
 	        }
 
-            var inputs = new List<Matrix>(count);
-            var targets = new List<Matrix>(count);
+            var inputs = new List<Matrix<T>>(count);
+            var targets = new List<Matrix<T>>(count);
 	        for (int i = 0; i < count; i++)
 	        {
 	            inputs.Add(_matrices[_curIdx + i]);
@@ -112,7 +112,7 @@ namespace Retia.Training.Data
 
 	        _curIdx += count;
 
-	        return new TrainingSequence(inputs, targets);
+	        return new TrainingSequence<T>(inputs, targets);
 	    }
 
 	    public event EventHandler DataSetReset;

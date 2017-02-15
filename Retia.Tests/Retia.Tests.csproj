@@ -68,10 +68,13 @@
   <ItemGroup>
     <Compile Include="Genetic\GeneticTestsBase.cs" />
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
-    <Compile Include="Mathematics\ActivationFuncsTests.cs" />
-    <Compile Include="Mathematics\MatrixTests.cs" />
-    <Compile Include="Mathematics\MatrixTests.Data.cs" />
-    <Compile Include="Mathematics\ParallelForTests.cs" />
+    <Compile Include="Mathematics\DoubleMathProviderTests.cs" />
+    <Compile Include="Mathematics\DoubleMatrixTests.cs" />
+    <Compile Include="Mathematics\MathProviderTestsBase.cs" />
+    <Compile Include="Mathematics\MatrixTestsBase.cs" />
+    <Compile Include="Mathematics\MatrixTestsBase.Data.cs" />
+    <Compile Include="Mathematics\SingleMathProviderTests.cs" />
+    <Compile Include="Mathematics\SingleMatrixTests.cs" />
     <Compile Include="Optimizers\RMSPropOptimizerTests.cs" />
     <Compile Include="Plumbing\AssertExtensions.cs" />
     <Compile Include="Plumbing\DisposableFile.cs" />
@@ -99,6 +102,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="NugetRelativeRefs.xslt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="NugetRelativeRefs.targets" />

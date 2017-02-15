@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Retia.Mathematics;
+using Retia.Tests.Plumbing;
 using Retia.Training.Batching;
 using Retia.Training.Data;
 using Xunit;
@@ -7,8 +10,16 @@ using XunitShould;
 
 namespace Retia.Tests.Training.Batching
 {
-	public class LinearBatcherTests
-	{
+    public class DoubleLinearBatcherTests : LinearBatcherTests<double>
+    {
+    }
+
+    public class SingleLinearBatcherTests : LinearBatcherTests<float>
+    {
+    }
+
+    public abstract class LinearBatcherTests<T> where T : struct, IEquatable<T>, IFormattable
+    {
 		private const int InputSize = 10;
 		private const int SetSize = 100;
 
@@ -19,7 +30,7 @@ namespace Retia.Tests.Training.Batching
 			const int batchSize = 5;
 
 			var samples = GetSamples();
-			var batcher = new LinearBatcher();
+			var batcher = new LinearBatcher<T>();
 			var result = batcher.BatchSamples(samples, new BatchDimension(BatchDimensionType.BatchSize, batchSize));
 
 			CheckBatches(result, batchCount, batchSize);
@@ -32,13 +43,13 @@ namespace Retia.Tests.Training.Batching
 			const int batchSize = 4;
 
 			var samples = GetSamples();
-			var batcher = new LinearBatcher();
+			var batcher = new LinearBatcher<T>();
 			var result = batcher.BatchSamples(samples, new BatchDimension(BatchDimensionType.BatchCount, batchCount));
 
 			CheckBatches(result, batchCount, batchSize);
 		}
 
-		private static void CheckBatches(List<Sample> result, int batchCount, int batchSize)
+		private static void CheckBatches(List<Sample<T>> result, int batchCount, int batchSize)
 		{
 			result.Count.ShouldEqual(batchCount);
 			for (int b = 0; b < batchCount; b++)
@@ -53,15 +64,15 @@ namespace Retia.Tests.Training.Batching
 				{
 					for (int r = 0; r < InputSize; r++)
 					{
-						batch.Input[r, с].ShouldEqual(с * batchCount + b + r);
+						batch.Input[r, с].ShouldEqualWithinError<T>(MathProvider<T>.Instance.Scalar(с * batchCount + b + r));
 					}
 				}
 			}
 		}
 
-		private List<LinearSample> GetSamples()
+		private List<LinearSample<T>> GetSamples()
 		{
-			return Enumerable.Range(0, SetSize).Select(x => new LinearSample(Enumerable.Range(x, InputSize).Select(d => (float)d).ToArray(), Enumerable.Range(x, InputSize).Select(d => (float)d).ToArray())).ToList();
+			return Enumerable.Range(0, SetSize).Select(x => new LinearSample<T>(Enumerable.Range(x, InputSize).Select(d => MathProvider<T>.Instance.Scalar(d)).ToArray(), Enumerable.Range(x, InputSize).Select(d => MathProvider<T>.Instance.Scalar(d)).ToArray())).ToList();
 		}
 	}
 }

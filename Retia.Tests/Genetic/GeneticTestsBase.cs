@@ -15,9 +15,9 @@ namespace Retia.Tests.Genetic
             for (int i = 0; i < 10; i++)
             {
                 result.Add(new Evolvable
-                           {
-                               Chromosome = Enumerable.Range(i, 10).Select(x => (float)x).ToArray()
-                           });
+                {
+                    Chromosome = Enumerable.Range(i, 10).Select(x => (float)x).ToArray()
+                });
             }
 
             return result;
@@ -40,10 +40,10 @@ namespace Retia.Tests.Genetic
             public IEvolvable Clone()
             {
                 return new Evolvable
-                       {
-                           Fitness = Fitness,
-                           Chromosome = Chromosome.ToArray()
-                       };
+                {
+                    Fitness = Fitness,
+                    Chromosome = Chromosome.ToArray()
+                };
             }
         }
     }

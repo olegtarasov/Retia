@@ -2,17 +2,17 @@
 
 namespace Retia.Training.Data
 {
-	public interface IDataProvider
-	{
-		IDataSet CreateTrainingSet();
-		IDataSet CreateTestSet();
+	public interface IDataProvider<T> where T : struct, IEquatable<T>, IFormattable
+    {
+		IDataSet<T> CreateTrainingSet();
+		IDataSet<T> CreateTestSet();
 
-        IDataSet TrainingSet { get; }
-        IDataSet TestSet { get; }
+        IDataSet<T> TrainingSet { get; }
+        IDataSet<T> TestSet { get; }
 
         int InputSize { get;  }
 		int OutputSize { get; }
-	    event EventHandler<DataSetChangedArgs> TrainingSetChanged;
-	    event EventHandler<DataSetChangedArgs> TestSetChanged;
+	    event EventHandler<DataSetChangedArgs<T>> TrainingSetChanged;
+	    event EventHandler<DataSetChangedArgs<T>> TestSetChanged;
 	}
 }

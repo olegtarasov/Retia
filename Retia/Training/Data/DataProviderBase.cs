@@ -1,19 +1,22 @@
 ﻿using System;
+using Retia.Mathematics;
 
 namespace Retia.Training.Data
 {
-    public abstract class DataProviderBase : IDataProvider
+    public abstract class DataProviderBase<T> : IDataProvider<T> where T : struct, IEquatable<T>, IFormattable
     {
-        private IDataSet _trainingSet;
-        private IDataSet _testSet;
+        protected static MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
 
-        public event EventHandler<DataSetChangedArgs> TrainingSetChanged;
-        public event EventHandler<DataSetChangedArgs> TestSetChanged;
+        private IDataSet<T> _trainingSet;
+        private IDataSet<T> _testSet;
 
-        public abstract IDataSet CreateTrainingSet();
-        public abstract IDataSet CreateTestSet();
+        public event EventHandler<DataSetChangedArgs<T>> TrainingSetChanged;
+        public event EventHandler<DataSetChangedArgs<T>> TestSetChanged;
 
-        public IDataSet TrainingSet
+        public abstract IDataSet<T> CreateTrainingSet();
+        public abstract IDataSet<T> CreateTestSet();
+
+        public IDataSet<T> TrainingSet
         {
             get
             {
@@ -28,11 +31,11 @@ namespace Retia.Training.Data
             {
                 var old = _trainingSet;
                 _trainingSet = value;
-                OnTrainingSetChanged(new DataSetChangedArgs(old, _trainingSet));
+                OnTrainingSetChanged(new DataSetChangedArgs<T>(old, _trainingSet));
             }
         }
 
-        public IDataSet TestSet
+        public IDataSet<T> TestSet
         {
             get
             {
@@ -47,7 +50,7 @@ namespace Retia.Training.Data
             {
                 var old = _testSet;
                 _testSet = value;
-                OnTestSetChanged(new DataSetChangedArgs(old, _testSet));
+                OnTestSetChanged(new DataSetChangedArgs<T>(old, _testSet));
             }
         }
 
@@ -55,12 +58,12 @@ namespace Retia.Training.Data
         public abstract int OutputSize { get; }
 
 
-        protected virtual void OnTrainingSetChanged(DataSetChangedArgs e)
+        protected virtual void OnTrainingSetChanged(DataSetChangedArgs<T> e)
         {
             TrainingSetChanged?.Invoke(this, e);
         }
 
-        protected virtual void OnTestSetChanged(DataSetChangedArgs e)
+        protected virtual void OnTestSetChanged(DataSetChangedArgs<T> e)
         {
             TestSetChanged?.Invoke(this, e);
         }

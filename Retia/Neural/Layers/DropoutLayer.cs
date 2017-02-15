@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
@@ -9,13 +9,13 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class DropoutLayer : NeuroLayer
+    public class DropoutLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
-        private readonly float _dropout = 0.5f;
+        private readonly float _dropout;
 
-        private readonly List<Matrix> _masks = new List<Matrix>();
-        private Matrix _scale;
+        private readonly List<Matrix<T>> _masks = new List<Matrix<T>>();
+        private Matrix<T> _scale;
 
         public DropoutLayer(int size, float dropout = 0.5f)
         {
@@ -33,7 +33,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        private DropoutLayer(DropoutLayer other) : base(other)
+        private DropoutLayer(DropoutLayer<T> other) : base(other)
         {
             _size = other._size;
             _dropout = other._dropout;
@@ -56,16 +56,16 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override NeuroLayer Clone()
+        public override NeuroLayer<T> Clone()
         {
-            return new DropoutLayer(this);
+            return new DropoutLayer<T>(this);
         }
 
-        public override void Optimize(OptimizerBase optimizer)
+        public override void Optimize(OptimizerBase<T> optimizer)
         {
         }
 
-        public override Matrix Step(Matrix input, bool inTraining = false)
+        public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
             if (input.ColumnCount != BatchSize)
                 throw new InvalidOperationException($"Input has invalid batch size! Expected: {BatchSize}, got: {input.ColumnCount}");
@@ -74,16 +74,16 @@ namespace Retia.Neural.Layers
 
             if (inTraining)
             {
-                var mask = MatrixFactory.RandomMaskMatrix(_size, BatchSize, _dropout);
+                var mask = MatrixFactory.RandomMaskMatrix<T>(_size, BatchSize, _dropout);
                 _masks.Add(mask);
-                return (Matrix)input.PointwiseMultiply(mask);
+                return input.PointwiseMultiply(mask);
             }
 
             //if not in training we scale all input activations by factor of dropout probability
-            return (Matrix)input.PointwiseMultiply(_scale);
+            return input.PointwiseMultiply(_scale);
         }
 
-        public override List<Matrix> BackPropagate(List<Matrix> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             if (_masks.Count == 0)
                 throw new Exception("Empty step history, nothing to propagate!");
@@ -93,14 +93,14 @@ namespace Retia.Neural.Layers
             //TODO: add more param checks (out sens dimensions == input x batchSize, etc)
 
             var seqLen = _masks.Count;
-            var inputSensList = new List<Matrix>(seqLen);
+            var inputSensList = new List<Matrix<T>>(seqLen);
 
             for (int i = seqLen - 1; i >= 0; i--)
             {
                 var mask = _masks[i];
                 var dOut = outSens[i];
                 //this layer can not be first, so we always calculate input sens, disregarding needInputSens param
-                var dInput = (Matrix)dOut.PointwiseMultiply(mask);
+                var dInput = dOut.PointwiseMultiply(mask);
                 inputSensList.Insert(0, dInput);
             }
             return inputSensList;
@@ -114,7 +114,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             _masks.Clear();
         }
@@ -123,38 +123,13 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
             //masks are dynamically generated during training, not needed in gen alg
-
-            /*
-            int maskSize = MaskSize;
-
-            if (maskSize == 0)
-            {
-                return;
-            }
-
-            for (int i = 0; i < _masks.Count; i++)
-            {
-                _masks[i].CopyToArray(destination, ref idx);
-            }*/
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(T[] vector, ref int idx)
         {
-            /*
-            int maskSize = MaskSize;
-            if (maskSize == 0 || vector.Length == 0)
-            {
-                return;
-            }
-
-            int maskCount = vector.Length / MaskSize;
-            for (int i = 0; i < maskCount; i++)
-            {
-                _masks[i].CopyFromArray(vector, ref idx);
-            }*/
         }
 
         public override LayerSpecBase CreateSpec()
@@ -164,7 +139,7 @@ namespace Retia.Neural.Layers
 
         protected override void Initialize()
         {
-            _scale = DenseMatrix.Create(_size, BatchSize, _dropout);
+            _scale = Matrix<T>.Build.Dense(_size, BatchSize, MathProvider.Scalar(_dropout));
         }
     }
 }

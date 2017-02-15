@@ -1,22 +1,18 @@
-﻿using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra.Single;
+﻿using System;
+using MathNet.Numerics.Distributions;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 using Retia.RandomGenerator;
 
 namespace Retia.Neural.Initializers
 {
-    public class ProportionalRandomMatrixInitializer : IMatrixInitializer
+    public class ProportionalRandomMatrixInitializer<T> : IMatrixInitializer<T> where T : struct, IEquatable<T>, IFormattable
     {
         public double Dispersion { get; set; } = 5e-2;
 
-        public Matrix CreateMatrix(int rows, int columns)
+        public Matrix<T> CreateMatrix(int rows, int columns)
         {
-            return DenseMatrix.CreateRandom(rows, columns, new Normal(0.0f, Dispersion / columns));
-        }
-
-        public float[] CreateArray(int size)
-        {
-            return RandomMatrixInitializer.CreateRandomArray(size, Dispersion);
+            return Matrix<T>.Build.Random(rows, columns, new ContinuousUniform(0.0f, Dispersion / columns));
         }
     }
 }

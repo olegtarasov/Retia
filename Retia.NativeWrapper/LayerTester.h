@@ -7,7 +7,7 @@
 using namespace System;
 using namespace System::Collections::Generic;
 using namespace Retia::Contracts;
-using namespace MathNet::Numerics::LinearAlgebra::Single;
+using namespace MathNet::Numerics::LinearAlgebra;
 
 public ref class LayerTester
 {
@@ -46,7 +46,7 @@ public:
 		delete _container;
 	}
 
-	void TestForward(List<Matrix^>^ inputs, List<Matrix^>^ outputs)
+	void TestForward(List<Matrix<float>^>^ inputs, List<Matrix<float>^>^ outputs)
 	{
 		auto inMatrices = gcnew ManagedMatrixContainer();
 		auto outMatrices = gcnew ManagedMatrixContainer();

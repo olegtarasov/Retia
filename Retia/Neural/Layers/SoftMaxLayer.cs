@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Single;
 using Retia.Contracts;
 using Retia.Helpers;
@@ -10,11 +11,11 @@ using Retia.RandomGenerator;
 
 namespace Retia.Neural.Layers
 {
-    public class SoftMaxLayer : NeuroLayer
+    public class SoftMaxLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
 
-        private SoftMaxLayer(SoftMaxLayer other) : base(other)
+        private SoftMaxLayer(SoftMaxLayer<T> other) : base(other)
         {
             _size = other._size;
         }
@@ -33,9 +34,9 @@ namespace Retia.Neural.Layers
         public override int OutputSize => _size;
         public override int TotalParamCount => 0;
 
-        public override double LayerError(Matrix y, Matrix target)
+        public override double LayerError(Matrix<T> y, Matrix<T> target)
         {
-            return ErrorFunctions.CrossEntropy(y, target);
+            return MathProvider.CrossEntropy(y, target);
         }
 
         public override void Save(Stream s)
@@ -46,18 +47,18 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override NeuroLayer Clone()
+        public override NeuroLayer<T> Clone()
         {
-            return new SoftMaxLayer(_size);
+            return new SoftMaxLayer<T>(this);
         }
 
-        public override void Optimize(OptimizerBase optimizer)
+        public override void Optimize(OptimizerBase<T> optimizer)
         {
         }
 
-        public override Matrix Step(Matrix input, bool inTraining = false)
+        public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
-            var output = SoftMax.SoftMaxNorm(input);
+            var output = MathProvider.SoftMaxNorm(input);
             if (inTraining)
             {
                 Inputs.Add(input);
@@ -67,12 +68,14 @@ namespace Retia.Neural.Layers
         }
 
 
-        protected override float Derivative(Matrix input, Matrix output, int batch, int i, int o)
+        protected override T Derivative(Matrix<T> input, Matrix<T> output, int batch, int i, int o)
         {
-            return i == o ? output[i, batch] * (1 - output[o, batch]) : -output[i, batch] * output[o, batch];
+            // TODO: Support
+            throw new NotSupportedException();
+            //return i == o ? output[i, batch] * (1 - output[o, batch]) : -output[i, batch] * output[o, batch];
         }
 
-        public override List<Matrix> BackPropagate(List<Matrix> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             if (Outputs.Count != Inputs.Count)
                 throw new Exception("Backprop was not initialized (empty state sequence)");
@@ -92,7 +95,7 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
             Outputs.Clear();
             Inputs.Clear();
@@ -102,11 +105,11 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override void ToVectorState(float[] destination, ref int idx, bool grad = false)
+        public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
         }
 
-        public override void FromVectorState(float[] vector, ref int idx)
+        public override void FromVectorState(T[] vector, ref int idx)
         {
         }
 

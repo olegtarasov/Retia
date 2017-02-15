@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Mathematics;
 using Retia.Tests.Plumbing;
@@ -13,37 +13,39 @@ using XunitShould;
 
 namespace Retia.Tests.Mathematics
 {
-    public partial class MatrixTests
+    public abstract partial class MatrixTestsBase<T> where T : struct, IEquatable<T>, IFormattable
     {
+        protected MathProviderBase<T> MathProvider => MathProvider<T>.Instance;
+
         #region String parsing
 
         [Fact]
         public void CanParseMatrixFromValidString()
         {
-            var matrix = MatrixFactory.ParseString(@"1.0 2.0 3.0
+            var matrix = MatrixFactory.ParseString<T>(@"1.0 2.0 3.0
                                                    4.0 5.0 6.0");
 
             matrix.ShouldHaveSize(2, 3);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f });
+            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
         }
 
         [Fact]
         public void CanParseColumnVectorFromValidString()
         {
-            var matrix = MatrixFactory.ParseString(@"1.0 
+            var matrix = MatrixFactory.ParseString<T>(@"1.0 
                                                    2.0
                                                    3.0");
 
             matrix.ShouldHaveSize(3, 1);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 2.0f, 3.0f });
+            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 2.0f, 3.0f));
         }
 
         [Fact]
         public void CanParseColumnVectorFromValidStringWithTrailingNewlines()
         {
-            var matrix = MatrixFactory.ParseString(@"1.0 
+            var matrix = MatrixFactory.ParseString<T>(@"1.0 
                                                    2.0
                                                    3.0
 
@@ -51,23 +53,23 @@ namespace Retia.Tests.Mathematics
 
             matrix.ShouldHaveSize(3, 1);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 2.0f, 3.0f });
+            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 2.0f, 3.0f));
         }
 
         [Fact]
         public void CanParseRowVectorFromValidString()
         {
-            var matrix = MatrixFactory.ParseString(@"1.0 2.0 3.0");
+            var matrix = MatrixFactory.ParseString<T>(@"1.0 2.0 3.0");
 
             matrix.ShouldHaveSize(1, 3);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 2.0f, 3.0f });
+            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 2.0f, 3.0f));
         }
 
         [Fact]
         public void CantParseMatrixFromInsufficientData()
         {
-            Trap.Exception(() => MatrixFactory.ParseString(@"1.0 2.0 3.0
+            Trap.Exception(() => MatrixFactory.ParseString<T>(@"1.0 2.0 3.0
                                                            4.0 5.0 
                                                            7.0 8.0 9.0"))
                 .ShouldBeInstanceOf<InvalidOperationException>();
@@ -76,12 +78,12 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanParseMatrixWithCommaSeparators()
         {
-            var matrix = MatrixFactory.ParseString(@"1,0 2,0 3,0
+            var matrix = MatrixFactory.ParseString<T>(@"1,0 2,0 3,0
                                                    4,0 5,0 6,0");
 
             matrix.ShouldHaveSize(2, 3);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f });
+            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
         }
         #endregion
 
@@ -90,71 +92,69 @@ namespace Retia.Tests.Mathematics
         private static IEnumerable<object[]> GetAccumulatePositiveTestData()
         {
             // Alpha-beta combinations
-            yield return new object[] { Matrix5By3, Matrix3By6, DenseMatrix.Create(5, 6, 1), Transpose.DontTranspose, Transpose.DontTranspose, 1.0f, 0.0f };
-            yield return new object[] { Matrix5By3, Matrix3By6, DenseMatrix.Create(5, 6, 1), Transpose.DontTranspose, Transpose.DontTranspose, 1.0f, 1.0f };
-            yield return new object[] { Matrix5By3, Matrix3By6, DenseMatrix.Create(5, 6, 1), Transpose.DontTranspose, Transpose.DontTranspose, 0.0f, 1.0f };
-            yield return new object[] { Matrix5By3, Matrix3By6, DenseMatrix.Create(5, 6, 1), Transpose.DontTranspose, Transpose.DontTranspose, 0.0f, 0.0f };
-
+            yield return new object[] { Matrix5By3, Matrix3By6, Matrix<T>.Build.Dense(5, 6, Matrix<T>.One), Transpose.DontTranspose, Transpose.DontTranspose, false };
+            yield return new object[] { Matrix5By3, Matrix3By6, Matrix<T>.Build.Dense(5, 6, Matrix<T>.One), Transpose.DontTranspose, Transpose.DontTranspose, true };
+            
             // Transpose combinations
-            yield return new object[] { Matrix3By6, Matrix3By6, DenseMatrix.Create(6, 6, 1), Transpose.Transpose, Transpose.DontTranspose, 1.0f, 1.0f };
-            yield return new object[] { Matrix5By3, Matrix5By3, DenseMatrix.Create(5, 5, 1), Transpose.DontTranspose, Transpose.Transpose, 1.0f, 1.0f };
-            yield return new object[] { Matrix3By6, Matrix5By3, DenseMatrix.Create(6, 5, 1), Transpose.Transpose, Transpose.Transpose, 1.0f, 1.0f };
+            yield return new object[] { Matrix3By6, Matrix3By6, Matrix<T>.Build.Dense(6, 6, Matrix<T>.One), Transpose.Transpose, Transpose.DontTranspose, true };
+            yield return new object[] { Matrix5By3, Matrix5By3, Matrix<T>.Build.Dense(5, 5, Matrix<T>.One), Transpose.DontTranspose, Transpose.Transpose, true };
+            yield return new object[] { Matrix3By6, Matrix5By3, Matrix<T>.Build.Dense(6, 5, Matrix<T>.One), Transpose.Transpose, Transpose.Transpose, true };
 
             // Vector tests
-            yield return new object[] { RowVector5, ColumnVector5, DenseMatrix.Create(1, 1, 1), Transpose.DontTranspose, Transpose.DontTranspose, 1.0f, 1.0f };
-            yield return new object[] { ColumnVector5, RowVector5, DenseMatrix.Create(5, 5, 1), Transpose.DontTranspose, Transpose.DontTranspose, 1.0f, 1.0f };
-            yield return new object[] { RowVector5, ColumnVector5, DenseMatrix.Create(5, 5, 1), Transpose.Transpose, Transpose.Transpose, 1.0f, 1.0f };
+            yield return new object[] { RowVector5, ColumnVector5, Matrix<T>.Build.Dense(1, 1, Matrix<T>.One), Transpose.DontTranspose, Transpose.DontTranspose, true};
+            yield return new object[] { ColumnVector5, RowVector5, Matrix<T>.Build.Dense(5, 5, Matrix<T>.One), Transpose.DontTranspose, Transpose.DontTranspose, true};
+            yield return new object[] { RowVector5, ColumnVector5, Matrix<T>.Build.Dense(5, 5, Matrix<T>.One), Transpose.Transpose, Transpose.Transpose, true};
 
             // Matrix-vector tests
-            yield return new object[] { Matrix5By3, ColumnVector3, DenseMatrix.Create(5, 1, 1), Transpose.DontTranspose, Transpose.DontTranspose, 1.0f, 1.0f };
-            yield return new object[] { Matrix5By3, ColumnVector5, DenseMatrix.Create(3, 1, 1), Transpose.Transpose, Transpose.DontTranspose, 1.0f, 1.0f };
+            yield return new object[] { Matrix5By3, ColumnVector3, Matrix<T>.Build.Dense(5, 1, Matrix<T>.One), Transpose.DontTranspose, Transpose.DontTranspose, true};
+            yield return new object[] { Matrix5By3, ColumnVector5, Matrix<T>.Build.Dense(3, 1, Matrix<T>.One), Transpose.Transpose, Transpose.DontTranspose, true};
         }
 
         ///     C = beta * C + alpha * AB;
         [Theory]
         [MemberData(nameof(GetAccumulatePositiveTestData))]
-        public void CanCalculateMatrixDotAndAccumulate(Matrix A, Matrix B, Matrix C, Transpose transposeA, Transpose transposeB, float alpha, float beta)
+        public void CanCalculateMatrixDotAndAccumulate(Matrix<T> A, Matrix<T> B, Matrix<T> C, Transpose transposeA, Transpose transposeB, bool useC)
         {
             var tA = GetTestMatrix(A);
             var tB = GetTestMatrix(B);
             var tC = GetTestMatrix(C);
 
-            C.Accumulate(A, B, beta, alpha, transposeA, transposeB);
+            C.Accumulate(A, B, transposeA, transposeB, useC);
 
             if (transposeA == Transpose.Transpose)
             {
-                tA = (Matrix)tA.Transpose();
+                tA = tA.Transpose();
             }
             if (transposeB == Transpose.Transpose)
             {
-                tB = (Matrix)tB.Transpose();
+                tB = tB.Transpose();
             }
 
-            C.AsColumnMajorArray().ShouldArrayEqual((beta * tC + alpha * tA * tB).ToColumnMajorArray());
+            C.AsColumnMajorArray().ShouldArrayEqual(((useC ? Matrix<T>.One : Matrix<T>.Zero) * tC + tA * tB).ToColumnMajorArray());
         }
 
         private static IEnumerable<object[]> GetAccumulateScalarPositiveTestData()
         {
-            yield return new object[] { Matrix5By3, DenseMatrix.Create(5, 3, 1), 1.0f };
-            yield return new object[] { Matrix5By3, DenseMatrix.Create(5, 3, 1), 0.0f };
-            yield return new object[] { Matrix5By3, DenseMatrix.Create(5, 3, 1), 2.0f };
+            yield return new object[] { Matrix5By3, Matrix<T>.Build.Dense(5, 3, Matrix<T>.One), 1.0f };
+            yield return new object[] { Matrix5By3, Matrix<T>.Build.Dense(5, 3, Matrix<T>.One), 0.0f };
+            yield return new object[] { Matrix5By3, Matrix<T>.Build.Dense(5, 3, Matrix<T>.One), 2.0f };
 
-            yield return new object[] { ColumnVector5, DenseMatrix.Create(5, 1, 1), 1.0f };
-            yield return new object[] { ColumnVector5, DenseMatrix.Create(5, 1, 1), 0.0f };
-            yield return new object[] { ColumnVector5, DenseMatrix.Create(5, 1, 1), 2.0f };
+            yield return new object[] { ColumnVector5, Matrix<T>.Build.Dense(5, 1, Matrix<T>.One), 1.0f };
+            yield return new object[] { ColumnVector5, Matrix<T>.Build.Dense(5, 1, Matrix<T>.One), 0.0f };
+            yield return new object[] { ColumnVector5, Matrix<T>.Build.Dense(5, 1, Matrix<T>.One), 2.0f };
         }
 
         ///     C = alpha*A + C
         [Theory]
         [MemberData(nameof(GetAccumulateScalarPositiveTestData))]
-        public void CanMultiplyMatrixByScalarAndAccumulate(Matrix A, Matrix C, float alpha)
+        public void CanAccumulateMatrices(Matrix<T> A, Matrix<T> C, float alpha)
         {
             var tA = GetTestMatrix(A);
             var tC = GetTestMatrix(C);
 
-            C.Accumulate(A, alpha);
+            C.Accumulate(A);
 
-            C.AsColumnMajorArray().ShouldArrayEqual((alpha * tA + tC).ToColumnMajorArray());
+            C.AsColumnMajorArray().ShouldArrayEqual((tA + tC).ToColumnMajorArray());
         }
 
         #endregion
@@ -164,7 +164,7 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanTileColumnVector()
         {
-            var matrix = MatrixFactory.ParseString(@"1
+            var matrix = MatrixFactory.ParseString<T>(@"1
                                                    2
                                                    3
                                                    4");
@@ -172,7 +172,7 @@ namespace Retia.Tests.Mathematics
             var result = matrix.TileColumns(3);
             result.ShouldHaveSize(4, 3);
 
-            result.AsColumnMajorArray().ShouldArrayEqual(new float[] { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4 });
+            result.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4));
         }
 
         [Fact]
@@ -182,7 +182,7 @@ namespace Retia.Tests.Mathematics
 
             result.ShouldHaveSize(3, 18);
 
-            var test = DenseMatrix.OfColumns(Enumerable.Range(0, 3).SelectMany(x => Matrix3By6.EnumerateColumns()));
+            var test = Matrix<T>.Build.DenseOfColumns(Enumerable.Range(0, 3).SelectMany(x => Matrix3By6.EnumerateColumns()));
 
             result.AsColumnMajorArray().ShouldArrayEqual(test.AsColumnMajorArray());
         }
@@ -190,12 +190,12 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanTileRowVector()
         {
-            var matrix = MatrixFactory.ParseString(@"1 2 3 4");
+            var matrix = MatrixFactory.ParseString<T>(@"1 2 3 4");
 
             var result = matrix.TileRows(3);
             result.ShouldHaveSize(3, 4);
 
-            result.AsColumnMajorArray().ShouldArrayEqual(new float[] { 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 });
+            result.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4));
         }
 
         [Fact]
@@ -205,7 +205,7 @@ namespace Retia.Tests.Mathematics
 
             result.ShouldHaveSize(9, 6);
 
-            var test = DenseMatrix.OfRows(Enumerable.Range(0, 3).SelectMany(x => Matrix3By6.EnumerateRows()));
+            var test = Matrix<T>.Build.DenseOfRows(Enumerable.Range(0, 3).SelectMany(x => Matrix3By6.EnumerateRows()));
 
             result.AsColumnMajorArray().ShouldArrayEqual(test.AsColumnMajorArray());
         }
@@ -217,16 +217,16 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanSaveAndLoadMatrix()
         {
-            var matrix = MatrixFactory.ParseString(@"1.0 2.0 3.0
+            var matrix = MatrixFactory.ParseString<T>(@"1.0 2.0 3.0
                                                    4.0 5.0 6.0");
 
             matrix.ShouldHaveSize(2, 3);
 
             using (var file = new DisposableFile())
             {
-                var read = file.WriteAndReadData(stream => matrix.Save(stream), MatrixFactory.Load);
+                var read = file.WriteAndReadData(stream => matrix.Save(stream), MatrixFactory.Load<T>);
 
-                read.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f });
+                read.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
             }
         }
 
@@ -235,9 +235,9 @@ namespace Retia.Tests.Mathematics
         {
             using (new FakeRandom(1.0, 4.0, 2.0, 5.0, 3.0, 6.0))
             {
-                var matrix = MatrixFactory.RandomMatrix(2, 3, 5);
+                var matrix = MatrixFactory.RandomMatrix<T>(2, 3, 5);
                 matrix.ShouldHaveSize(2, 3);
-                matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f });
+                matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
             }
         }
 
@@ -246,19 +246,19 @@ namespace Retia.Tests.Mathematics
         {
             using (new FakeRandom(0.4, 0.6, 0.5, 0.25, 0.0, 1.0))
             {
-                var matrix = MatrixFactory.RandomMaskMatrix(2, 3, 0.5f);
+                var matrix = MatrixFactory.RandomMaskMatrix<T>(2, 3, 0.5f);
                 matrix.ShouldHaveSize(2, 3);
-                matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f });
+                matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f));
             }
         }
 
         [Fact]
         public void CanCompareMatrices()
         {
-            MatrixFactory.ParseString(@"1.0 2.0 3.0
+            MatrixFactory.ParseString<T>(@"1.0 2.0 3.0
                                                     4.0 5.0 6.0
                                                     7.0 8.0 9.0").EqualsTo(
-                MatrixFactory.ParseString(@"1.0 2.0 3.0
+                MatrixFactory.ParseString<T>(@"1.0 2.0 3.0
                                                     4.0 5.0 6.0
                                                     7.0 8.0 9.0")).ShouldBeTrue();
 
@@ -267,9 +267,9 @@ namespace Retia.Tests.Mathematics
             self.EqualsTo(self).ShouldBeTrue();
             Matrix3By6.EqualsTo(Matrix5By3).ShouldBeFalse();
 
-            var arr = new float[] {1, 2, 3, 4};
-            var m1 = new DenseMatrix(2, 2, arr);
-            var m2 = new DenseMatrix(2, 2, arr);
+            var arr = MathProvider.Array(1, 2, 3, 4);
+            var m1 = Matrix<T>.Build.Dense(2, 2, arr);
+            var m2 = Matrix<T>.Build.Dense(2, 2, arr);
             m1.EqualsTo(m2).ShouldBeTrue();
         }
 
@@ -280,14 +280,14 @@ namespace Retia.Tests.Mathematics
 
             clone.AsColumnMajorArray().ShouldArrayEqual(Matrix3By6.AsColumnMajorArray());
 
-            clone[1, 1] = 42.0f;
+            clone[1, 1] = MathProvider.Scalar(42.0f);
             clone[1, 1].ShouldNotEqual(Matrix3By6[1, 1]);
         }
 
         [Fact]
         public void CanCopyMatrixToArray()
         {
-            var dest = new float[Matrix5By3.RowCount * Matrix5By3.ColumnCount];
+            var dest = new T[Matrix5By3.RowCount * Matrix5By3.ColumnCount];
             int idx = 0;
 
             Matrix5By3.CopyToArray(dest, ref idx);
@@ -299,7 +299,7 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanRestoreMatrixFromArray()
         {
-            var dest = new float[Matrix5By3.RowCount * Matrix5By3.ColumnCount];
+            var dest = new T[Matrix5By3.RowCount * Matrix5By3.ColumnCount];
             int idx = 0;
 
             Matrix5By3.CopyToArray(dest, ref idx);
@@ -308,7 +308,7 @@ namespace Retia.Tests.Mathematics
             idx.ShouldEqual(Matrix5By3.RowCount * Matrix5By3.ColumnCount);
 
             idx = 0;
-            var mat = new DenseMatrix(5, 3);
+            var mat = Matrix<T>.Build.Dense(5, 3);
             mat.CopyFromArray(dest, ref idx);
 
             mat.AsColumnMajorArray().ShouldArrayEqual(Matrix5By3.AsColumnMajorArray());
@@ -318,12 +318,12 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanClampMatrix()
         {
-            var matrix = MatrixFactory.ParseString(@"2 5
+            var matrix = MatrixFactory.ParseString<T>(@"2 5
                                                    -6 1");
 
-            matrix.Clamp(-4, 4);
+            matrix.Clamp(MathProvider.Scalar(-4), MathProvider.Scalar(4));
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(new[] { 2.0f, -4.0f, 4.0f, 1.0f });
+            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
         }
 
         [Fact]
@@ -358,16 +358,16 @@ namespace Retia.Tests.Mathematics
         [Fact]
         public void CanPerformIndependentMul()
         {
-            var m11 = MatrixFactory.RandomMatrix(3, 6, 5);
-            var m2 = MatrixFactory.RandomMatrix(6, 8, 5);
+            var m11 = MatrixFactory.RandomMatrix<T>(3, 6, 5);
+            var m2 = MatrixFactory.RandomMatrix<T>(6, 8, 5);
 
             var res1 = m11 * m2;
 
-            var m21 = MatrixFactory.RandomMatrix(3, 6, 5);
+            var m21 = MatrixFactory.RandomMatrix<T>(3, 6, 5);
 
             var res2 = m21 * m2;
 
-            var m1g = DenseMatrix.OfRows(m11.EnumerateRows().Concat(m21.EnumerateRows()));
+            var m1g = Matrix<T>.Build.DenseOfRows(m11.EnumerateRows().Concat(m21.EnumerateRows()));
             
             var resg = m1g * m2;
 
@@ -378,7 +378,7 @@ namespace Retia.Tests.Mathematics
             rg2.AsColumnMajorArray().ShouldArrayEqual(res2.AsColumnMajorArray());
         }
 
-        private Matrix GetTestMatrix(Matrix matrix)
+        private Matrix<T> GetTestMatrix(Matrix<T> matrix)
         {
             return matrix.CloneMatrix();
         }

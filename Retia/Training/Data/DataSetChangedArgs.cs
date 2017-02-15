@@ -2,15 +2,15 @@
 
 namespace Retia.Training.Data
 {
-    public class DataSetChangedArgs : EventArgs
+    public class DataSetChangedArgs<T> : EventArgs where T : struct, IEquatable<T>, IFormattable
     {
-        public DataSetChangedArgs(IDataSet oldSet, IDataSet newSet)
+        public DataSetChangedArgs(IDataSet<T> oldSet, IDataSet<T> newSet)
         {
             OldSet = oldSet;
             NewSet = newSet;
         }
 
-        public IDataSet OldSet { get; set; }
-        public IDataSet NewSet { get; set; }
+        public IDataSet<T> OldSet { get; set; }
+        public IDataSet<T> NewSet { get; set; }
     }
 }

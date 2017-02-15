@@ -1,21 +1,15 @@
-﻿using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
-using Retia.Mathematics;
+﻿using System;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace Retia.Neural.Initializers
 {
-    public class ConstantMatrixInitializer : IMatrixInitializer
+    public class ConstantMatrixInitializer<T> : IMatrixInitializer<T> where T : struct, IEquatable<T>, IFormattable
     {
-        public float Value { get; set; } = 0.0f;
+        public T Value { get; set; } = (T)Convert.ChangeType(0.0f, typeof(T));
 
-        public Matrix CreateMatrix(int rows, int columns)
+        public Matrix<T> CreateMatrix(int rows, int columns)
         {
-            return DenseMatrix.Create(rows, columns, Value);
-        }
-
-        public float[] CreateArray(int size)
-        {
-            return Enumerable.Repeat(Value, size).ToArray();
+            return Matrix<T>.Build.Dense(rows, columns, Value);
         }
     }
 }

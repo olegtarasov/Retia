@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
 
 namespace Retia.Neural
 {
-    public class BiGRU : NeuralNet
+    public class BiGRU<T> : NeuralNet<T> where T : struct, IEquatable<T>, IFormattable
     {
-        private NeuralNet forward;
-        private NeuralNet backward;
-        private NeuralNet outNet;
+        private NeuralNet<T> forward;
+        private NeuralNet<T> backward;
+        private NeuralNet<T> outNet;
         public BiGRU(int xSize, int hSize, int ySize, int batchSize, int seqLen)
         {
-            forward = new LayeredNet(batchSize, seqLen, new GruLayer(xSize, hSize));
-            backward = new LayeredNet(batchSize, seqLen, new GruLayer(xSize, hSize));
-            outNet = new LayeredNet(batchSize, seqLen, new GruLayer(hSize * 2, hSize), new LinearLayer(hSize, ySize));
+            forward = new LayeredNet<T>(batchSize, seqLen, new GruLayer<T>(xSize, hSize));
+            backward = new LayeredNet<T>(batchSize, seqLen, new GruLayer<T>(xSize, hSize));
+            outNet = new LayeredNet<T>(batchSize, seqLen, new GruLayer<T>(hSize * 2, hSize), new LinearLayer<T>(hSize, ySize));
         }
 
-        public BiGRU(BiGRU other)
+        public BiGRU(BiGRU<T> other)
         {
             forward = other.forward.Clone();
             backward = other.backward.Clone();
@@ -36,9 +36,9 @@ namespace Retia.Neural
             outNet.Save(s);
         }
 
-        public override NeuralNet Clone()
+        public override NeuralNet<T> Clone()
         {
-            return new BiGRU(this);
+            return new BiGRU<T>(this);
         }
 
         public override void Optimize()
@@ -48,23 +48,23 @@ namespace Retia.Neural
             outNet.Optimize();
         }
 
-        public override List<Matrix> BackPropagate(List<Matrix> targets, bool needInputSense = false)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> targets, bool needInputSense = false)
         {
             var prop = outNet.BackPropagate(targets, true);
 
             var batchSize = targets[0].ColumnCount;
 
-            var fSens = new List<Matrix>(targets.Count);
-            var bSens = new List<Matrix>(targets.Count);
+            var fSens = new List<Matrix<T>>(targets.Count);
+            var bSens = new List<Matrix<T>>(targets.Count);
             for (int i = 0; i < prop.Count; i++)
             {
                 var sens = prop[i];
 
-                var f = new DenseMatrix(forward.OutputSize, batchSize);
+                var f = Matrix<T>.Build.Dense(forward.OutputSize, batchSize);
                 f.SetSubMatrix(0, 0, f.RowCount, 0, 0, f.ColumnCount, sens);
                 fSens.Add(f);
 
-                var b = new DenseMatrix(backward.OutputSize, batchSize);
+                var b = Matrix<T>.Build.Dense(backward.OutputSize, batchSize);
                 b.SetSubMatrix(0, f.RowCount, b.RowCount, 0, 0, b.ColumnCount, sens);
                 bSens.Add(b);
             }
@@ -76,12 +76,12 @@ namespace Retia.Neural
             return null;
         }
 
-        public override double Error(Matrix y, Matrix target)
+        public override double Error(Matrix<T> y, Matrix<T> target)
         {
             return outNet.Error(y, target);
         }
 
-        public override Matrix Step(Matrix input, bool inTraining = false)
+        public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
             throw new NotSupportedException("Can not make single step on BiGRU");
         }
@@ -100,14 +100,14 @@ namespace Retia.Neural
             outNet.ResetOptimizer();
         }
 
-        public override void InitBackPropagation()
+        public override void InitSequence()
         {
-            forward.InitBackPropagation();
-            backward.InitBackPropagation();
-            outNet.InitBackPropagation();
+            forward.InitSequence();
+            backward.InitSequence();
+            outNet.InitSequence();
         }
 
-        public override OptimizerBase Optimizer
+        public override OptimizerBase<T> Optimizer
         {
             get { return outNet.Optimizer; }
             set
@@ -124,19 +124,19 @@ namespace Retia.Neural
         public override int TotalParamCount
             => forward.TotalParamCount + backward.TotalParamCount + outNet.TotalParamCount;
 
-        public override List<Matrix> ProcessSequence(List<Matrix> inputs)
+        public override List<Matrix<T>> ProcessSequence(List<Matrix<T>> inputs)
         {
             return ProcessSequence(inputs, false);
         }
-        public List<Matrix> ProcessSequence(List<Matrix> inputs, bool inTraining)
+        public List<Matrix<T>> ProcessSequence(List<Matrix<T>> inputs, bool inTraining)
         {
-            var yList = new List<Matrix>(inputs.Count);
+            var yList = new List<Matrix<T>>(inputs.Count);
 
-            var combinedList = new List<Matrix>(inputs.Count);
+            var combinedList = new List<Matrix<T>>(inputs.Count);
             var batchSize = inputs[0].ColumnCount;
 
             for (int i = 0; i < inputs.Count; i++)
-                combinedList.Add(new DenseMatrix(forward.OutputSize * 2, batchSize));
+                combinedList.Add(Matrix<T>.Build.Dense(forward.OutputSize * 2, batchSize));
 
             for (int i = 0; i < inputs.Count; i++)
             {
@@ -158,13 +158,13 @@ namespace Retia.Neural
             return yList;
         }
 
-        public override double TrainSequence(List<Matrix> inputs, List<Matrix> targets)
+        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
             if (inputs.Count != targets.Count || targets.Count == 0)
                 throw new Exception("Not enough targets or inputs provided!");
 
             var sequenceLen = inputs.Count;
-            InitBackPropagation();
+            InitSequence();
             //var yList = new List<Matrix>(sequenceLen);
             var error = new List<double>(sequenceLen);
             //var sw=new Stopwatch();
@@ -181,16 +181,16 @@ namespace Retia.Neural
             return totalErr;
         }
 
-        public override List<Matrix> TestSequence(List<Matrix> inputs, List<Matrix> targets, out List<double> errors)
+        public override List<Matrix<T>> TestSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<double> errors)
         {
-            var yList = new List<Matrix>(inputs.Count);
+            var yList = new List<Matrix<T>>(inputs.Count);
             errors = new List<double>(inputs.Count);
 
-            var combinedList = new List<Matrix>(inputs.Count);
+            var combinedList = new List<Matrix<T>>(inputs.Count);
             var batchSize = inputs[0].ColumnCount;
 
             for (int i = 0; i < inputs.Count; i++)
-                combinedList.Add(new DenseMatrix(forward.OutputSize * 2, batchSize));
+                combinedList.Add(Matrix<T>.Build.Dense(forward.OutputSize * 2, batchSize));
 
             for (int i = 0; i < inputs.Count; i++)
             {

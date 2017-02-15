@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Integration;
@@ -11,20 +11,24 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public abstract class NeuroLayer : ICloneable<NeuroLayer>, IFileWritable
+    public abstract class NeuroLayer<T> : ICloneable<NeuroLayer<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
         protected int BatchSize;
         protected int SeqLen;
 
-        protected List<Matrix> Inputs = new List<Matrix>();
-        protected List<Matrix> Outputs = new List<Matrix>();
+        protected List<Matrix<T>> Inputs = new List<Matrix<T>>();
+        protected List<Matrix<T>> Outputs = new List<Matrix<T>>();
+
+        protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
 
         protected NeuroLayer()
         {
         }
 
-        protected NeuroLayer(NeuroLayer other)
+        protected NeuroLayer(NeuroLayer<T> other)
         {
+            BatchSize = other.BatchSize;
+            SeqLen = other.SeqLen;
             Inputs = other.Inputs.Select(x => x.CloneMatrix()).ToList();
             Outputs = other.Outputs.Select(x => x.CloneMatrix()).ToList();
         }
@@ -32,13 +36,13 @@ namespace Retia.Neural.Layers
         public abstract int InputSize { get; }
         public abstract int OutputSize { get; }
         public abstract int TotalParamCount { get; }
-        public virtual Matrix[] InternalState { get;  set; }
+        public virtual Matrix<T>[] InternalState { get;  set; }
 
-        public abstract NeuroLayer Clone();
+        public abstract NeuroLayer<T> Clone();
 
         public abstract void Save(Stream s);
 
-        public abstract void Optimize(OptimizerBase optimizer);
+        public abstract void Optimize(OptimizerBase<T> optimizer);
 
         /// <summary>
         ///     Forward layer step
@@ -46,11 +50,11 @@ namespace Retia.Neural.Layers
         /// <param name="input">Input matrix</param>
         /// <param name="inTraining">Store states for back propagation</param>
         /// <returns>Layer output</returns>
-        public abstract Matrix Step(Matrix input, bool inTraining = false);
+        public abstract Matrix<T> Step(Matrix<T> input, bool inTraining = false);
 
         public abstract void ResetMemory();
         public abstract void ResetOptimizer();
-        public abstract void InitBackPropagation();
+        public abstract void InitSequence();
         public abstract void ClampGrads(float limit);
         public abstract LayerSpecBase CreateSpec();
 
@@ -58,12 +62,12 @@ namespace Retia.Neural.Layers
         /// Converts layer state to a vector of doubles.
         /// </summary>
         /// <returns>Layer vector state.</returns>
-        public abstract void ToVectorState(float[] destination, ref int idx, bool grad=false);
+        public abstract void ToVectorState(T[] destination, ref int idx, bool grad=false);
 
         /// <summary>
         /// Modifies layer state from a vector of doubles.
         /// </summary>
-        public abstract void FromVectorState(float[] vector, ref int idx);
+        public abstract void FromVectorState(T[] vector, ref int idx);
 
 
         /// <summary>
@@ -72,7 +76,7 @@ namespace Retia.Neural.Layers
         /// <param name="outSens">Sequence of sensitivity matrices of next layer</param>
         /// <param name="needInputSens">Calculate input sensitivity for further propagation</param>
         /// <returns></returns>
-        public virtual List<Matrix> BackPropagate(List<Matrix> outSens, bool needInputSens = true)
+        public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             return outSens;
         }
@@ -83,13 +87,13 @@ namespace Retia.Neural.Layers
         /// </summary>
         /// <param name="outSens">Sequence of sensitivity matrices of next layer</param>
         /// <returns></returns>
-        public virtual List<Matrix> PropagateSensitivity(List<Matrix> outSens)
+        public virtual List<Matrix<T>> PropagateSensitivity(List<Matrix<T>> outSens)
         {
-            var iSensList = new List<Matrix>(Inputs.Count);
+            var iSensList = new List<Matrix<T>>(Inputs.Count);
             for (int step = 0; step < Inputs.Count; step++)
             {
                 var oSens = outSens[step];
-                var iSens = new DenseMatrix(InputSize, BatchSize);
+                var iSens = Matrix<T>.Build.Dense(InputSize, BatchSize);
                 for (int b = 0; b < BatchSize; b++)
                     CalcSens(step, b, iSens, oSens);
                 iSensList.Add(iSens);
@@ -103,15 +107,15 @@ namespace Retia.Neural.Layers
         /// <param name="y">Layer output</param>
         /// <param name="target">Layer target</param>
         /// <returns></returns>
-        public virtual double LayerError(Matrix y, Matrix target)
+        public virtual double LayerError(Matrix<T> y, Matrix<T> target)
         {
             return 0.0;
         }
 
-        public virtual void SetParam(int i, float value)
+        public virtual void SetParam(int i, T value)
         {
             int refInd = 0;
-            var state = new float[TotalParamCount];
+            var state = new T[TotalParamCount];
             ToVectorState(state, ref refInd);
             state[i] = value;
             refInd = 0;
@@ -122,34 +126,9 @@ namespace Retia.Neural.Layers
         ///     Calculates matched error (out-target) and propagates it through layer to inputs
         /// </summary>
         /// <param name="targets">Sequence of targets</param>
-        public virtual List<Matrix> ErrorPropagate(List<Matrix> targets)
+        public virtual List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
         {
-            if (Outputs.Count != targets.Count || targets.Count == 0)
-                throw new Exception("Not enough targets provided or not enough output states stored!");
-
-            var sensitivities = new List<Matrix>(SeqLen);
-            float k = 1.0f / BatchSize;
-
-            for (int i = 0; i < SeqLen; i++)
-            {
-                var y = Outputs[i];
-                var target = targets[i];
-                var sensitivity = (Matrix)new DenseMatrix(y.RowCount, y.ColumnCount);
-
-                var ya = y.AsColumnMajorArray();
-                var ta = target.AsColumnMajorArray();
-                var sa = sensitivity.AsColumnMajorArray();
-
-                for (int idx = 0; idx < ya.Length; idx++)
-                {
-                    float t = ta[idx];
-                    sa[idx] = float.IsNaN(t) ? 0.0f : (ya[idx] - t) * k;
-                }
-
-                sensitivities.Add(sensitivity);
-            }
-
-            return sensitivities;
+            return MathProvider.ErrorPropagate(Outputs, targets, SeqLen, BatchSize);
         }
 
         public void Save(string filename)
@@ -157,10 +136,10 @@ namespace Retia.Neural.Layers
             this.SaveObject(filename);
         }
 
-        public float GetParam(int i, bool grad = false)
+        public T GetParam(int i, bool grad = false)
         {
             int refInd=0;
-            var state = new float[TotalParamCount];
+            var state = new T[TotalParamCount];
             ToVectorState(state, ref refInd, grad);
             return state[i];
         }
@@ -178,9 +157,9 @@ namespace Retia.Neural.Layers
         /// <param name="i">Input index</param>
         /// <param name="o">Output index</param>
         /// <returns>Derivative value</returns>
-        protected virtual float Derivative(Matrix input, Matrix output, int batch, int i, int o)
+        protected virtual T Derivative(Matrix<T> input, Matrix<T> output, int batch, int i, int o)
         {
-            return 0.0f;
+            return default(T);
         }
 
         internal void Initialize(int batchSize, int seqLen)
@@ -191,15 +170,17 @@ namespace Retia.Neural.Layers
             Initialize();
         }
 
-        private void CalcSens(int step, int batch, Matrix iSens, Matrix outSens)
+        private void CalcSens(int step, int batch, Matrix<T> iSens, Matrix<T> outSens)
         {
-            for (int i = 0; i < InputSize; i++)
-            {
-                for (int o = 0; o < OutputSize; o++)
-                {
-                    iSens[i, batch] += Derivative(Inputs[step], Outputs[step], batch, i, o) * outSens[o, batch];
-                }
-            }
+            // TODO: Support this
+            throw new NotSupportedException();
+            //for (int i = 0; i < InputSize; i++)
+            //{
+            //    for (int o = 0; o < OutputSize; o++)
+            //    {
+            //        iSens[i, batch] += Derivative(Inputs[step], Outputs[step], batch, i, o) * outSens[o, batch];
+            //    }
+            //}
         }
 
         //}
