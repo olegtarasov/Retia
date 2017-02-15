@@ -11,7 +11,7 @@ using Float = System.Single;
 
 namespace Retia.Mathematics
 {
-    public class SingleMathProvider : MathProviderBase<Float>
+    public class MathProviderImpl : MathProviderBase<Float>
     {
         [DllImport("FastFuncs", EntryPoint="ApplySigmoid2S")] private static extern void ApplySigmoid2(IntPtr a, IntPtr b, int n);
 

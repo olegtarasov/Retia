@@ -1,2 +1,2 @@
 ﻿<#@ include file="../DoubleClassGenerator.ttinclude" #>
-<# GenerateClass("SingleMathProvider.cs"); #>
+<# GenerateClass("MathProviderImpl.cs"); #>
