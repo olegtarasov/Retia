@@ -165,7 +165,7 @@ namespace Retia.Mathematics
 
         protected override Matrix<float> PropagateSingleError(Matrix<float> y, Matrix<float> target, int batchSize)
         {
-            return target.Map2((targetVal, yVal) => float.IsNaN(targetVal) ? 0.0f : yVal, y).Divide(batchSize);
+            return target.Map2((targetVal, yVal) => float.IsNaN(targetVal) ? 0.0f : yVal - targetVal, y).Divide(batchSize);
         }
 
         protected override bool AlmostEqual(float a, float b)
