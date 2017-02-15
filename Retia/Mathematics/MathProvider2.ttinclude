@@ -13,19 +13,19 @@ using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
-    public partial class <#= $"{char.ToUpper(type[0])}{type.Substring(1)}" #>MathProvider : MathProviderBase<<#= type #>>
+    public partial class <#= type #>MathProvider : MathProviderBase<<#= type #>>
     {
 		[DllImport("FastFuncs")]
-        private static extern void ApplySigmoid2<#= char.ToUpper(type[0]) #>(IntPtr a, IntPtr b, int n);
+        private static extern void ApplySigmoid2<#= type[0] #>(IntPtr a, IntPtr b, int n);
 
         [DllImport("FastFuncs")]
-        private static extern void ApplyTanh<#= char.ToUpper(type[0]) #>(IntPtr matrix, int n);
+        private static extern void ApplyTanh<#= type[0] #>(IntPtr matrix, int n);
 
         [DllImport("FastFuncs")]
-        private static extern void CalculateH<#= char.ToUpper(type[0]) #>(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
+        private static extern void CalculateH<#= type[0] #>(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
 
         [DllImport("FastFuncs")]
-        private static extern void GravesRMSPropUpdate<#= char.ToUpper(type[0]) #>(<#= type #> weightDecay, <#= type #> learningRate, <#= type #> decayRate, <#= type #> momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
+        private static extern void GravesRMSPropUpdate<#= type[0] #>(<#= type #> weightDecay, <#= type #> learningRate, <#= type #> decayRate, <#= type #> momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
 
         public override List<int> SoftMaxChoice(Matrix<<#= type #>> p, double T = 1)
         {
@@ -71,7 +71,7 @@ namespace Retia.Mathematics
         {
             using (var ptrs = new MatrixPointers<<#= type #>>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
             {
-                GravesRMSPropUpdate<#= char.ToUpper(type[0]) #>(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
+                GravesRMSPropUpdate<#= type[0] #>(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
             }
         }
 
@@ -79,7 +79,7 @@ namespace Retia.Mathematics
         {
             using (var ptrs = new MatrixPointers<<#= type #>>(H, hCandidate, z, lastH))
             {
-                CalculateH<#= char.ToUpper(type[0]) #>(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
+                CalculateH<#= type[0] #>(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
             }
         }
 
@@ -111,7 +111,7 @@ namespace Retia.Mathematics
         {
             using (var ptrs = new MatrixPointers<<#= type #>>(matrix1, matrix2))
             {
-                ApplySigmoid2<#= char.ToUpper(type[0]) #>(ptrs[0], ptrs[1], matrix1.Length());
+                ApplySigmoid2<#= type[0] #>(ptrs[0], ptrs[1], matrix1.Length());
             }
         }
 
@@ -119,7 +119,7 @@ namespace Retia.Mathematics
         {
             using (var ptrs = new MatrixPointers<<#= type #>>(matrix))
             {
-                ApplyTanh<#= char.ToUpper(type[0]) #>(ptrs[0], matrix.Length());
+                ApplyTanh<#= type[0] #>(ptrs[0], matrix.Length());
             }
         }
 
