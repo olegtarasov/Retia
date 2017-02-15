@@ -1,4 +1,5 @@
-﻿    
+﻿using FP = System.Single;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,21 +11,17 @@ using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
-    public partial class SingleMathProvider : MathProviderBase<Single>
+    public class SingleMathProvider : MathProviderBase<FP>
     {
-		[DllImport("FastFuncs")]
-        private static extern void ApplySigmoid2S(IntPtr a, IntPtr b, int n);
+        [DllImport("FastFuncs", EntryPoint="ApplySigmoid2S")] private static extern void ApplySigmoid2(IntPtr a, IntPtr b, int n);
 
-        [DllImport("FastFuncs")]
-        private static extern void ApplyTanhS(IntPtr matrix, int n);
+        [DllImport("FastFuncs", EntryPoint="ApplyTanhS")] private static extern void ApplyTanh(IntPtr matrix, int n);
 
-        [DllImport("FastFuncs")]
-        private static extern void CalculateHS(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
+        [DllImport("FastFuncs", EntryPoint="CalculateHS")] private static extern void CalculateH(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
 
-        [DllImport("FastFuncs")]
-        private static extern void GravesRMSPropUpdateS(Single weightDecay, Single learningRate, Single decayRate, Single momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
+        [DllImport("FastFuncs", EntryPoint="GravesRMSPropUpdateS")] private static extern void GravesRMSPropUpdate(FP weightDecay, FP learningRate, FP decayRate, FP momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
 
-        public override List<int> SoftMaxChoice(Matrix<Single> p, double T = 1)
+        public override List<int> SoftMaxChoice(Matrix<FP> p, double T = 1)
         {
             var probs = new List<int>(p.ColumnCount);
             var rnd = SafeRandom.Generator;
@@ -49,48 +46,48 @@ namespace Retia.Mathematics
             return probs;
         }
 
-        public override Single Scalar(float scalar)
+        public override FP Scalar(float scalar)
         {
-            return (Single)scalar;
+            return (FP)scalar;
         }
 
-        public override Single Scalar(double scalar)
+        public override FP Scalar(double scalar)
         {
-            return (Single)scalar;
+            return (FP)scalar;
         }
 
-        public override Single NaN()
+        public override FP NaN()
         {
-            return Single.NaN;
+            return FP.NaN;
         }
 
-        public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<Single> weight)
+        public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<FP> weight)
         {
-            using (var ptrs = new MatrixPointers<Single>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
+            using (var ptrs = new MatrixPointers<FP>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
             {
-                GravesRMSPropUpdateS(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
+                GravesRMSPropUpdate(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
             }
         }
 
-        public override void CalculateH(Matrix<Single> H, Matrix<Single> hCandidate, Matrix<Single> z, Matrix<Single> lastH)
+        public override void CalculateH(Matrix<FP> H, Matrix<FP> hCandidate, Matrix<FP> z, Matrix<FP> lastH)
         {
-            using (var ptrs = new MatrixPointers<Single>(H, hCandidate, z, lastH))
+            using (var ptrs = new MatrixPointers<FP>(H, hCandidate, z, lastH))
             {
-                CalculateHS(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
+                CalculateH(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
             }
         }
 
-        public override Matrix<Single> SoftMaxNorm(Matrix<Single> y, double T = 1)
+        public override Matrix<FP> SoftMaxNorm(Matrix<FP> y, double T = 1)
         {
             var p = y.CloneMatrix();
 
             var ya = y.AsColumnMajorArray();
             var pa = p.AsColumnMajorArray();
 
-            var sums = new Single[y.ColumnCount];
+            var sums = new FP[y.ColumnCount];
             for (int i = 0; i < ya.Length; i++)
             {
-                pa[i] = (Single)Math.Exp(pa[i] / T);
+                pa[i] = (FP)Math.Exp(pa[i] / T);
                 var c = i / y.RowCount;
                 sums[c] += pa[i];
             }
@@ -100,27 +97,27 @@ namespace Retia.Mathematics
                 var c = i / y.RowCount;
                 pa[i] /= sums[c];
             }
-            
+
             return p;
         }
 
-        public override void ApplySigmoid2(Matrix<Single> matrix1, Matrix<Single> matrix2)
+        public override void ApplySigmoid2(Matrix<FP> matrix1, Matrix<FP> matrix2)
         {
-            using (var ptrs = new MatrixPointers<Single>(matrix1, matrix2))
+            using (var ptrs = new MatrixPointers<FP>(matrix1, matrix2))
             {
-                ApplySigmoid2S(ptrs[0], ptrs[1], matrix1.Length());
+                ApplySigmoid2(ptrs[0], ptrs[1], matrix1.Length());
             }
         }
 
-        public override void ApplyTanh(Matrix<Single> matrix)
+        public override void ApplyTanh(Matrix<FP> matrix)
         {
-            using (var ptrs = new MatrixPointers<Single>(matrix))
+            using (var ptrs = new MatrixPointers<FP>(matrix))
             {
-                ApplyTanhS(ptrs[0], matrix.Length());
+                ApplyTanh(ptrs[0], matrix.Length());
             }
         }
 
-        public override double CrossEntropy(Matrix<Single> p, Matrix<Single> target)
+        public override double CrossEntropy(Matrix<FP> p, Matrix<FP> target)
         {
             if (p.ColumnCount != target.ColumnCount || p.RowCount != target.RowCount)
                 throw new Exception("Matrix dimensions must agree!");
@@ -133,7 +130,7 @@ namespace Retia.Mathematics
             double err = 0.0d;
             for (int i = 0; i < pa.Length; i++)
             {
-                if (Single.IsNaN(ta[i]))
+                if (FP.IsNaN(ta[i]))
                     continue;
                 err += ta[i] * Math.Log(pa[i]);
             }
@@ -141,7 +138,7 @@ namespace Retia.Mathematics
             return -err / p.ColumnCount;
         }
 
-        public override double MeanSquare(Matrix<Single> y, Matrix<Single> target)
+        public override double MeanSquare(Matrix<FP> y, Matrix<FP> target)
         {
             if (y.ColumnCount != target.ColumnCount || y.RowCount != target.RowCount)
                 throw new Exception("Matrix dimensions must agree!");
@@ -155,7 +152,7 @@ namespace Retia.Mathematics
             notNan = 0;
             for (int i = 0; i < ya.Length; i++)
             {
-                if (Single.IsNaN(ta[i]))
+                if (FP.IsNaN(ta[i]))
                     continue;
                 notNan++;
                 double delta = ta[i] - ya[i];
@@ -165,22 +162,22 @@ namespace Retia.Mathematics
             return notNan == 0 ? 0.0 : 0.5 * err / notNan;
         }
 
-        protected override Matrix<Single> PropagateSingleError(Matrix<Single> y, Matrix<Single> target, int batchSize)
+        protected override Matrix<FP> PropagateSingleError(Matrix<FP> y, Matrix<FP> target, int batchSize)
         {
-            return target.Map2((targetVal, yVal) => Single.IsNaN(targetVal) ? (Single)0.0f : yVal - targetVal, y).Divide(batchSize);
+            return target.Map2((targetVal, yVal) => FP.IsNaN(targetVal) ? (FP)0.0f : yVal - targetVal, y).Divide(batchSize);
         }
 
-        protected override bool AlmostEqual(Single a, Single b)
+        protected override bool AlmostEqual(FP a, FP b)
         {
-            return Math.Abs(a - b) < 10e-10;
+            return Math.Abs(a - b) < 10e-7f;
         }
 
-        public override Single[] Array(params float[] input)
+        public override FP[] Array(params float[] input)
         {
-            return input.Select(x => (Single)x).ToArray();
+            return input.Select(x => (FP)x).ToArray();
         }
 
-        public override void ClampMatrix(Matrix<Single> matrix, Single min, Single max)
+        public override void ClampMatrix(Matrix<FP> matrix, FP min, FP max)
         {
             var arr = matrix.AsColumnMajorArray();
             for (int i = 0; i < arr.Length; i++)
@@ -192,13 +189,13 @@ namespace Retia.Mathematics
             }
         }
 
-        public override Matrix<Single> RandomMatrix(int rows, int cols, float min, float max)
+        public override Matrix<FP> RandomMatrix(int rows, int cols, float min, float max)
         {
             var random = SafeRandom.Generator;
-            var arr = new Single[rows * cols];
+            var arr = new FP[rows * cols];
             for (int i = 0; i < arr.Length; i++)
-                arr[i] = (Single)random.NextDouble(min, max);
-            return Matrix<Single>.Build.Dense(rows, cols, arr);
+                arr[i] = (FP)random.NextDouble(min, max);
+            return Matrix<FP>.Build.Dense(rows, cols, arr);
         }
-	}
+    }
 }

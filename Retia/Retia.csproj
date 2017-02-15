@@ -69,18 +69,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DoubleMathProvider.tt</DependentUpon>
     </Compile>
-    <Compile Include="Mathematics\SingleMathProvider.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>SingleMathProvider.tt</DependentUpon>
-    </Compile>
     <Compile Include="Mathematics\_DoubleMathProvider.cs" />
     <Compile Include="Mathematics\Fir.cs" />
     <Compile Include="Mathematics\MathProvider.cs" />
     <Compile Include="Mathematics\MathProviderBase.cs" />
     <Compile Include="Mathematics\MatrixExtensions.cs" />
     <Compile Include="Mathematics\MatrixFactory.cs" />
-    <Compile Include="Mathematics\_SingleMathProvider.cs" />
+    <Compile Include="Mathematics\SingleMathProvider.cs" />
     <Compile Include="Neural\BiGRU.cs" />
     <Compile Include="Neural\Initializers\ConstantMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\IMatrixInitializer.cs" />
@@ -143,14 +138,9 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="Mathematics\MathProvider2.ttinclude" />
     <Content Include="Mathematics\DoubleMathProvider.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DoubleMathProvider.cs</LastGenOutput>
-    </Content>
-    <Content Include="Mathematics\SingleMathProvider.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>SingleMathProvider.cs</LastGenOutput>
     </Content>
     <Content Include="NugetRelativeRefs.xslt" />
   </ItemGroup>
