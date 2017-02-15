@@ -1,4 +1,5 @@
-﻿using System;
+﻿    
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,9 +10,9 @@ using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
-    public class DoubleMathProvider : MathProviderBase<double>
+    public partial class DoubleMathProvider : MathProviderBase<double>
     {
-        [DllImport("FastFuncs")]
+		[DllImport("FastFuncs")]
         private static extern void ApplySigmoid2D(IntPtr a, IntPtr b, int n);
 
         [DllImport("FastFuncs")]
@@ -55,7 +56,7 @@ namespace Retia.Mathematics
 
         public override double Scalar(double scalar)
         {
-            return scalar;
+            return (double)scalar;
         }
 
         public override double NaN()
@@ -89,7 +90,7 @@ namespace Retia.Mathematics
             var sums = new double[y.ColumnCount];
             for (int i = 0; i < ya.Length; i++)
             {
-                pa[i] = Math.Exp(pa[i] / T);
+                pa[i] = (double)Math.Exp(pa[i] / T);
                 var c = i / y.RowCount;
                 sums[c] += pa[i];
             }
@@ -196,8 +197,8 @@ namespace Retia.Mathematics
             var random = SafeRandom.Generator;
             var arr = new double[rows * cols];
             for (int i = 0; i < arr.Length; i++)
-                arr[i] = random.NextDouble(min, max);
+                arr[i] = (double)random.NextDouble(min, max);
             return Matrix<double>.Build.Dense(rows, cols, arr);
         }
-    }
+	}
 }

@@ -64,13 +64,23 @@
     <Compile Include="Integration\LogEventArgs.cs" />
     <Compile Include="Integration\ProgressEventArgs.cs" />
     <Compile Include="Integration\ProgressTracker.cs" />
-    <Compile Include="Mathematics\DoubleMathProvider.cs" />
+    <Compile Include="Mathematics\DoubleMathProvider.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DoubleMathProvider.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Mathematics\SingleMathProvider.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SingleMathProvider.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Mathematics\_DoubleMathProvider.cs" />
     <Compile Include="Mathematics\Fir.cs" />
     <Compile Include="Mathematics\MathProvider.cs" />
     <Compile Include="Mathematics\MathProviderBase.cs" />
     <Compile Include="Mathematics\MatrixExtensions.cs" />
     <Compile Include="Mathematics\MatrixFactory.cs" />
-    <Compile Include="Mathematics\SingleMathProvider.cs" />
+    <Compile Include="Mathematics\_SingleMathProvider.cs" />
     <Compile Include="Neural\BiGRU.cs" />
     <Compile Include="Neural\Initializers\ConstantMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\IMatrixInitializer.cs" />
@@ -133,6 +143,15 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="Mathematics\MathProvider2.ttinclude" />
+    <Content Include="Mathematics\DoubleMathProvider.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DoubleMathProvider.cs</LastGenOutput>
+    </Content>
+    <Content Include="Mathematics\SingleMathProvider.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SingleMathProvider.cs</LastGenOutput>
+    </Content>
     <Content Include="NugetRelativeRefs.xslt" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +163,9 @@
       <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
       <Name>Retia.NativeWrapper</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="NugetRelativeRefs.targets" />

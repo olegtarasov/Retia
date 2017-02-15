@@ -1,5 +1,7 @@
-﻿using System;
+﻿    
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
@@ -8,9 +10,9 @@ using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
-    public class SingleMathProvider : MathProviderBase<float>
+    public partial class SingleMathProvider : MathProviderBase<Single>
     {
-        [DllImport("FastFuncs")]
+		[DllImport("FastFuncs")]
         private static extern void ApplySigmoid2S(IntPtr a, IntPtr b, int n);
 
         [DllImport("FastFuncs")]
@@ -20,9 +22,9 @@ namespace Retia.Mathematics
         private static extern void CalculateHS(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
 
         [DllImport("FastFuncs")]
-        private static extern void GravesRMSPropUpdateS(float weightDecay, float learningRate, float decayRate, float momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
+        private static extern void GravesRMSPropUpdateS(Single weightDecay, Single learningRate, Single decayRate, Single momentum, IntPtr weightMatrix, IntPtr grad1_cache, IntPtr grad2_cache, IntPtr momentum_cache, IntPtr gradient, int n);
 
-        public override List<int> SoftMaxChoice(Matrix<float> p, double T = 1)
+        public override List<int> SoftMaxChoice(Matrix<Single> p, double T = 1)
         {
             var probs = new List<int>(p.ColumnCount);
             var rnd = SafeRandom.Generator;
@@ -47,48 +49,48 @@ namespace Retia.Mathematics
             return probs;
         }
 
-        public override float Scalar(float scalar)
+        public override Single Scalar(float scalar)
         {
-            return scalar;
+            return (Single)scalar;
         }
 
-        public override float Scalar(double scalar)
+        public override Single Scalar(double scalar)
         {
-            return (float)scalar;
+            return (Single)scalar;
         }
 
-        public override float NaN()
+        public override Single NaN()
         {
-            return float.NaN;
+            return Single.NaN;
         }
 
-        public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<float> weight)
+        public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<Single> weight)
         {
-            using (var ptrs = new MatrixPointers<float>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
+            using (var ptrs = new MatrixPointers<Single>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
             {
                 GravesRMSPropUpdateS(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
             }
         }
 
-        public override void CalculateH(Matrix<float> H, Matrix<float> hCandidate, Matrix<float> z, Matrix<float> lastH)
+        public override void CalculateH(Matrix<Single> H, Matrix<Single> hCandidate, Matrix<Single> z, Matrix<Single> lastH)
         {
-            using (var ptrs = new MatrixPointers<float>(H, hCandidate, z, lastH))
+            using (var ptrs = new MatrixPointers<Single>(H, hCandidate, z, lastH))
             {
                 CalculateHS(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
             }
         }
 
-        public override Matrix<float> SoftMaxNorm(Matrix<float> y, double T = 1)
+        public override Matrix<Single> SoftMaxNorm(Matrix<Single> y, double T = 1)
         {
             var p = y.CloneMatrix();
 
             var ya = y.AsColumnMajorArray();
             var pa = p.AsColumnMajorArray();
 
-            var sums = new float[y.ColumnCount];
+            var sums = new Single[y.ColumnCount];
             for (int i = 0; i < ya.Length; i++)
             {
-                pa[i] = (float)Math.Exp(pa[i] / T);
+                pa[i] = (Single)Math.Exp(pa[i] / T);
                 var c = i / y.RowCount;
                 sums[c] += pa[i];
             }
@@ -98,27 +100,27 @@ namespace Retia.Mathematics
                 var c = i / y.RowCount;
                 pa[i] /= sums[c];
             }
-
+            
             return p;
         }
 
-        public override void ApplySigmoid2(Matrix<float> matrix1, Matrix<float> matrix2)
+        public override void ApplySigmoid2(Matrix<Single> matrix1, Matrix<Single> matrix2)
         {
-            using (var ptrs = new MatrixPointers<float>(matrix1, matrix2))
+            using (var ptrs = new MatrixPointers<Single>(matrix1, matrix2))
             {
                 ApplySigmoid2S(ptrs[0], ptrs[1], matrix1.Length());
             }
         }
 
-        public override void ApplyTanh(Matrix<float> matrix)
+        public override void ApplyTanh(Matrix<Single> matrix)
         {
-            using (var ptrs = new MatrixPointers<float>(matrix))
+            using (var ptrs = new MatrixPointers<Single>(matrix))
             {
                 ApplyTanhS(ptrs[0], matrix.Length());
             }
         }
 
-        public override double CrossEntropy(Matrix<float> p, Matrix<float> target)
+        public override double CrossEntropy(Matrix<Single> p, Matrix<Single> target)
         {
             if (p.ColumnCount != target.ColumnCount || p.RowCount != target.RowCount)
                 throw new Exception("Matrix dimensions must agree!");
@@ -131,7 +133,7 @@ namespace Retia.Mathematics
             double err = 0.0d;
             for (int i = 0; i < pa.Length; i++)
             {
-                if (double.IsNaN(ta[i]))
+                if (Single.IsNaN(ta[i]))
                     continue;
                 err += ta[i] * Math.Log(pa[i]);
             }
@@ -139,7 +141,7 @@ namespace Retia.Mathematics
             return -err / p.ColumnCount;
         }
 
-        public override double MeanSquare(Matrix<float> y, Matrix<float> target)
+        public override double MeanSquare(Matrix<Single> y, Matrix<Single> target)
         {
             if (y.ColumnCount != target.ColumnCount || y.RowCount != target.RowCount)
                 throw new Exception("Matrix dimensions must agree!");
@@ -153,7 +155,7 @@ namespace Retia.Mathematics
             notNan = 0;
             for (int i = 0; i < ya.Length; i++)
             {
-                if (double.IsNaN(ta[i]))
+                if (Single.IsNaN(ta[i]))
                     continue;
                 notNan++;
                 double delta = ta[i] - ya[i];
@@ -163,22 +165,22 @@ namespace Retia.Mathematics
             return notNan == 0 ? 0.0 : 0.5 * err / notNan;
         }
 
-        protected override Matrix<float> PropagateSingleError(Matrix<float> y, Matrix<float> target, int batchSize)
+        protected override Matrix<Single> PropagateSingleError(Matrix<Single> y, Matrix<Single> target, int batchSize)
         {
-            return target.Map2((targetVal, yVal) => float.IsNaN(targetVal) ? 0.0f : yVal - targetVal, y).Divide(batchSize);
+            return target.Map2((targetVal, yVal) => Single.IsNaN(targetVal) ? (Single)0.0f : yVal - targetVal, y).Divide(batchSize);
         }
 
-        protected override bool AlmostEqual(float a, float b)
+        protected override bool AlmostEqual(Single a, Single b)
         {
-            return Math.Abs(a - b) < 10e-7f;
+            return Math.Abs(a - b) < 10e-10;
         }
 
-        public override float[] Array(params float[] input)
+        public override Single[] Array(params float[] input)
         {
-            return input;
+            return input.Select(x => (Single)x).ToArray();
         }
 
-        public override void ClampMatrix(Matrix<float> matrix, float min, float max)
+        public override void ClampMatrix(Matrix<Single> matrix, Single min, Single max)
         {
             var arr = matrix.AsColumnMajorArray();
             for (int i = 0; i < arr.Length; i++)
@@ -190,13 +192,13 @@ namespace Retia.Mathematics
             }
         }
 
-        public override Matrix<float> RandomMatrix(int rows, int cols, float min, float max)
+        public override Matrix<Single> RandomMatrix(int rows, int cols, float min, float max)
         {
             var random = SafeRandom.Generator;
-            var arr = new float[rows * cols];
+            var arr = new Single[rows * cols];
             for (int i = 0; i < arr.Length; i++)
-                arr[i] = (float)random.NextDouble(min, max);
-            return Matrix<float>.Build.Dense(rows, cols, arr);
+                arr[i] = (Single)random.NextDouble(min, max);
+            return Matrix<Single>.Build.Dense(rows, cols, arr);
         }
-    }
+	}
 }
