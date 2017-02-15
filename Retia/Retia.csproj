@@ -137,6 +137,9 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="DoubleClassGenerator.ttinclude">
+      <LastGenOutput>DoubleClassGenerator.txt</LastGenOutput>
+    </None>
     <Content Include="Mathematics\DoubleMathProvider.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DoubleMathProvider.cs</LastGenOutput>
