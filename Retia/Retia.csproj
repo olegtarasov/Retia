@@ -69,7 +69,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DoubleMathProvider.tt</DependentUpon>
     </Compile>
-    <Compile Include="Mathematics\_DoubleMathProvider.cs" />
     <Compile Include="Mathematics\Fir.cs" />
     <Compile Include="Mathematics\MathProvider.cs" />
     <Compile Include="Mathematics\MathProviderBase.cs" />
