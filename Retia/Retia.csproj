@@ -64,18 +64,17 @@
     <Compile Include="Integration\LogEventArgs.cs" />
     <Compile Include="Integration\ProgressEventArgs.cs" />
     <Compile Include="Integration\ProgressTracker.cs" />
-    <Compile Include="Mathematics\DoubleMathProvider.cs">
+    <Compile Include="Mathematics\MathProviderImplD.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>DoubleMathProvider.tt</DependentUpon>
+      <DependentUpon>MathProviderImplD.tt</DependentUpon>
     </Compile>
-    <Compile Include="Mathematics\_DoubleMathProvider.cs" />
     <Compile Include="Mathematics\Fir.cs" />
     <Compile Include="Mathematics\MathProvider.cs" />
     <Compile Include="Mathematics\MathProviderBase.cs" />
     <Compile Include="Mathematics\MatrixExtensions.cs" />
     <Compile Include="Mathematics\MatrixFactory.cs" />
-    <Compile Include="Mathematics\SingleMathProvider.cs" />
+    <Compile Include="Mathematics\MathProviderImpl.cs" />
     <Compile Include="Neural\BiGRU.cs" />
     <Compile Include="Neural\Initializers\ConstantMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\IMatrixInitializer.cs" />
@@ -138,9 +137,12 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Mathematics\DoubleMathProvider.tt">
+    <None Include="DoubleClassGenerator.ttinclude">
+      <LastGenOutput>DoubleClassGenerator.txt</LastGenOutput>
+    </None>
+    <Content Include="Mathematics\MathProviderImplD.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DoubleMathProvider.cs</LastGenOutput>
+      <LastGenOutput>MathProviderImplD.cs</LastGenOutput>
     </Content>
     <Content Include="NugetRelativeRefs.xslt" />
   </ItemGroup>
