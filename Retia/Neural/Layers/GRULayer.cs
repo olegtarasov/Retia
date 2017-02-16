@@ -7,6 +7,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
 using Retia.Optimizers;
 
@@ -76,9 +77,11 @@ namespace Retia.Neural.Layers
             _bhz = biasInitializer.CreateMatrix(hSize, 1);
 
             ResetOptimizer();
+
+            ErrorFunction = new MeanSquareError<T>();
         }
 
-        public GruLayer(BinaryReader reader)
+        public GruLayer(BinaryReader reader) : base(reader)
         {
             _bxr = NeuroWeight<T>.Load(reader.BaseStream);
             _bxz = NeuroWeight<T>.Load(reader.BaseStream);
@@ -133,7 +136,6 @@ namespace Retia.Neural.Layers
         public override int InputSize => _wxh.Weight.ColumnCount;
         public override int OutputSize => _whh.Weight.RowCount;
 
-        // TODO: Clean this shit up
         public override int TotalParamCount => _wxr.Weight.Length() + _wxz.Weight.Length() + _wxh.Weight.Length() +
                                                _whr.Weight.Length() + _whz.Weight.Length() + _whh.Weight.Length() +
                                                _bxr.Weight.Length() + _bxz.Weight.Length() + _bxh.Weight.Length() + 
@@ -141,6 +143,8 @@ namespace Retia.Neural.Layers
 
         public override void Save(Stream stream)
         {
+            base.Save(stream);
+
             _bxr.Save(stream);
             _bxz.Save(stream);
             _bxh.Save(stream);

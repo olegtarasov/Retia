@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Genetic", "Retia.Gene
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Tests", "Retia.Tests\Retia.Tests.csproj", "{987EE651-9A46-4012-89E2-3D8E952A2A2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageModel", "LanguageModel\LanguageModel.csproj", "{F060879F-1DD8-4542-B916-14E6769BDDEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanguageModel", "Examples\LanguageModel\LanguageModel.csproj", "{F060879F-1DD8-4542-B916-14E6769BDDEA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benchmark.csproj", "{FC6BD609-9533-433C-AA94-25059417103D}"
 EndProject
@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastFuncs", "FastFuncs\FastFuncs.vcxproj", "{A2AC454D-1806-44A7-A36B-59DAB41000C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{64470CD0-0C60-4DAE-A76B-3BE23DC3652F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,5 +111,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F060879F-1DD8-4542-B916-14E6769BDDEA} = {64470CD0-0C60-4DAE-A76B-3BE23DC3652F}
 	EndGlobalSection
 EndGlobal

@@ -5,6 +5,7 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
 using Retia.Optimizers;
 
@@ -34,9 +35,11 @@ namespace Retia.Neural.Layers
         {
             _weights = matrixInitializer.CreateMatrix(ySize, xSize);
             _bias = matrixInitializer.CreateMatrix(ySize, 1);
+
+            ErrorFunction = new MeanSquareError<T>();
         }
 
-        public LinearLayer(BinaryReader reader)
+        public LinearLayer(BinaryReader reader) : base(reader)
         {
             _bias = NeuroWeight<T>.Load(reader.BaseStream);
             _weights = NeuroWeight<T>.Load(reader.BaseStream);
@@ -92,13 +95,10 @@ namespace Retia.Neural.Layers
             _weights.Weight.CopyFromArray(vector, ref idx);
         }
 
-        public override double LayerError(Matrix<T> y, Matrix<T> target)
-        {
-            return MathProvider.MeanSquare(y, target);
-        }
-
         public override void Save(Stream s)
         {
+            base.Save(s);
+
             _bias.Save(s);
             _weights.Save(s);
         }

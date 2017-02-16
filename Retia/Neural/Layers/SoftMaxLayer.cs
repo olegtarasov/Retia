@@ -6,6 +6,7 @@ using MathNet.Numerics.LinearAlgebra.Single;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
 using Retia.RandomGenerator;
 
@@ -23,9 +24,11 @@ namespace Retia.Neural.Layers
         public SoftMaxLayer(int size)
         {
             _size = size;
+
+            ErrorFunction = new CrossEntropyError<T>();
         }
 
-        public SoftMaxLayer(BinaryReader reader)
+        public SoftMaxLayer(BinaryReader reader) : base(reader)
         {
             _size = reader.ReadInt32();
         }
@@ -34,13 +37,10 @@ namespace Retia.Neural.Layers
         public override int OutputSize => _size;
         public override int TotalParamCount => 0;
 
-        public override double LayerError(Matrix<T> y, Matrix<T> target)
-        {
-            return MathProvider.CrossEntropy(y, target);
-        }
-
         public override void Save(Stream s)
         {
+            base.Save(s);
+
             using (var writer = s.NonGreedyWriter())
             {
                 writer.Write(_size);

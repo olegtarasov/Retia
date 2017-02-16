@@ -23,7 +23,7 @@ namespace Retia.Neural.Layers
             _dropout = dropout;
         }
 
-        public DropoutLayer(BinaryReader reader)
+        public DropoutLayer(BinaryReader reader) : base(reader)
         {
             _size = reader.ReadInt32();
             _dropout = reader.ReadSingle();
@@ -49,6 +49,8 @@ namespace Retia.Neural.Layers
 
         public override void Save(Stream s)
         {
+            base.Save(s);
+
             using (var writer = s.NonGreedyWriter())
             {
                 writer.Write(_size);

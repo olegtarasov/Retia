@@ -77,7 +77,7 @@ namespace LanguageModel
 			LayeredNet<float> network;
 			if (string.IsNullOrEmpty(configPath))
 			{
-				network = CreateNetwork(_dataProvider.InputSize, 128, _dataProvider.OutputSize, 1);
+				network = CreateNetwork(_dataProvider.InputSize, 128, _dataProvider.OutputSize);
                 network.Optimizer = optimizer;
 			}
 			else
@@ -99,13 +99,13 @@ namespace LanguageModel
 		                           ErrorFilterSize = 20,
 		                           SequenceLength = SEQ_LEN,
 		                           ReportMesages = true,
-		                           MaxEpoch = 0
+		                           MaxEpoch = 20
 		                       };
 
             trainOptions.RunTests.Never();
             trainOptions.ScaleLearningRate.EachEpoch(10, 0.97);
             trainOptions.ReportProgress.EachIteration(10);
-            //trainOptions.RunUserTests.EachIteration(100);
+            trainOptions.RunUserTests.EachIteration(100);
 			var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions);
             var epochWatch = new Stopwatch();
            
@@ -120,7 +120,7 @@ namespace LanguageModel
 				errFile.Flush(true);
 				network.Save(rnnPath);
 			};
-			trainer.UserTest += (sender, args) => Console.WriteLine(TestRNN(network.Clone(), 500, _dataProvider.Vocab));
+			trainer.UserTest += (sender, args) => Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
 		    trainer.EpochReached += () =>
 		    {
                 epochWatch.Stop();
@@ -159,14 +159,10 @@ namespace LanguageModel
 			return LayeredNet<float>.Load(fileName);
 		}
 
-		private static LayeredNet<float> CreateNetwork(int xSize, int hSize, int ySize, int layerCount)
+		private static LayeredNet<float> CreateNetwork(int xSize, int hSize, int ySize)
 		{
             return new LayeredNet<float>(BATCH_SIZE, SEQ_LEN, 
                 new GruLayer<float>(xSize, hSize),
-                //new GruLayer(hSize, hSize),
-                //new GruLayer(hSize, hSize),
-                //new GruLayer(hSize, hSize),
-                //new GruLayer(hSize, hSize),
                 new LinearLayer<float>(hSize, ySize),
                 new SoftMaxLayer<float>(ySize));
         }

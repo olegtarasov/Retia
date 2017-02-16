@@ -26,7 +26,7 @@ namespace Retia.Neural.Layers
             _size = size;
         }
 
-        public TanhLayer(BinaryReader reader)
+        public TanhLayer(BinaryReader reader) : base(reader)
         {
             _size = reader.ReadInt32();
         }
@@ -36,6 +36,8 @@ namespace Retia.Neural.Layers
         public override int TotalParamCount => 0;
         public override void Save(Stream s)
         {
+            base.Save(s);
+
             using (var writer = s.NonGreedyWriter())
             {
                 writer.Write(_size);

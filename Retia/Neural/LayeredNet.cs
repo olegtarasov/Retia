@@ -52,6 +52,18 @@ namespace Retia.Neural
             Layers = other.Layers.Select(x => x.Clone()).ToList();
         }
 
+        protected LayeredNet(LayeredNet<T> other, int batchSize, int seqLength)
+        {
+            BatchSize = batchSize;
+            SeqLen = seqLength;
+            Layers = other.Layers.Select(x => x.Clone()).ToList();
+
+            foreach (var layer in Layers)
+            {
+                layer.Initialize(batchSize, seqLength);
+            }
+        }
+
         private LayeredNet()
         {
         }
@@ -99,6 +111,8 @@ namespace Retia.Neural
                     throw new InvalidOperationException("Invalid magic bytes!");
                 }
 
+                int batchSize = reader.ReadInt32();
+                int seqLen = reader.ReadInt32();
                 int layerCount = reader.ReadInt32();
                 var layers = new NeuroLayer<T>[layerCount];
                 for (int i = 0; i < layerCount; i++)
@@ -124,7 +138,7 @@ namespace Retia.Neural
                     layers[i] = layer;
                 }
 
-                return (TNet)Activator.CreateInstance(typeof(TNet), new object[] {layers});
+                return (TNet)Activator.CreateInstance(typeof(TNet), batchSize, seqLen, layers);
             }
         }
 
@@ -181,8 +195,12 @@ namespace Retia.Neural
         {
             if (_gpuNetwork != null)
             {
-                // TODO: GPU
-                //return _gpuNetwork.TrainSequence(inputs, targets);
+                if (typeof(T) != typeof(float))
+                {
+                    throw new InvalidOperationException("GPU is only supported for float data type!");
+                }
+
+                return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
             }
 
             return base.TrainSequence(inputs, targets);
@@ -209,6 +227,8 @@ namespace Retia.Neural
             using (var writer = s.NonGreedyWriter())
             {
                 writer.Write(_magic);
+                writer.Write(BatchSize);
+                writer.Write(SeqLen);
                 writer.Write(Layers.Count);
 
                 foreach (var layer in Layers)
@@ -223,6 +243,17 @@ namespace Retia.Neural
         public override NeuralNet<T> Clone()
         {
             return new LayeredNet<T>(this);
+        }
+
+        /// <summary>
+        /// Clones current network and initializes the new network with specified batch size and sequence length.
+        /// </summary>
+        /// <param name="batchSize">New batch size.</param>
+        /// <param name="seqLength">New sequence length.</param>
+        /// <returns>New layered network which is totally decoupled from the source network.</returns>
+        public LayeredNet<T> Clone(int batchSize, int seqLength)
+        {
+            return new LayeredNet<T>(this, batchSize, seqLength);
         }
 
         public override void Optimize()

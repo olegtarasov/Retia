@@ -7,19 +7,19 @@ using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Integration;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
     public abstract class NeuroLayer<T> : ICloneable<NeuroLayer<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
+        protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         protected int BatchSize;
         protected int SeqLen;
 
         protected List<Matrix<T>> Inputs = new List<Matrix<T>>();
         protected List<Matrix<T>> Outputs = new List<Matrix<T>>();
-
-        protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
 
         protected NeuroLayer()
         {
@@ -31,7 +31,23 @@ namespace Retia.Neural.Layers
             SeqLen = other.SeqLen;
             Inputs = other.Inputs.Select(x => x.CloneMatrix()).ToList();
             Outputs = other.Outputs.Select(x => x.CloneMatrix()).ToList();
+            ErrorFunction = other.ErrorFunction.Clone();
         }
+
+        protected NeuroLayer(BinaryReader reader)
+        {
+            BatchSize = reader.ReadInt32();
+            SeqLen = reader.ReadInt32();
+
+            bool hasError = reader.ReadBoolean();
+            if (hasError)
+            {
+                string errorType = reader.ReadString();
+                ErrorFunction = (ErrorFunctionBase<T>)Activator.CreateInstance(Type.GetType(errorType));
+            }
+        }
+
+        public ErrorFunctionBase<T> ErrorFunction { get; set; }
 
         public abstract int InputSize { get; }
         public abstract int OutputSize { get; }
@@ -40,7 +56,20 @@ namespace Retia.Neural.Layers
 
         public abstract NeuroLayer<T> Clone();
 
-        public abstract void Save(Stream s);
+        public virtual void Save(Stream s)
+        {
+            using (var writer = s.NonGreedyWriter())
+            {
+                writer.Write(BatchSize);
+                writer.Write(SeqLen);
+                writer.Write(ErrorFunction != null);
+
+                if (ErrorFunction != null)
+                {
+                    writer.Write(ErrorFunction.GetType().FullName);
+                }
+            }
+        }
 
         public abstract void Optimize(OptimizerBase<T> optimizer);
 
@@ -109,7 +138,12 @@ namespace Retia.Neural.Layers
         /// <returns></returns>
         public virtual double LayerError(Matrix<T> y, Matrix<T> target)
         {
-            return 0.0;
+            if (ErrorFunction == null)
+            {
+                throw new InvalidOperationException("Layer error function is not specified!");
+            }
+
+            return ErrorFunction.LayerError(y, target);
         }
 
         public virtual void SetParam(int i, T value)
@@ -128,7 +162,12 @@ namespace Retia.Neural.Layers
         /// <param name="targets">Sequence of targets</param>
         public virtual List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
         {
-            return MathProvider.ErrorPropagate(Outputs, targets, SeqLen, BatchSize);
+            if (ErrorFunction == null)
+            {
+                throw new InvalidOperationException("Layer error function is not specified!");
+            }
+
+            return ErrorFunction.BackpropagateError(Outputs, targets);
         }
 
         public void Save(string filename)
@@ -183,21 +222,21 @@ namespace Retia.Neural.Layers
             //}
         }
 
-        //}
-        //    return d[o, batch];
-
-        //    var d = (0.5f / delta) * (p - n);
-        //    var n = Step(nInput);
-
-        //    var p = Step(pInput);
-        //    nInput[i, batch] -= delta;
-        //    pInput[i, batch] += delta;
-        //    var nInput = input.CloneMatrix();
+        //public virtual float NumDerrivative(Matrix input, Matrix output, int batch, int i, int o)
+        //{
+        //    const float delta = 1e-5f;
 
         //    var pInput = input.CloneMatrix();
-        //    const float delta = 1e-5f;
-        //{
+        //    var nInput = input.CloneMatrix();
+        //    pInput[i, batch] += delta;
+        //    nInput[i, batch] -= delta;
 
-        //public virtual float NumDerrivative(Matrix input, Matrix output, int batch, int i, int o)
+        //    var p = Step(pInput);
+        //    var n = Step(nInput);
+
+        //    var d = (0.5f / delta) * (p - n);
+        //    return d[o, batch];
+
+        //}
     }
 }

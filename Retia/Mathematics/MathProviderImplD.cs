@@ -120,7 +120,7 @@ namespace Retia.Mathematics
             }
         }
 
-        public override double CrossEntropy(Matrix<Float> p, Matrix<Float> target)
+        public override double CrossEntropyError(Matrix<Float> p, Matrix<Float> target)
         {
             if (p.ColumnCount != target.ColumnCount || p.RowCount != target.RowCount)
                 throw new Exception("Matrix dimensions must agree!");
@@ -128,20 +128,37 @@ namespace Retia.Mathematics
             var pa = p.AsColumnMajorArray();
             var ta = target.AsColumnMajorArray();
 
-            //todo: should be fixed, we must take NaN cols into account
             //E(y0, ... ,yn) = -y0*log(p0)-...-yn*log(pn)
             double err = 0.0d;
+            int notNan = 0;
+            int cols = p.ColumnCount;
             for (int i = 0; i < pa.Length; i++)
             {
+                if (i % p.RowCount == 0)
+                {
+                    if (notNan == 0)
+                        cols--;
+
+                    notNan = 0;
+                }
+
                 if (Float.IsNaN(ta[i]))
                     continue;
+
+                notNan++;
+                
                 err += ta[i] * Math.Log(pa[i]);
             }
 
-            return -err / p.ColumnCount;
+            if (cols == 0)
+            {
+                throw new InvalidOperationException("All of your targets are NaN! This is pointless.");
+            }
+
+            return -err / cols;
         }
 
-        public override double MeanSquare(Matrix<Float> y, Matrix<Float> target)
+        public override double MeanSquareError(Matrix<Float> y, Matrix<Float> target)
         {
             if (y.ColumnCount != target.ColumnCount || y.RowCount != target.RowCount)
                 throw new Exception("Matrix dimensions must agree!");
@@ -162,17 +179,7 @@ namespace Retia.Mathematics
                 err += delta * delta;
             }
 
-            return notNan == 0 ? 0.0 : 0.5 * err / notNan;
-        }
-
-        protected override Matrix<Float> PropagateSingleError(Matrix<Float> y, Matrix<Float> target, int batchSize)
-        {
-            return target.Map2((targetVal, yVal) => Float.IsNaN(targetVal) ? (Float)0.0f : yVal - targetVal, y).Divide(batchSize);
-        }
-
-        protected override bool AlmostEqual(Float a, Float b)
-        {
-            return Math.Abs(a - b) < 10e-7f;
+            return (notNan == 0 ? 0.0 : 0.5 * err / notNan) / y.ColumnCount;
         }
 
         public override Float[] Array(params float[] input)
@@ -207,6 +214,88 @@ namespace Retia.Mathematics
             {
                 AdagradUpdate(learningRate, ptrs[0], ptrs[1], ptrs[2], weight.Weight.Length());
             }
+        }
+
+        public override Matrix<Float> BackPropagateMeanSquareError(Matrix<Float> output, Matrix<Float> target)
+        {
+            var result = Matrix<Float>.Build.Dense(output.RowCount, output.ColumnCount);
+            var oa = output.AsColumnMajorArray();
+            var ta = target.AsColumnMajorArray();
+            var ra = result.AsColumnMajorArray();
+
+            int rows = output.RowCount;
+            int notNan = 0;
+            for (int i = 0; i < oa.Length; i++)
+            {
+                if (i % rows == 0)
+                {
+                    for (int j = i - rows; j < i; j++)
+                    {
+                        ra[i] /= notNan;
+                    }
+
+                    notNan = 0;
+                }
+
+                if (Float.IsNaN(ta[i]))
+                {
+                    continue;
+                }
+
+                notNan++;
+
+                ra[i] = oa[i] - ta[i];
+            }
+
+            return result;
+        }
+
+        protected override bool AlmostEqual(Float a, Float b)
+        {
+            return Math.Abs(a - b) < 10e-7f;
+        }
+
+        public override Matrix<Float> BackPropagateCrossEntropyError(Matrix<Float> output, Matrix<Float> target)
+        {
+            var result = Matrix<Float>.Build.Dense(output.RowCount, output.ColumnCount);
+            var oa = output.AsColumnMajorArray();
+            var ta = target.AsColumnMajorArray();
+            var ra = result.AsColumnMajorArray();
+
+            int rows = output.RowCount;
+            int cols = output.ColumnCount;
+            int notNan = 0;
+            for (int i = 0; i < oa.Length; i++)
+            {
+                if (i % rows == 0)
+                {
+                    if (notNan == 0)
+                        cols--;
+
+                    notNan = 0;
+                }
+
+                if (Float.IsNaN(ta[i]))
+                {
+                    continue;
+                }
+
+                notNan++;
+
+                ra[i] = oa[i] - ta[i];
+            }
+
+            if (cols == 0)
+            {
+                throw new InvalidOperationException("All of your targets are NaN! This is pointless.");
+            }
+
+            for (int i = 0; i < ra.Length; i++)
+            {
+                ra[i] /= cols;
+            }
+
+            return result;
         }
     }
 }

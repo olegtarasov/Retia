@@ -87,8 +87,8 @@ namespace Benchmark
                     var pOut = pLayer.Step(samples.Inputs[j]);
                     var nOut = nLayer.Step(samples.Inputs[j]);
 
-                    pErr += MathProvider<df>.Instance.MeanSquare(pOut, samples.Targets[j]);
-                    nErr += MathProvider<df>.Instance.MeanSquare(nOut, samples.Targets[j]); 
+                    pErr += MathProvider<df>.Instance.MeanSquareError(pOut, samples.Targets[j]);
+                    nErr += MathProvider<df>.Instance.MeanSquareError(nOut, samples.Targets[j]); 
                 }
                
                 double num = (pErr - nErr) / (2.0f * delta);

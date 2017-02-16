@@ -72,7 +72,7 @@ namespace Retia.Training.Testers
                     confusionMatrix.Prediction(targetClass, predicted[colIdx]);
                 }
 
-                errors.Add(MathProvider.CrossEntropy(MathProvider.SoftMaxNorm(stepResult), sample.Target));
+                errors.Add(MathProvider.CrossEntropyError(MathProvider.SoftMaxNorm(stepResult), sample.Target));
             }
 
             confusionMatrix.CalculateResult(sampleCount * batchSize);

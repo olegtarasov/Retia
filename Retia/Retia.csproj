@@ -76,6 +76,9 @@
     <Compile Include="Mathematics\MatrixFactory.cs" />
     <Compile Include="Mathematics\MathProviderImpl.cs" />
     <Compile Include="Neural\BiGRU.cs" />
+    <Compile Include="Neural\ErrorFunctions\CrossEntropyError.cs" />
+    <Compile Include="Neural\ErrorFunctions\ErrorFunctionBase.cs" />
+    <Compile Include="Neural\ErrorFunctions\MeanSquareError.cs" />
     <Compile Include="Neural\Initializers\ConstantMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\IMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\ProportionalRandomMatrixInitializer.cs" />
