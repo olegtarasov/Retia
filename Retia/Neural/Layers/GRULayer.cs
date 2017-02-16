@@ -270,17 +270,33 @@ namespace Retia.Neural.Layers
             return H;
         }
 
-        private List<Matrix<T>> BackpropNew(List<Matrix<T>> sensitivities, bool needInputSens)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
-            var dh = Enumerable.Range(0, sensitivities.Count).Select(x => (Matrix<T>)null).ToList();
-            var di = Enumerable.Range(0, sensitivities.Count).Select(x => (Matrix<T>)null).ToList();
+            _bxr.ClearGrad();
+            _bxz.ClearGrad();
+            _bxh.ClearGrad();
+
+            _bhr.ClearGrad();
+            _bhz.ClearGrad();
+            _bhh.ClearGrad();
+
+            _wxr.ClearGrad();
+            _wxz.ClearGrad();
+            _wxh.ClearGrad();
+            
+            _whr.ClearGrad();
+            _whz.ClearGrad();
+            _whh.ClearGrad();
+
+            var dh = Enumerable.Range(0, outSens.Count).Select(x => (Matrix<T>)null).ToList();
+            var di = Enumerable.Range(0, outSens.Count).Select(x => (Matrix<T>)null).ToList();
 
             var batchOnes = Matrix<T>.Build.Dense(BatchSize, 1, Matrix<T>.One);
 
-            for (int i = sensitivities.Count - 1; i >= 0; i--)
+            for (int i = outSens.Count - 1; i >= 0; i--)
             {
-                var dY = sensitivities[i];
-                var dhNext = i == sensitivities.Count - 1 ? Matrix<T>.Build.Dense(_hSize, BatchSize) : dh[i + 1];
+                var dY = outSens[i];
+                var dhNext = i == outSens.Count - 1 ? Matrix<T>.Build.Dense(_hSize, BatchSize) : dh[i + 1];
                 var z = _zVals[i];
                 var r = _rVals[i];
                 var input = Inputs[i];
@@ -298,27 +314,27 @@ namespace Retia.Neural.Layers
                 var dbhh = dbxh.PointwiseMultiply(r); // h x b
                 _bhh.Gradient.CollapseColumnsAndAccumulate(dbhh, batchOnes); // h x 1
                 _whh.Gradient.Accumulate(dbhh, hPrev, transposeB: Transpose.Transpose); // h x h
-                
+
                 // bxr, Wxr
                 var dbxr = dbxh.PointwiseMultiply(hProp).PointwiseMultiply(r.PointwiseMultiply(_hiddenOnes - r)); // h x b
                 _bxr.Gradient.CollapseColumnsAndAccumulate(dbxr, batchOnes); // h x 1
                 _wxr.Gradient.Accumulate(dbxr, input, transposeB: Transpose.Transpose); // h x i
-                
+
                 // bhr, whr
                 var dbhr = dbxr; // h x b
                 _bhr.Gradient.CollapseColumnsAndAccumulate(dbhr, batchOnes); // h x 1
                 _whr.Gradient.Accumulate(dbhr, hPrev, transposeB: Transpose.Transpose); // h x h
-                
+
                 // bxz, wxz
                 var dbxz = dhSum.PointwiseMultiply(hPrev - hNew).PointwiseMultiply(z.PointwiseMultiply(_hiddenOnes - z)); // h x b
                 _bxz.Gradient.CollapseColumnsAndAccumulate(dbxz, batchOnes); // h x 1
                 _wxz.Gradient.Accumulate(dbxz, input, transposeB: Transpose.Transpose); // h x i
-                
+
                 // bhz, whz
                 var dbhz = dbxz; // h x b
                 _bhz.Gradient.CollapseColumnsAndAccumulate(dbhz, batchOnes); // h x 1
                 _whz.Gradient.Accumulate(dbhz, hPrev, transposeB: Transpose.Transpose); // h x h
-                
+
                 dh[i] = dhSum.PointwiseMultiply(z) + _whz.Weight.Transpose() * dbhz + _whr.Weight.Transpose() * dbhr + _whh.Weight.Transpose() * dbhh;
 
                 if (needInputSens)
@@ -328,219 +344,6 @@ namespace Retia.Neural.Layers
             }
 
             return di;
-        }
-
-        //private void CalcBackHadamards(Matrix sH, Matrix sR, Matrix sZ, Matrix sHprop, Matrix sHnext, Matrix z,
-        //                               Matrix r, Matrix h,
-        //                               Matrix newH,
-        //                               Matrix prevH, Matrix sY, Matrix propH)
-        //{
-        //    var _sH = sH.AsColumnMajorArray();
-        //    var _sR = sR.AsColumnMajorArray();
-        //    var _sZ = sZ.AsColumnMajorArray();
-        //    var _sHnext = sHnext.AsColumnMajorArray();
-        //    var _sHprop = sHprop.AsColumnMajorArray();
-        //    var _z = z.AsColumnMajorArray();
-        //    var _r = r.AsColumnMajorArray();
-        //    var _h = h.AsColumnMajorArray();
-        //    var _prevH = prevH.AsColumnMajorArray();
-        //    var _sY = sY.AsColumnMajorArray();
-        //    var _propH = propH.AsColumnMajorArray();
-        //    var _newH = newH.AsColumnMajorArray();
-
-        //    /*
-        //    var sO = sHnext + sY;
-        //    var derH = hiddenOnes - (newH ^ newH);
-        //    var sH = derH ^ z ^ sO;
-        //    var sHprop = sH ^ r;
-
-        //    var derR = r ^ (hiddenOnes - r);
-        //    var sR = derR ^ propH ^ sH;
-
-        //    var derZ = z ^ (hiddenOnes - z);
-        //    var sZ = derZ ^ (newH - prevH) ^ sO;
-
-        //    //The way prevH influence current state
-        //    sHnext = ((hiddenOnes - z) ^ sO);
-        //    */
-
-        //    for (var i = 0; i < _hiddenOnes.RowCount * _hiddenOnes.ColumnCount; i++)
-        //    {
-        //        var sO = _sHnext[i] + _sY[i];
-        //        var derH = 1 - _newH[i] * _newH[i];
-        //        _sH[i] = derH * _z[i] * sO;
-        //        _sHprop[i] = _sH[i] * _r[i];
-        //        var derR = _r[i] * (1.0f - _r[i]);
-        //        _sR[i] = derR * _propH[i] * _sH[i];
-        //        var derZ = _z[i] * (1.0f - _z[i]);
-        //        _sZ[i] = derZ * (_newH[i] - _prevH[i]) * sO;
-        //        _sHnext[i] = (1 - _z[i]) * sO;
-        //    }
-        //}
-
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
-        {
-            return BackpropNew(outSens, needInputSens);
-
-            //if (Outputs.Count != Inputs.Count)
-            //    throw new Exception("Backprop was not initialized (empty state sequence)");
-            //if (Inputs.Count == 0)
-            //    throw new Exception("Empty inputs history, nothing to propagate!");
-            //if (outSens.Count != Inputs.Count)
-            //    throw new Exception("Not enough sensitivies in list!");
-
-            //var inputSensList = new List<Matrix>(SeqLen);
-
-            //var hiddenIdentity = DenseMatrix.Create(BatchSize, 1, DenseMatrix.One);
-            //var yIdentity = DenseMatrix.Create(BatchSize, 1, DenseMatrix.One);
-
-
-            //_bxr.ClearGrad();
-            //_bxz.ClearGrad();
-            //_bxh.ClearGrad();
-
-            //_bhr.ClearGrad();
-            //_bhz.ClearGrad();
-            //_bhh.ClearGrad();
-
-            //_wxr.ClearGrad();
-            //_wxz.ClearGrad();
-            //_wxh.ClearGrad();
-
-            //_whr.ClearGrad();
-            //_whz.ClearGrad();
-            //_whh.ClearGrad();
-
-
-            ////Sensitivity of next state
-            //var sHnext = new DenseMatrix(_hiddenOnes.RowCount, _hiddenOnes.ColumnCount);
-
-            //for (var i = Inputs.Count - 1; i >= 0; i--)
-            //{
-            //    //output sensitivity
-            //    var sY = outSens[i];
-
-            //    //inputs
-            //    var x = Inputs[i];
-
-            //    //R matrix
-            //    var r = _rVals[i];
-
-            //    //Z matrix
-            //    var z = _zVals[i];
-
-            //    //Previous hidden value
-
-            //    var prevH = i > 0 ? Outputs[i - 1] : new DenseMatrix(OutputSize, BatchSize);
-
-            //    //Current hidden value
-            //    var H = Outputs[i];
-
-            //    //Weighted previous hidden value
-            //    var propH = _hPropVals[i];
-
-            //    //Current hidden candidate
-            //    var newH = _hNewVals[i];
-
-
-            //    //Transponsed martices
-            //    /*
-            //    var tPrevH = Matrix.Transpose(prevH);
-            //    var tX = Matrix.Transpose(x);
-            //    */
-
-            //    //Sigmoid derrivative:  f'(x) = f(x)*(1-f(x))
-            //    //Tanh derrivative:     f'(x) = 1-f(x)*f(x)
-
-            //    //var sO = sHnext + sY;
-
-
-            //    /*
-            //    var derH = hiddenOnes - (newH ^ newH);
-            //    var sH = derH ^ z ^ sO;
-
-            //    var sHprop = sH ^ r;
-
-            //    var derR = r ^ (hiddenOnes - r);
-            //    var sR = derR ^ propH ^ sH;
-
-            //    var derZ = z ^ (hiddenOnes - z);
-            //    var sZ = derZ ^ (newH - prevH) ^ sO;
-
-            //    //The way prevH influence current state
-            //    var sHnext = ((hiddenOnes - z) ^ sO);
-            //    */
-
-            //    //Matrices below (and sHnext) will be rewritten during calculation!
-            //    var sH = new DenseMatrix(_hiddenOnes.RowCount, _hiddenOnes.ColumnCount);
-            //    var sHprop = new DenseMatrix(_hiddenOnes.RowCount, _hiddenOnes.ColumnCount);
-            //    var sR = new DenseMatrix(_hiddenOnes.RowCount, _hiddenOnes.ColumnCount);
-            //    var sZ = new DenseMatrix(_hiddenOnes.RowCount, _hiddenOnes.ColumnCount);
-
-            //    CalcBackHadamards(sH, sR, sZ, sHprop, sHnext, z, r, H, newH, prevH, sY, propH);
-
-            //    //sHnext = (tWhh * sHprop) + (tWhr * sR) + sHnext + (tWhz * sZ);
-            //    sHnext.Accumulate(_whh.Weight, sHprop, 1.0f, 1.0f, Transpose.Transpose);
-            //    sHnext.Accumulate(_whr.Weight, sR, 1.0f, 1.0f, Transpose.Transpose);
-            //    sHnext.Accumulate(_whz.Weight, sZ, 1.0f, 1.0f, Transpose.Transpose);
-
-            //    if (needInputSens)
-            //    {
-            //        var sInput = new DenseMatrix(x.RowCount, BatchSize);
-            //        sInput.Accumulate(_wxz.Weight, sZ, 1.0f, 1.0f, Transpose.Transpose);
-            //        sInput.Accumulate(_wxr.Weight, sR, 1.0f, 1.0f, Transpose.Transpose);
-            //        sInput.Accumulate(_wxh.Weight, sH, 1.0f, 1.0f, Transpose.Transpose);
-            //        inputSensList.Insert(0, sInput);
-            //    }
-            //    else
-            //        inputSensList.Insert(0, new DenseMatrix(x.RowCount, BatchSize));
-            //    /*
-            //    var dGradWhh = sHprop * tPrevH;
-            //    var dGradWhr = sR * tPrevH;
-            //    var dGradWhz = sZ * tPrevH;
-
-            //    var dGradWhy = sY * Matrix.Transpose(H);
-
-            //    var dGradWxh = sH * tX;
-            //    var dGradWxr = sR * tX;
-            //    var dGradWxz = sZ * tX;
-
-            //    gradWhh += dGradWhh;
-            //    gradWhr += dGradWhr;
-            //    gradWhz += dGradWhz;
-            //    gradWhy += dGradWhy;
-
-            //    gradWxh += dGradWxh;
-            //    gradWxr += dGradWxr;
-            //    gradWxz += dGradWxz;
-            //    */
-
-            //    _whr.Gradient.Accumulate(sR, prevH, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
-            //    _whz.Gradient.Accumulate(sZ, prevH, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
-            //    _whh.Gradient.Accumulate(sHprop, prevH, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
-
-            //    _wxr.Gradient.Accumulate(sR, x, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
-            //    _wxz.Gradient.Accumulate(sZ, x, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
-            //    _wxh.Gradient.Accumulate(sH, x, 1.0f, 1.0f, Transpose.DontTranspose, Transpose.Transpose);
-
-            //    if (sH.ColumnCount > 1)
-            //    {
-            //        _bxr.Gradient.Accumulate(sR, hiddenIdentity, 1.0f);
-            //        _bxz.Gradient.Accumulate(sZ, hiddenIdentity, 1.0f);
-            //        _bxh.Gradient.Accumulate(sH, hiddenIdentity, 1.0f);
-            //    }
-            //    else
-            //    {
-            //        _bxr.Gradient.Accumulate(sR);
-            //        _bxz.Gradient.Accumulate(sZ);
-            //        _bxh.Gradient.Accumulate(sH);
-            //    }
-            //}
-
-            ////clamp gradients to this value
-            //const float CLAMP = 5.0f;
-            //ClampGrads(CLAMP);
-            //return inputSensList;
         }
 
         public override void ClampGrads(float limit)
