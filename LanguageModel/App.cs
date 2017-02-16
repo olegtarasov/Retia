@@ -73,8 +73,8 @@ namespace LanguageModel
 			Console.WriteLine($"Loading test set from {batchesPath}");
 			_dataProvider.Load(batchesPath);
 
-		    var optimizer = new RMSPropOptimizer(learningRate, 0.95f, 0.0f, 0.9f);
-			LayeredNet network;
+		    var optimizer = new RMSPropOptimizer<float>(learningRate, 0.95f, 0.0f, 0.9f);
+			LayeredNet<float> network;
 			if (string.IsNullOrEmpty(configPath))
 			{
 				network = CreateNetwork(_dataProvider.InputSize, 128, _dataProvider.OutputSize, 1);
@@ -106,7 +106,7 @@ namespace LanguageModel
             trainOptions.ScaleLearningRate.EachEpoch(10, 0.97);
             trainOptions.ReportProgress.EachIteration(10);
             //trainOptions.RunUserTests.EachIteration(100);
-			var trainer = new OptimizingTrainer(network, optimizer, _dataProvider, null, trainOptions);
+			var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions);
             var epochWatch = new Stopwatch();
            
 			trainer.Message += (sender, args) => Console.WriteLine(args.Message);
@@ -154,24 +154,24 @@ namespace LanguageModel
 		}
 
   
-        private static LayeredNet CreateNetwork(string fileName)
+        private static LayeredNet<float> CreateNetwork(string fileName)
 		{
-			return LayeredNet.Load(fileName);
+			return LayeredNet<float>.Load(fileName);
 		}
 
-		private static LayeredNet CreateNetwork(int xSize, int hSize, int ySize, int layerCount)
+		private static LayeredNet<float> CreateNetwork(int xSize, int hSize, int ySize, int layerCount)
 		{
-            return new LayeredNet(BATCH_SIZE, SEQ_LEN, 
-                new GruLayer(xSize, hSize),
+            return new LayeredNet<float>(BATCH_SIZE, SEQ_LEN, 
+                new GruLayer<float>(xSize, hSize),
                 //new GruLayer(hSize, hSize),
                 //new GruLayer(hSize, hSize),
                 //new GruLayer(hSize, hSize),
                 //new GruLayer(hSize, hSize),
-                new LinearLayer(hSize, ySize),
-                new SoftMaxLayer(ySize));
+                new LinearLayer<float>(hSize, ySize),
+                new SoftMaxLayer<float>(ySize));
         }
 
-		private static string TestRNN(NeuralNet network, int count, List<char> vocab, string startFrom = "")
+		private static string TestRNN(NeuralNet<float> network, int count, List<char> vocab, string startFrom = "")
 		{
 			var rnd = SafeRandom.Generator;
 			
@@ -204,7 +204,7 @@ namespace LanguageModel
 			for (int i = 0; i < count; i++)
 			{
 				var p = network.Step(input);
-				var index = SoftMax.SoftMaxChoice(p)[0];
+				var index = MathProvider<float>.Instance.SoftMaxChoice(p)[0];
 				char output = vocab[index];
 
 				sb.Append(output);

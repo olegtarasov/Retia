@@ -20,7 +20,7 @@ namespace Retia.Tests.Training.Batching
 			const int batchSize = 5;
 
 			var samples = GetSamples();
-			var batcher = new SequenceBatcher<float>(samples[0].Length);
+			var batcher = new SequenceBatcher<float, float[]>(samples[0].Length, (f, i) => f[i]);
 			var result = batcher.BatchSamples(samples, new BatchDimension(BatchDimensionType.BatchSize, batchSize));
 
 			CheckBatches(result, batchCount, batchSize);
@@ -33,7 +33,7 @@ namespace Retia.Tests.Training.Batching
 			const int batchSize = 4;
 
 			var samples = GetSamples();
-			var batcher = new SequenceBatcher<float>(samples[0].Length);
+			var batcher = new SequenceBatcher<float, float[]>(samples[0].Length, (f, i) => f[i]);
 			var result = batcher.BatchSamples(samples, new BatchDimension(BatchDimensionType.BatchCount, batchCount));
 
 			CheckBatches(result, batchCount, batchSize);

@@ -6,23 +6,23 @@ using Retia.Mathematics;
 
 namespace Retia.Training.Batching
 {
-	public class SequenceBatcher<T> where T : struct, IEquatable<T>, IFormattable
+	public class SequenceBatcher<TType, TInput> where TType : struct, IEquatable<TType>, IFormattable
     {
 		private readonly int _size;
-		//private readonly Func<T[], int, T> _mapper;
+		private readonly Func<TInput, int, TType> _mapper;
 
-		public SequenceBatcher(int size/*, Func<T, int, T> mapper*/)
+		public SequenceBatcher(int size, Func<TInput, int, TType> mapper)
 		{
-			//if (mapper == null)
-			//{
-			//	throw new ArgumentNullException(nameof(mapper));
-			//}
+            if (mapper == null)
+            {
+                throw new ArgumentNullException(nameof(mapper));
+            }
 
-			_size = size;
-			//_mapper = mapper;
+            _size = size;
+			_mapper = mapper;
 		}
 
-		public List<Matrix<T>> BatchSamples(List<T[]> samples, BatchDimension dimension, IProgressWriter progressWriter = null)
+		public List<Matrix<TType>> BatchSamples(List<TInput> samples, BatchDimension dimension, IProgressWriter progressWriter = null)
 		{
 			int batchSize, batchCount;
 			switch (dimension.Type)
@@ -42,9 +42,9 @@ namespace Retia.Training.Batching
 			return BatchSamples(samples, batchCount, batchSize, progressWriter);
 		}
 
-		private List<Matrix<T>> BatchSamples(List<T[]> samples, int batchCount, int batchSize, IProgressWriter progressWriter)
+		private List<Matrix<TType>> BatchSamples(List<TInput> samples, int batchCount, int batchSize, IProgressWriter progressWriter)
 		{
-			var result = new List<Matrix<T>>();
+			var result = new List<Matrix<TType>>();
 			
 			var tracker = new ProgressTracker(batchSize);
 
@@ -55,14 +55,14 @@ namespace Retia.Training.Batching
 				    progressWriter?.SetProgress(sampleIdx, batchCount, "Batching");
 				}
 
-				var matrix = Matrix<T>.Build.Dense(_size, batchSize);
+				var matrix = Matrix<TType>.Build.Dense(_size, batchSize);
 				for (int col = 0; col < batchSize; col++)
 				{
 					var input = samples[sampleIdx + col * batchCount];
 					
 					for (int i = 0; i < _size; i++)
 					{
-						matrix[i, col] = input[i];
+						matrix[i, col] = _mapper(input, i);
 					}
 				}
 

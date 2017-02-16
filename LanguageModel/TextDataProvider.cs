@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using MathNet.Numerics.LinearAlgebra.Single;
+using MathNet.Numerics.LinearAlgebra;
 using Retia;
 using Retia.Integration;
 using Retia.Mathematics;
@@ -13,8 +13,8 @@ using Retia.Training.Data;
 
 namespace LanguageModel
 {
-	public class TextDataProvider : DataProviderBase
-	{
+	public class TextDataProvider : DataProviderBase<float>
+    {
 		private readonly int _batchSize;
 
 		public TextDataProvider(int batchSize)
@@ -24,12 +24,12 @@ namespace LanguageModel
 
 		public List<char> Vocab { get; private set; }
 
-	    public override IDataSet CreateTrainingSet()
+	    public override IDataSet<float> CreateTrainingSet()
 	    {
 	        return TrainingSet;
 	    }
 
-	    public override IDataSet CreateTestSet()
+	    public override IDataSet<float> CreateTestSet()
 	    {
 	        return TestSet;
 	    }
@@ -43,10 +43,10 @@ namespace LanguageModel
 
 			var text = File.ReadAllText(path);
 
-            var batcher = new SequenceBatcher<char>(Vocab.Count, (ch, i) => Vocab[i] == ch ? 1 : 0);
+            var batcher = new SequenceBatcher<float, char>(Vocab.Count, (ch, i) => Vocab[i] == ch ? 1 : 0);
 			var matrices = batcher.BatchSamples(text.ToList(), new BatchDimension(BatchDimensionType.BatchSize, _batchSize), progressWriter);
-			TrainingSet = new SequentialDataSet(matrices);
-			TestSet = new SequentialDataSet(new List<Matrix>()); // No testing yet.
+			TrainingSet = new SequentialDataSet<float>(matrices);
+			TestSet = new SequentialDataSet<float>(new List<Matrix<float>>()); // No testing yet.
 		}
 
 		public void LoadVocab(string path)
@@ -67,8 +67,8 @@ namespace LanguageModel
 				int vocabLen = reader.ReadInt32();
 				Vocab = reader.ReadChars(vocabLen).ToList();
 
-				TrainingSet = SequentialDataSet.Load(stream);
-				TestSet = SequentialDataSet.Load(stream);
+				TrainingSet = SequentialDataSet<float>.Load(stream);
+				TestSet = SequentialDataSet<float>.Load(stream);
 			}
 		}
 
