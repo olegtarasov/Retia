@@ -46,14 +46,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>$(ProjectDir)..\Out\$(Platform)\$(Configuration);c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)..\Out\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(ProjectDir)..\Retia.Cuda\bin\$(Platform)\$(Configuration);c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include\;$(ProjectDir)..\Retia.Cuda;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>$(ProjectDir)..\Out\$(Platform)\$(Configuration);c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\;$(LibraryPath)</LibraryPath>
-    <OutDir>$(ProjectDir)..\Out\$(Platform)\$(Configuration)\</OutDir>
+    <LibraryPath>$(ProjectDir)..\Retia.Cuda\bin\$(Platform)\$(Configuration);c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
     <IncludePath>c:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include\;$(ProjectDir)..\Retia.Cuda;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

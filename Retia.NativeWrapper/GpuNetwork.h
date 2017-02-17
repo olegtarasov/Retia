@@ -61,6 +61,16 @@ namespace Retia::NativeWrapper {
 			return result;
 		}
 
+		void TransferStatesToHost(LayeredNetSpec^ spec)
+		{
+			for (int i = 0; i < spec->Layers->Count; i++)
+			{
+				auto state = LayerStateFactory::GetLayerState(spec->Layers[i]);
+				_network->TransferStatesToHost(i, state->matrices());
+				state->SyncToMatrix();
+			}
+		}
+
 		void Optimize()
 		{
 			_network->Opimize();

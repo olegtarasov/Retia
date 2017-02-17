@@ -206,6 +206,17 @@ namespace Retia.Neural
             return base.TrainSequence(inputs, targets);
         }
 
+        public void TransferStateToHost()
+        {
+            if (_gpuNetwork == null)
+            {
+                throw new InvalidOperationException("You are not using GPU!");
+            }
+
+            var spec = CreateSpec();
+            _gpuNetwork.TransferStatesToHost(spec);
+        }
+
         public void UseGpu()
         {
             if (_gpuNetwork != null)

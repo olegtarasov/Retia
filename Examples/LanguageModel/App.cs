@@ -120,7 +120,14 @@ namespace LanguageModel
 				errFile.Flush(true);
 				network.Save(rnnPath);
 			};
-			trainer.UserTest += (sender, args) => Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
+			trainer.UserTest += (sender, args) =>
+			{
+			    if (gpu)
+			    {
+			        network.TransferStateToHost();
+			    }
+			    Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
+			};
 		    trainer.EpochReached += () =>
 		    {
                 epochWatch.Stop();
