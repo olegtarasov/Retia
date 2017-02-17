@@ -11,6 +11,18 @@ public:
 	}
 
 	virtual ~OptimizerBase() = default;
+
+
+	float learningRate() const
+	{
+		return _learningRate;
+	}
+
+	void set_learningRate(float learningRate)
+	{
+		_learningRate = learningRate;
+	}
+
 	virtual void Optimize(NeuroWeigth& weigth) = 0;
 
 protected:

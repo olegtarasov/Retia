@@ -2,6 +2,11 @@
 
 #include <algorithm>
 
+void LayeredNet::UpdateLearningRate(float learningRate)
+{
+	_optimizer->set_learningRate(learningRate);
+}
+
 void LayeredNet::TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states)
 {
 	if (layer >= _layers.size())

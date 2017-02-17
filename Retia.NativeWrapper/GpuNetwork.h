@@ -85,6 +85,11 @@ namespace Retia::NativeWrapper {
 		{
 			_network->ResetOptimizerCache();
 		}
+
+		void UpdateLearningRate(float learningRate)
+		{
+			_network->UpdateLearningRate(learningRate);
+		}
 		
 
 	private:

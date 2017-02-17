@@ -217,6 +217,12 @@ namespace Retia.Neural
             _gpuNetwork.TransferStatesToHost(spec);
         }
 
+        public override void UpdateLearningRate(float learningRate)
+        {
+            base.UpdateLearningRate(learningRate);
+            _gpuNetwork?.UpdateLearningRate(learningRate);
+        }
+
         public void UseGpu()
         {
             if (_gpuNetwork != null)

@@ -97,6 +97,7 @@ namespace Retia.Training.Trainers
             _errors = new List<double>();
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
+            _scailingTicks = 0;
 
             OnMessage($"Sequence length: {Options.SequenceLength}");
             OnMessage($"Using network with total param count {_network.TotalParamCount}");
@@ -168,7 +169,7 @@ namespace Retia.Training.Trainers
         private void ScaleLearingRate()
         {
             _scailingTicks++;
-            _optimizer.LearningRate = (float)(_initialLr / (1.0 + _scailingTicks * Options.ScaleLearningRate.ScaleFactor));
+            _network.UpdateLearningRate((float)(_initialLr / (1.0 + _scailingTicks * Options.ScaleLearningRate.ScaleFactor)));
         }
     }
 }

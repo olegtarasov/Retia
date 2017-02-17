@@ -14,6 +14,7 @@ public:
 	}
 
 
+	void UpdateLearningRate(float learningRate) override;
 	void TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states) override;
 	double TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector<RawMatrixPtr*>& targets) override;
 	void AddLayer(NeuroLayer* layer);
