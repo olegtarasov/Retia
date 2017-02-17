@@ -81,7 +81,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="MathNet.Numerics">
-      <HintPath>$(ProjectDir)..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <HintPath>$(SolutionDir)packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

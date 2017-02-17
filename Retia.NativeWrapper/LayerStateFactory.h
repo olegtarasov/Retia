@@ -2,6 +2,7 @@
 
 #include "ManagedMatrixContainer.h"
 
+using namespace System;
 using namespace Retia::Contracts;
 
 public ref class LayerStateFactory
@@ -51,6 +52,6 @@ public:
 		if(spec->LayerType == LayerType::Softmax)
 			return gcnew ManagedMatrixContainer(true);
 
-		return nullptr;
+		throw gcnew InvalidOperationException("Layer type not supported!");
 	}
 };
