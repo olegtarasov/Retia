@@ -47,6 +47,10 @@ public:
 			return result;
 		}
 		
+		//valid layer, but no state to return, returning empy containter, not nullptr!
+		if(spec->LayerType == LayerType::Softmax)
+			return gcnew ManagedMatrixContainer(true);
+
 		return nullptr;
 	}
 };

@@ -25,7 +25,7 @@ namespace LanguageModel
 	public class App
 	{
 		private const int BATCH_SIZE = 64;
-		private const int SEQ_LEN = 64;
+		private const int SEQ_LEN = 128;
 		
 		private readonly TextDataProvider _dataProvider = new TextDataProvider(BATCH_SIZE);
         
@@ -77,7 +77,7 @@ namespace LanguageModel
 			LayeredNet<float> network;
 			if (string.IsNullOrEmpty(configPath))
 			{
-				network = CreateNetwork(_dataProvider.InputSize, 128, _dataProvider.OutputSize);
+				network = CreateNetwork(_dataProvider.InputSize, 256, _dataProvider.OutputSize);
                 network.Optimizer = optimizer;
 			}
 			else
