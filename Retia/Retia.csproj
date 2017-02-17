@@ -52,7 +52,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\CollectionExtensions.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
     <Compile Include="Integration\ConsoleProgressWriter.cs" />
@@ -69,12 +68,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MathProviderImplD.tt</DependentUpon>
     </Compile>
-    <Compile Include="Mathematics\Fir.cs" />
     <Compile Include="Mathematics\MathProvider.cs" />
     <Compile Include="Mathematics\MathProviderBase.cs" />
     <Compile Include="Mathematics\MatrixExtensions.cs" />
     <Compile Include="Mathematics\MatrixFactory.cs" />
     <Compile Include="Mathematics\MathProviderImpl.cs" />
+    <Compile Include="Mathematics\MAV.cs" />
     <Compile Include="Neural\BiGRU.cs" />
     <Compile Include="Neural\ErrorFunctions\CrossEntropyError.cs" />
     <Compile Include="Neural\ErrorFunctions\ErrorFunctionBase.cs" />

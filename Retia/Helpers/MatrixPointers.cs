@@ -9,8 +9,11 @@ namespace Retia.Helpers
     {
         private readonly GCHandle[] _handles;
 
+        private bool _disposed;
+
         public MatrixPointers(params Matrix<T>[] matrices)
         {
+            _disposed = false;
             _handles = new GCHandle[matrices.Length];
 
             for (int i = 0; i < matrices.Length; i++)
@@ -19,10 +22,20 @@ namespace Retia.Helpers
             }
         }
 
-        public IntPtr this[int idx] => _handles[idx].AddrOfPinnedObject();
+        public IntPtr this[int idx]
+        {
+            get
+            {
+                if (_disposed)
+                    throw new ObjectDisposedException(nameof(MatrixPointers<T>));
+
+                return _handles[idx].AddrOfPinnedObject();
+            }
+        }
 
         public void Dispose()
         {
+            _disposed = true;
             for (int i = 0; i < _handles.Length; i++)
             {
                 _handles[i].Free();

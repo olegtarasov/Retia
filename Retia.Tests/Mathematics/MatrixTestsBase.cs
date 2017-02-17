@@ -27,7 +27,7 @@ namespace Retia.Tests.Mathematics
 
             matrix.ShouldHaveSize(2, 3);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
+            matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace Retia.Tests.Mathematics
 
             matrix.ShouldHaveSize(3, 1);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 2.0f, 3.0f));
+            matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 2.0f, 3.0f));
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace Retia.Tests.Mathematics
 
             matrix.ShouldHaveSize(3, 1);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 2.0f, 3.0f));
+            matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 2.0f, 3.0f));
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Retia.Tests.Mathematics
 
             matrix.ShouldHaveSize(1, 3);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 2.0f, 3.0f));
+            matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 2.0f, 3.0f));
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace Retia.Tests.Mathematics
 
             matrix.ShouldHaveSize(2, 3);
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
+            matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
         }
         #endregion
 
@@ -130,7 +130,7 @@ namespace Retia.Tests.Mathematics
                 tB = tB.Transpose();
             }
 
-            C.AsColumnMajorArray().ShouldArrayEqual(((useC ? Matrix<T>.One : Matrix<T>.Zero) * tC + tA * tB).ToColumnMajorArray());
+            C.AsColumnMajorArray().ShouldArrayEqualWithinError(((useC ? Matrix<T>.One : Matrix<T>.Zero) * tC + tA * tB).ToColumnMajorArray());
         }
 
         private static IEnumerable<object[]> GetAccumulateScalarPositiveTestData()
@@ -154,7 +154,7 @@ namespace Retia.Tests.Mathematics
 
             C.Accumulate(A);
 
-            C.AsColumnMajorArray().ShouldArrayEqual((tA + tC).ToColumnMajorArray());
+            C.AsColumnMajorArray().ShouldArrayEqualWithinError((tA + tC).ToColumnMajorArray());
         }
 
         #endregion
@@ -172,7 +172,7 @@ namespace Retia.Tests.Mathematics
             var result = matrix.TileColumns(3);
             result.ShouldHaveSize(4, 3);
 
-            result.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4));
+            result.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4));
         }
 
         [Fact]
@@ -184,7 +184,7 @@ namespace Retia.Tests.Mathematics
 
             var test = Matrix<T>.Build.DenseOfColumns(Enumerable.Range(0, 3).SelectMany(x => Matrix3By6.EnumerateColumns()));
 
-            result.AsColumnMajorArray().ShouldArrayEqual(test.AsColumnMajorArray());
+            result.AsColumnMajorArray().ShouldArrayEqualWithinError(test.AsColumnMajorArray());
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace Retia.Tests.Mathematics
             var result = matrix.TileRows(3);
             result.ShouldHaveSize(3, 4);
 
-            result.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4));
+            result.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4));
         }
 
         [Fact]
@@ -207,7 +207,7 @@ namespace Retia.Tests.Mathematics
 
             var test = Matrix<T>.Build.DenseOfRows(Enumerable.Range(0, 3).SelectMany(x => Matrix3By6.EnumerateRows()));
 
-            result.AsColumnMajorArray().ShouldArrayEqual(test.AsColumnMajorArray());
+            result.AsColumnMajorArray().ShouldArrayEqualWithinError(test.AsColumnMajorArray());
         }
 
         #endregion
@@ -226,7 +226,7 @@ namespace Retia.Tests.Mathematics
             {
                 var read = file.WriteAndReadData(stream => matrix.Save(stream), MatrixFactory.Load<T>);
 
-                read.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
+                read.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
             }
         }
 
@@ -237,7 +237,7 @@ namespace Retia.Tests.Mathematics
             {
                 var matrix = MatrixFactory.RandomMatrix<T>(2, 3, 5);
                 matrix.ShouldHaveSize(2, 3);
-                matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
+                matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 4.0f, 2.0f, 5.0f, 3.0f, 6.0f));
             }
         }
 
@@ -248,7 +248,7 @@ namespace Retia.Tests.Mathematics
             {
                 var matrix = MatrixFactory.RandomMaskMatrix<T>(2, 3, 0.5f);
                 matrix.ShouldHaveSize(2, 3);
-                matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f));
+                matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f));
             }
         }
 
@@ -278,7 +278,7 @@ namespace Retia.Tests.Mathematics
         {
             var clone = Matrix3By6.CloneMatrix();
 
-            clone.AsColumnMajorArray().ShouldArrayEqual(Matrix3By6.AsColumnMajorArray());
+            clone.AsColumnMajorArray().ShouldArrayEqualWithinError(Matrix3By6.AsColumnMajorArray());
 
             clone[1, 1] = MathProvider.Scalar(42.0f);
             clone[1, 1].ShouldNotEqual(Matrix3By6[1, 1]);
@@ -292,7 +292,7 @@ namespace Retia.Tests.Mathematics
 
             Matrix5By3.CopyToArray(dest, ref idx);
 
-            Matrix5By3.AsColumnMajorArray().ShouldArrayEqual(dest);
+            Matrix5By3.AsColumnMajorArray().ShouldArrayEqualWithinError(dest);
             idx.ShouldEqual(Matrix5By3.RowCount * Matrix5By3.ColumnCount);
         }
 
@@ -304,14 +304,14 @@ namespace Retia.Tests.Mathematics
 
             Matrix5By3.CopyToArray(dest, ref idx);
 
-            Matrix5By3.AsColumnMajorArray().ShouldArrayEqual(dest);
+            Matrix5By3.AsColumnMajorArray().ShouldArrayEqualWithinError(dest);
             idx.ShouldEqual(Matrix5By3.RowCount * Matrix5By3.ColumnCount);
 
             idx = 0;
             var mat = Matrix<T>.Build.Dense(5, 3);
             mat.CopyFromArray(dest, ref idx);
 
-            mat.AsColumnMajorArray().ShouldArrayEqual(Matrix5By3.AsColumnMajorArray());
+            mat.AsColumnMajorArray().ShouldArrayEqualWithinError(Matrix5By3.AsColumnMajorArray());
             idx.ShouldEqual(Matrix5By3.RowCount * Matrix5By3.ColumnCount);
         }
 
@@ -323,7 +323,7 @@ namespace Retia.Tests.Mathematics
 
             matrix.Clamp(MathProvider.Scalar(-4), MathProvider.Scalar(4));
 
-            matrix.AsColumnMajorArray().ShouldArrayEqual(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
+            matrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace Retia.Tests.Mathematics
             result.Count.ShouldEqual(3);
             for (int i = 0; i < result.Count; i++)
             {
-                result[i].AsColumnMajorArray().ShouldArrayEqual(Matrix3By6.SubMatrix(0, Matrix3By6.RowCount, i * 2, 2).AsColumnMajorArray());
+                result[i].AsColumnMajorArray().ShouldArrayEqualWithinError(Matrix3By6.SubMatrix(0, Matrix3By6.RowCount, i * 2, 2).AsColumnMajorArray());
             }
         }
 
@@ -343,7 +343,7 @@ namespace Retia.Tests.Mathematics
         {
             var result = Matrix3By6.SplitColumns(6);
             result.Count.ShouldEqual(1);
-            result[0].AsColumnMajorArray().ShouldArrayEqual(Matrix3By6.AsColumnMajorArray());
+            result[0].AsColumnMajorArray().ShouldArrayEqualWithinError(Matrix3By6.AsColumnMajorArray());
         }
 
         [Fact]
@@ -374,8 +374,8 @@ namespace Retia.Tests.Mathematics
             var rg1 = resg.SubMatrix(0, 3, 0, 8);
             var rg2 = resg.SubMatrix(3, 3, 0, 8);
 
-            rg1.AsColumnMajorArray().ShouldArrayEqual(res1.AsColumnMajorArray());
-            rg2.AsColumnMajorArray().ShouldArrayEqual(res2.AsColumnMajorArray());
+            rg1.AsColumnMajorArray().ShouldArrayEqualWithinError(res1.AsColumnMajorArray());
+            rg2.AsColumnMajorArray().ShouldArrayEqualWithinError(res2.AsColumnMajorArray());
         }
 
         private Matrix<T> GetTestMatrix(Matrix<T> matrix)

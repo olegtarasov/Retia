@@ -2,35 +2,12 @@
 using System.IO;
 using System.Text;
 using Retia.Integration;
-using Retia.Mathematics;
 
 namespace Retia.Helpers
 {
 	public static class StreamHelpers
 	{
-	    public static T ReadDoubleOrSingle<T>(this BinaryReader reader) where T : struct, IEquatable<T>, IFormattable
-	    {
-            // This is super-slow, but then again reading from file shouldn't be fast.
-	        return (typeof(T) == typeof(double)) 
-                ? MathProvider<T>.Instance.Scalar(reader.ReadDouble())
-                : MathProvider<T>.Instance.Scalar(reader.ReadSingle());
-	    }
-
-	    public static void WriteDoubleOrSingle<T>(this BinaryWriter writer, T value) where T : struct, IEquatable<T>, IFormattable
-	    {
-            // Heavy boxing for each call
-	        if (typeof(T) == typeof(double))
-	        {
-	            writer.Write(Convert.ToDouble(value));
-	        }
-	        else
-	        {
-	            writer.Write(Convert.ToSingle(value));
-	        }
-	    }
-
-
-        public static BinaryWriter NonGreedyWriter(this Stream stream)
+	    public static BinaryWriter NonGreedyWriter(this Stream stream)
 	    {
 	        return new BinaryWriter(stream, Encoding.UTF8, true);
 	    }

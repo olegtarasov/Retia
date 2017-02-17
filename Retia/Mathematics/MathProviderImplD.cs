@@ -36,7 +36,7 @@ namespace Retia.Mathematics
                 double nextPos = p[0, j];
 
                 int i;
-                for (i = 1; i < p.ColumnCount; i++)
+                for (i = 1; i < p.RowCount; i++)
                 {
                     if (dChoice > curPos && dChoice <= nextPos)
                         break;
@@ -179,7 +179,7 @@ namespace Retia.Mathematics
                 err += delta * delta;
             }
 
-            return (notNan == 0 ? 0.0 : 0.5 * err / notNan) / y.ColumnCount;
+            return notNan == 0 ? 0.0 : 0.5 * err / notNan;
         }
 
         public override Float[] Array(params float[] input)
@@ -227,16 +227,6 @@ namespace Retia.Mathematics
             int notNan = 0;
             for (int i = 0; i < oa.Length; i++)
             {
-                if (i % rows == 0)
-                {
-                    for (int j = i - rows; j < i; j++)
-                    {
-                        ra[i] /= notNan;
-                    }
-
-                    notNan = 0;
-                }
-
                 if (Float.IsNaN(ta[i]))
                 {
                     continue;
@@ -245,6 +235,11 @@ namespace Retia.Mathematics
                 notNan++;
 
                 ra[i] = oa[i] - ta[i];
+            }
+
+            for (int i = 0; i < ra.Length; i++)
+            {
+                ra[i] /= notNan;
             }
 
             return result;

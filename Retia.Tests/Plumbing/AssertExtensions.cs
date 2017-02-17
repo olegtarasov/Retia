@@ -8,7 +8,7 @@ namespace Retia.Tests.Plumbing
 {
     public static class AssertExtensions
     {
-        public static void ShouldArrayEqual<T>(this T[] array1, T[] array2) where T : struct, IEquatable<T>, IFormattable
+        public static void ShouldArrayEqualWithinError<T>(this T[] array1, T[] array2) where T : struct, IEquatable<T>, IFormattable
         {
             if (array1 == null && array2 == null)
             {

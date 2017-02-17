@@ -66,8 +66,11 @@ namespace Retia::NativeWrapper {
 			for (int i = 0; i < spec->Layers->Count; i++)
 			{
 				auto state = LayerStateFactory::GetLayerState(spec->Layers[i]);
-				_network->TransferStatesToHost(i, state->matrices());
-				state->SyncToMatrix();
+				if (state != nullptr)
+				{
+					_network->TransferStatesToHost(i, state->matrices());
+					state->SyncToMatrix();
+				}
 			}
 		}
 

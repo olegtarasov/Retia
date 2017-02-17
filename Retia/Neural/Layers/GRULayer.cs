@@ -35,17 +35,6 @@ namespace Retia.Neural.Layers
         /// </summary>
         private Matrix<T> _lastH;
 
-        public override Matrix<T>[] InternalState
-        {
-            get { return new []{_lastH.CloneMatrix()}; }
-            set
-            {
-                if(value.Count()!=1)
-                    throw new Exception($"Internal state of {GetType().AssemblyQualifiedName} should consist of 1 matrix");
-                _lastH = value[0];
-            }
-        }
-
         public GruLayer(int xSize, int hSize) : this(xSize, hSize, 
             new ProportionalRandomMatrixInitializer<T>(),
             new ProportionalRandomMatrixInitializer<T>(),
@@ -133,6 +122,17 @@ namespace Retia.Neural.Layers
             _hSize = other._hSize;
         }
 
+        public override Matrix<T>[] InternalState
+        {
+            get { return new []{_lastH.CloneMatrix()}; }
+            set
+            {
+                if(value.Count()!=1)
+                    throw new Exception($"Internal state of {GetType().AssemblyQualifiedName} should consist of 1 matrix");
+                _lastH = value[0];
+            }
+        }
+
         public override int InputSize => _wxh.Weight.ColumnCount;
         public override int OutputSize => _whh.Weight.RowCount;
 
@@ -189,6 +189,11 @@ namespace Retia.Neural.Layers
             optimizer.Optimize(_whh);
         }
 
+        public override List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
+        {
+            return BackPropagate(base.ErrorPropagate(targets));
+        }
+
         public override void ResetMemory()
         {
             _lastH = Matrix<T>.Build.Dense(_lastH.RowCount, _lastH.ColumnCount);
@@ -211,13 +216,6 @@ namespace Retia.Neural.Layers
             _whr.ClearCache();
             _whz.ClearCache();
             _whh.ClearCache();
-        }
-
-        protected override void Initialize()
-        {
-            _lastH = Matrix<T>.Build.Dense(_hSize, BatchSize);
-            _hiddenOnes = Matrix<T>.Build.Dense(_hSize, BatchSize, Matrix<T>.One);
-            InitSequence();
         }
 
         public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
@@ -469,6 +467,13 @@ namespace Retia.Neural.Layers
             };
 
             return new GruLayerSpec(InputSize, BatchSize, SeqLen, 1, _hSize, weights);
+        }
+
+        protected override void Initialize()
+        {
+            _lastH = Matrix<T>.Build.Dense(_hSize, BatchSize);
+            _hiddenOnes = Matrix<T>.Build.Dense(_hSize, BatchSize, Matrix<T>.One);
+            InitSequence();
         }
     }
 }

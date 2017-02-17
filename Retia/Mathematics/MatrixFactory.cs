@@ -10,6 +10,11 @@ namespace Retia.Mathematics
 {
     public static class MatrixFactory
     {
+        public static Matrix<T> Create<T>(int rows, int columns) where T : struct, IEquatable<T>, IFormattable
+        {
+            return Matrix<T>.Build.Dense(rows, columns);
+        }
+
         public static void Save<T>(this Matrix<T> matrix, Stream stream) where T : struct, IEquatable<T>, IFormattable
         {
             if (typeof(T) == typeof(float))

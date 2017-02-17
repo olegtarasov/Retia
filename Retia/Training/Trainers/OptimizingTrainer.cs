@@ -16,7 +16,7 @@ namespace Retia.Training.Trainers
         private readonly double _initialLr;
 
         private List<double> _errors;
-        private Fir _fir;
+        private MAV _mav;
         private double _lastError;
 
         private double _dErr = 0;
@@ -63,11 +63,7 @@ namespace Retia.Training.Trainers
 
             if (Options.ErrorFilterSize > 0)
             {
-                filteredError = _fir.FilterSample(error);
-                if (!_fir.FirstTurnComplete)
-                {
-                    filteredError = error;
-                }
+                filteredError = _mav.Filter(error);
             }
             else
             {
@@ -98,7 +94,7 @@ namespace Retia.Training.Trainers
             DataProvider.CreateTrainingSet();
             DataProvider.CreateTestSet();
             _errors = new List<double>();
-            _fir = Options.ErrorFilterSize > 0 ? new Fir(Options.ErrorFilterSize) : null;
+            _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
 
             OnMessage($"Sequence length: {Options.SequenceLength}");
