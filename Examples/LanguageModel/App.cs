@@ -99,11 +99,11 @@ namespace LanguageModel
 		                           ErrorFilterSize = 20,
 		                           SequenceLength = SEQ_LEN,
 		                           ReportMesages = true,
-		                           MaxEpoch = 20
+		                           MaxEpoch = 1000
 		                       };
 
             trainOptions.RunTests.Never();
-            trainOptions.ScaleLearningRate.EachEpoch(10, 0.97);
+            trainOptions.ScaleLearningRate.EachIteration(1, 9.9e-5);
             trainOptions.ReportProgress.EachIteration(10);
             trainOptions.RunUserTests.EachIteration(100);
 			var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions);

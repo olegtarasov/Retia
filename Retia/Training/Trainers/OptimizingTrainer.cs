@@ -20,6 +20,7 @@ namespace Retia.Training.Trainers
         private double _lastError;
 
         private double _dErr = 0;
+        private int _scailingTicks = 0;
 
         public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataProvider<T> dataProvider, ITester<T> tester, OptimizingTrainerOptions options) : base(dataProvider, tester, options)
         {
@@ -114,14 +115,14 @@ namespace Retia.Training.Trainers
         }
 
         protected override void ValidateOptions(OptimizingTrainerOptions options)
-            {
+        {
             base.ValidateOptions(options);
 
             if (options.SequenceLength <= 0)
             {
                 throw new InvalidOperationException("Invalid sequence length!");
             }
-            }
+        }
 
         protected override void TrainIteration()
         {
@@ -129,6 +130,10 @@ namespace Retia.Training.Trainers
             double error = _network.TrainSequence(sequence.Inputs, sequence.Targets);
             _network.Optimize();
             ProcessError(error);
+
+            // Check for learning rate per-iter scaling
+            if (Options.ScaleLearningRate.ShouldDoOnIteration(Iteration))
+                ScaleLearingRate();
         }
 
         protected override void ResetMemory()
@@ -155,11 +160,15 @@ namespace Retia.Training.Trainers
                 ResetMemory();
             }
 
-            // Check for learning rate scaling
+            // Check for learning rate per-epoch scaling
             if (Options.ScaleLearningRate.ShouldDoOnEpoch(Epoch))
-            {
-                _optimizer.LearningRate = (float)(_initialLr / (1.0 + Iteration * Options.ScaleLearningRate.ScaleFactor));
-            }
+                 ScaleLearingRate();
+        }
+
+        private void ScaleLearingRate()
+        {
+            _scailingTicks++;
+            _optimizer.LearningRate = (float)(_initialLr / (1.0 + _scailingTicks * Options.ScaleLearningRate.ScaleFactor));
         }
     }
 }
