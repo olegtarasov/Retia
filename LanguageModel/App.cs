@@ -105,7 +105,7 @@ namespace LanguageModel
             trainOptions.RunTests.Never();
             trainOptions.ScaleLearningRate.EachEpoch(10, 0.97);
             trainOptions.ReportProgress.EachIteration(10);
-            //trainOptions.RunUserTests.EachIteration(100);
+            trainOptions.RunUserTests.EachIteration(100);
 			var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions);
             var epochWatch = new Stopwatch();
            
@@ -120,7 +120,14 @@ namespace LanguageModel
 				errFile.Flush(true);
 				network.Save(rnnPath);
 			};
-			trainer.UserTest += (sender, args) => Console.WriteLine(TestRNN(network.Clone(), 500, _dataProvider.Vocab));
+			trainer.UserTest += (sender, args) =>
+			{
+			    if (gpu)
+			    {
+			        network.TransferStateToHost();
+			    }
+			    Console.WriteLine(TestRNN(network.Clone(), 500, _dataProvider.Vocab));
+			};
 		    trainer.EpochReached += () =>
 		    {
                 epochWatch.Stop();

@@ -37,6 +37,7 @@ public:
 		return _seqLen;
 	}
 
+	virtual void TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states);
 	virtual double TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector<RawMatrixPtr*>& targets) = 0;
 	virtual void Opimize() = 0;
 	virtual void ResetMemory() = 0;
