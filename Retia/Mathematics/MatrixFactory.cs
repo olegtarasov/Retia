@@ -10,6 +10,15 @@ namespace Retia.Mathematics
 {
     public static class MatrixFactory
     {
+        public static Matrix<T> Create<T>(int rows, int columns, params float[] data) where T : struct, IEquatable<T>, IFormattable
+        {
+            if (rows * columns != data.Length)
+                throw new InvalidOperationException("Number of rows and columns doesn't equal to data length.");
+
+            var array = MathProvider<T>.Instance.Array(data);
+            return Matrix<T>.Build.Dense(rows, columns, array);
+        }
+
         public static Matrix<T> Create<T>(int rows, int columns) where T : struct, IEquatable<T>, IFormattable
         {
             return Matrix<T>.Build.Dense(rows, columns);

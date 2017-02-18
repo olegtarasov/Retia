@@ -62,7 +62,7 @@ TEST(AlgorithmsTests, CanCalculateCrossEntropyError)
 		(-(log(6.0f) * 3.0f) / 2) +
 		(-(log(7.0f) * 2.0f) / 2) +
 		(-(log(8.0f) * 1.0f) / 2)
-		) / 2;
+		);
 
 	cout << "Result: " << result << endl;
 	cout << "Ref: " << ref;

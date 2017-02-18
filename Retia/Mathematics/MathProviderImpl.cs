@@ -133,7 +133,7 @@ namespace Retia.Mathematics
             int cols = p.ColumnCount;
             for (int i = 0; i < pa.Length; i++)
             {
-                if (i % p.RowCount == 0)
+                if (i > 0 && i % p.RowCount == 0)
                 {
                     if (notNan == 0)
                         cols--;
@@ -261,7 +261,7 @@ namespace Retia.Mathematics
             int notNan = 0;
             for (int i = 0; i < oa.Length; i++)
             {
-                if (i % rows == 0)
+                if (i > 0 && i % rows == 0)
                 {
                     if (notNan == 0)
                         cols--;

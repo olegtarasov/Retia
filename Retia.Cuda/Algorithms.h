@@ -30,19 +30,19 @@ struct ErrorPropagationFunctor : public thrust::binary_function<float, float, fl
 
 struct CrossEntropyErrorFunctor
 {
-	const int _columns;
+	/*const int _columns;
 
 
 	explicit CrossEntropyErrorFunctor(int columns)
 		: _columns(columns)
 	{
-	}
+	}*/
 
 	template <typename Tuple>
 	__host__ __device__
 	float operator()(Tuple t)
 	{
-		return -(log(thrust::get<0>(t)) * thrust::get<1>(t)) / _columns;
+		return log(thrust::get<0>(t)) * thrust::get<1>(t);
 	}
 
 };
@@ -116,11 +116,11 @@ public:
 		auto err = thrust::transform_reduce(
 			thrust::make_zip_iterator(thrust::make_tuple(output.begin(), target.begin())),
 			thrust::make_zip_iterator(thrust::make_tuple(output.end(), target.end())),
-			CrossEntropyErrorFunctor(output.columns()),
+			CrossEntropyErrorFunctor(/*output.columns()*/),
 			0.0f,
 			thrust::plus<float>());
 
-		return err / target.seqLength();
+		return -err / output.columns();
 	}
 
 	template <class TMatrix>
