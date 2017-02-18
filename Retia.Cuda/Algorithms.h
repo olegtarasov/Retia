@@ -112,7 +112,7 @@ public:
 			0.0f,
 			thrust::plus<float>());
 
-		return -err / output.columns();
+		return -err / (output.columns() * output.seqLength());
 	}
 
 	template <class TMatrix>
