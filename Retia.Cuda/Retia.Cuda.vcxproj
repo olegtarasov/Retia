@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Algorithms.h" />
+    <ClInclude Include="AlgorithmTester.h" />
     <ClInclude Include="CudaContext.h" />
     <ClInclude Include="CudaMemoryBlock.h" />
     <ClInclude Include="CudaHandle.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="SoftmaxLayer.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="AlgorithmTester.cu" />
     <ClCompile Include="CudaContext.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>

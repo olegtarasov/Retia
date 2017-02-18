@@ -8,6 +8,11 @@ namespace Retia.Tests.Plumbing
 {
     public static class AssertExtensions
     {
+        public static void ShouldMatrixEqualWithinError<T>(this Matrix<T> a, Matrix<T> b) where T : struct, IEquatable<T>, IFormattable
+        {
+            a.AsColumnMajorArray().ShouldArrayEqualWithinError(b.AsColumnMajorArray());
+        }
+
         public static void ShouldArrayEqualWithinError<T>(this T[] array1, T[] array2) where T : struct, IEquatable<T>, IFormattable
         {
             if (array1 == null && array2 == null)

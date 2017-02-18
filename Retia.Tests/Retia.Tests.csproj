@@ -70,13 +70,10 @@
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
     <Compile Include="Helpers\MatrixPointersTests.cs" />
     <Compile Include="Helpers\StreamHelpersTests.cs" />
-    <Compile Include="Mathematics\DoubleMathProviderTests.cs" />
-    <Compile Include="Mathematics\DoubleMatrixTests.cs" />
-    <Compile Include="Mathematics\MathProviderTestsBase.cs" />
-    <Compile Include="Mathematics\MatrixTestsBase.cs" />
-    <Compile Include="Mathematics\MatrixTestsBase.Data.cs" />
-    <Compile Include="Mathematics\SingleMathProviderTests.cs" />
-    <Compile Include="Mathematics\SingleMatrixTests.cs" />
+    <Compile Include="Mathematics\GpuAlgorithmsTests.cs" />
+    <Compile Include="Mathematics\MathProviderTests.cs" />
+    <Compile Include="Mathematics\MatrixTests.cs" />
+    <Compile Include="Mathematics\MatrixTests.Data.cs" />
     <Compile Include="Neural\GradientCheckTests.cs" />
     <Compile Include="Neural\TestDataSet.cs" />
     <Compile Include="Optimizers\AdagradOptimizerTests.cs" />
@@ -95,6 +92,10 @@
     <ProjectReference Include="..\Retia.Genetic\Retia.Genetic.csproj">
       <Project>{6b721697-aaae-465c-916f-17f7f06e78d3}</Project>
       <Name>Retia.Genetic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
+      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
+      <Name>Retia.NativeWrapper</Name>
     </ProjectReference>
     <ProjectReference Include="..\Retia\Retia.csproj">
       <Project>{80608848-F915-434C-A22C-62A2BB9DE046}</Project>
