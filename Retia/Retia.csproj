@@ -52,7 +52,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
+    <Compile Include="Helpers\MinMaxTracker.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
     <Compile Include="Integration\ConsoleProgressWriter.cs" />
     <Compile Include="Integration\ICloneable.cs" />

@@ -35,6 +35,7 @@ namespace Retia.Training.Trainers
         }
 
         public override NeuralNet<T> TestableNetwork => _network;
+        public float LearningRate => _optimizer.LearningRate;
 
         protected virtual TrainingSequence<T> GetTrainSamples()
         {

@@ -15,7 +15,7 @@ namespace Retia.Training.Trainers
         where TReport : TrainReportEventArgsBase
     {
         protected readonly IDataProvider<T> DataProvider;
-        protected readonly TOptions Options;
+        public TOptions Options { get; }
 
         private readonly ITester<T> _tester;
         private readonly ManualResetEventSlim _pauseHandle = new ManualResetEventSlim(true);
