@@ -90,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="LayerStateFactory.h" />
     <ClInclude Include="LayerTester.h" />
+    <ClInclude Include="MathTester.h" />
     <ClInclude Include="MatrixContainer.h" />
     <ClInclude Include="ManagedMatrixContainer.h" />
     <ClInclude Include="resource.h" />
@@ -101,6 +102,7 @@
     <ClCompile Include="GpuNetwork.cpp" />
     <ClCompile Include="LayerStateFactory.cpp" />
     <ClCompile Include="LayerTester.cpp" />
+    <ClCompile Include="MathTester.cpp" />
     <ClCompile Include="MatrixContainer.cpp" />
     <ClCompile Include="ManagedMatrixContainer.cpp" />
     <ClCompile Include="Stdafx.cpp">

@@ -30,14 +30,6 @@ struct ErrorPropagationFunctor : public thrust::binary_function<float, float, fl
 
 struct CrossEntropyErrorFunctor
 {
-	/*const int _columns;
-
-
-	explicit CrossEntropyErrorFunctor(int columns)
-		: _columns(columns)
-	{
-	}*/
-
 	template <typename Tuple>
 	__host__ __device__
 	float operator()(Tuple t)

@@ -70,6 +70,9 @@
     <ClInclude Include="LayerContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AlgorithmTester.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -116,6 +119,9 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="LayerContainerBase.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="AlgorithmTester.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>
