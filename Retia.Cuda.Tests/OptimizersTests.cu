@@ -56,39 +56,40 @@ TEST(RMSPropTests, CanOptimizeSimple)
 	}
 }
 
-// Uncomment to test, otherwise too time-consuming
-//TEST(RMSPropTests, CanOptimizeRosenbrock)
-//{
-//	auto weight = HostMatrix(2, 1, 1);
-//	auto grad = HostMatrix(2, 1, 1);
-//	auto cache1 = HostMatrix(2, 1, 1);
-//	auto cache2 = HostMatrix(2, 1, 1);
-//	auto cacheM = HostMatrix(2, 1, 1);
-//
-//	InitMatrix(weight, new float[2]{ 0, 0 });
-//	grad.ZeroMemory();
-//	cache1.ZeroMemory();
-//	cache2.ZeroMemory();
-//	cacheM.ZeroMemory();
-//
-//	cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
-//	PrintWeights(weight, grad, cache1, cache2, cacheM, -1);
-//	for (int i = 0; i < 10000; ++i)
-//	{
-//		RosenbrockGrad(weight, grad);
-//		Algorithms::RMSPropOptimize(weight, grad, cache1, cache2, cacheM, 5e-4f, 0.99f, 0.0f, 0.0f);
-//		cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
-//		PrintWeights(weight, grad, cache1, cache2, cacheM, i);
-//	}
-//
-//	auto wPtr = weight.raw_ptr();
-//
-//	ASSERT_NEAR(Rosenbrock(weight), 0.0f, 1e-4f);
-//	for (int i = 0; i < weight.length(); ++i)
-//	{
-//		ASSERT_NEAR(wPtr[i], 1.0f, 1e-2f);
-//	}
-//}
+TEST(RMSPropTests, CanOptimizeRosenbrock)
+{
+	auto weight = HostMatrix(2, 1, 1);
+	auto grad = HostMatrix(2, 1, 1);
+	auto cache1 = HostMatrix(2, 1, 1);
+	auto cache2 = HostMatrix(2, 1, 1);
+	auto cacheM = HostMatrix(2, 1, 1);
+
+	InitMatrix(weight, new float[2]{ 0, 0 });
+	grad.ZeroMemory();
+	cache1.ZeroMemory();
+	cache2.ZeroMemory();
+	cacheM.ZeroMemory();
+
+	//cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
+	//PrintWeights(weight, grad, cache1, cache2, cacheM, -1);
+	for (int i = 0; i < 10000; ++i)
+	{
+		RosenbrockGrad(weight, grad);
+		Algorithms::RMSPropOptimize(weight, grad, cache1, cache2, cacheM, 5e-4f, 0.99f, 0.0f, 0.0f);
+		//cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
+		//PrintWeights(weight, grad, cache1, cache2, cacheM, i);
+	}
+
+	auto wPtr = weight.raw_ptr();
+
+	ASSERT_NEAR(Rosenbrock(weight), 0.0f, 1e-4f);
+	for (int i = 0; i < weight.length(); ++i)
+	{
+		ASSERT_NEAR(wPtr[i], 1.0f, 1e-2f);
+	}
+
+	cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
+}
 
 
 

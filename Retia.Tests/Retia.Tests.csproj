@@ -79,6 +79,8 @@
     <Compile Include="Mathematics\SingleMatrixTests.cs" />
     <Compile Include="Neural\GradientCheckTests.cs" />
     <Compile Include="Neural\TestDataSet.cs" />
+    <Compile Include="Optimizers\AdagradOptimizerTests.cs" />
+    <Compile Include="Optimizers\OptimizerTestBase.cs" />
     <Compile Include="Optimizers\RMSPropOptimizerTests.cs" />
     <Compile Include="Plumbing\AssertExtensions.cs" />
     <Compile Include="Plumbing\DisposableFile.cs" />
