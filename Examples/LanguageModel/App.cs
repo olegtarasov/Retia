@@ -6,9 +6,13 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Single;
+using Retia.Gui;
+using Retia.Gui.Models;
+using Retia.Gui.Windows;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural;
@@ -16,6 +20,7 @@ using Retia.Neural.Layers;
 using Retia.Optimizers;
 using Retia.RandomGenerator;
 using Retia.Training.Trainers;
+using Window = System.Windows.Window;
 
 // Learn -b="D:\__RNN\ook.bin"
 // Prepare -i="D:\__RNN\ook.txt"
@@ -28,8 +33,8 @@ namespace LanguageModel
 		private const int SEQ_LEN = 128;
 		
 		private readonly TextDataProvider _dataProvider = new TextDataProvider(BATCH_SIZE);
-        
-		[Verb]
+
+	    [Verb]
 		public void Compose(
 			[Aliases("b"), Required]			string batchesPath,
 			[Aliases("n"), Required]			string networkPath,
@@ -62,7 +67,8 @@ namespace LanguageModel
 			[Aliases("b"), Required]	string batchesPath, 
 			[Aliases("c")]				string configPath,
 			[Aliases("r"), DefaultValue(0.0002f)]  float learningRate,
-            [DefaultValue(false)]       bool gpu)
+            [DefaultValue(false)]       bool gpu,
+            [DefaultValue(false)]       bool gui)
 		{
             Control.UseNativeMKL();
 
@@ -134,6 +140,13 @@ namespace LanguageModel
 		        Console.WriteLine($"Trained epoch in {epochWatch.Elapsed.TotalSeconds} s.");
 		        //Console.ReadKey();
 		    };
+
+		    RetiaGui retiaGui;
+		    if (gui)
+		    {
+		        retiaGui = new RetiaGui();
+                retiaGui.Run(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
+		    }
 		   
 			var task = trainer.Train(cts.Token);
             epochWatch.Start();
