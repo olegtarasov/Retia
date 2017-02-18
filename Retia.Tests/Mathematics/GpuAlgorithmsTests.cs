@@ -8,6 +8,10 @@ using XunitShould;
 
 namespace Retia.Tests.Mathematics
 {
+    /// <summary>
+    /// This suite tests .NET and GPU algorithms on same data to make sure they give
+    /// identical results.
+    /// </summary>
     public class GpuAlgorithmsTests
     {
         private readonly MathProviderBase<float> MathProvider = MathProvider<float>.Instance;

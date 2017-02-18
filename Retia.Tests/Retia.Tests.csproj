@@ -70,14 +70,10 @@
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
     <Compile Include="Helpers\MatrixPointersTests.cs" />
     <Compile Include="Helpers\StreamHelpersTests.cs" />
-    <Compile Include="Mathematics\DoubleMathProviderTests.cs" />
-    <Compile Include="Mathematics\DoubleMatrixTests.cs" />
     <Compile Include="Mathematics\GpuAlgorithmsTests.cs" />
-    <Compile Include="Mathematics\MathProviderTestsBase.cs" />
-    <Compile Include="Mathematics\MatrixTestsBase.cs" />
-    <Compile Include="Mathematics\MatrixTestsBase.Data.cs" />
-    <Compile Include="Mathematics\SingleMathProviderTests.cs" />
-    <Compile Include="Mathematics\SingleMatrixTests.cs" />
+    <Compile Include="Mathematics\MathProviderTests.cs" />
+    <Compile Include="Mathematics\MatrixTests.cs" />
+    <Compile Include="Mathematics\MatrixTests.Data.cs" />
     <Compile Include="Neural\GradientCheckTests.cs" />
     <Compile Include="Neural\TestDataSet.cs" />
     <Compile Include="Optimizers\AdagradOptimizerTests.cs" />

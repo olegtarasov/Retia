@@ -8,6 +8,26 @@ using Xunit.Abstractions;
 
 namespace Retia.Tests.Mathematics
 {
+    public class SingleMathProviderTests : MathProviderTestsBase<float>
+    {
+        public SingleMathProviderTests(ITestOutputHelper output) : base(output)
+        {
+        }
+
+        protected override float Sigmoid(float input) => 1.0f / (1.0f + (float)Math.Exp(-input));
+        protected override float Tanh(float input) => (float)Math.Tanh(input);
+    }
+
+    public class DoubleMathProviderTests : MathProviderTestsBase<double>
+    {
+        public DoubleMathProviderTests(ITestOutputHelper output) : base(output)
+        {
+        }
+
+        protected override double Sigmoid(double input) => 1.0f / (1.0f + Math.Exp(-input));
+        protected override double Tanh(double input) => Math.Tanh(input);
+    }
+
     public abstract class MathProviderTestsBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         protected MathProviderTestsBase(ITestOutputHelper output)

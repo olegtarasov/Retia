@@ -13,6 +13,14 @@ using XunitShould;
 
 namespace Retia.Tests.Mathematics
 {
+    public class DoubleMatrixTests : MatrixTestsBase<double>
+    {
+    }
+
+    public class SingleMatrixTests : MatrixTestsBase<float>
+    {
+    }
+
     public abstract partial class MatrixTestsBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         protected MathProviderBase<T> MathProvider => MathProvider<T>.Instance;
