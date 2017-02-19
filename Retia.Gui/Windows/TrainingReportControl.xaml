@@ -33,7 +33,11 @@
                 <TextBlock Margin="4" VerticalAlignment="Center" Text="{Binding Report.Epoch}"/>
             </StackPanel>
         </WrapPanel>
-
-        <oxy:PlotView Model="{Binding PlotModel}" Controller="{StaticResource controller}"/>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+            <Label Margin="4 0">Plot range (iters):</Label>
+            <TextBox Margin="4 0" Width="50" VerticalAlignment="Center" Text="{Binding PlotRange}"/>
+        </StackPanel>
+        
+        <oxy:PlotView Model="{Binding PlotModel}" Controller="{StaticResource controller}" DockPanel.Dock="Top"/>
     </DockPanel>
 </UserControl>

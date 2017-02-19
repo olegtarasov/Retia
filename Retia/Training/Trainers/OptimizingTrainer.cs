@@ -13,8 +13,8 @@ namespace Retia.Training.Trainers
     {
         protected readonly NeuralNet<T> _network;
         private readonly OptimizerBase<T> _optimizer;
-        private readonly double _initialLr;
 
+        private double _initialLr;
         private List<double> _errors;
         private MAV _mav;
         private double _lastError;
@@ -35,7 +35,20 @@ namespace Retia.Training.Trainers
         }
 
         public override NeuralNet<T> TestableNetwork => _network;
-        public float LearningRate => _optimizer.LearningRate;
+
+        public float LearningRate
+        {
+            get
+            {
+                return _optimizer.LearningRate;
+            }
+            set
+            {
+                _optimizer.LearningRate = value;
+                _initialLr = value;
+                // Maybe we need to reset scaling ticks as well
+            }
+        }
 
         protected virtual TrainingSequence<T> GetTrainSamples()
         {

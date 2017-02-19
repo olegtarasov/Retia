@@ -29,26 +29,13 @@
                     <Label Margin="4" VerticalAlignment="Center">Learn rate scale factor:</Label>
                     <TextBox Margin="4" VerticalAlignment="Center" Width="40" Text="{Binding LearningRateScaleFactor}"/>
                 </StackPanel>
-                <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Label Margin="4" VerticalAlignment="Center">Hidden layer size:</Label>
-                    <TextBox Margin="4" VerticalAlignment="Center" Width="40" Text="{Binding HiddenSize}"/>
-                </StackPanel>-->
-                <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Label Margin="4" VerticalAlignment="Center">Sequence length:</Label>
-                    <TextBox Margin="4" VerticalAlignment="Center" Width="40" Text="{Binding SequenceLenght}"/>
-                </StackPanel>-->
-                <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                    <Label Margin="4" VerticalAlignment="Center">Batch count:</Label>
-                    <TextBox Margin="4" VerticalAlignment="Center" Width="40" Text="{Binding BatchCount}"/>
-                </StackPanel>-->
+                <Button HorizontalAlignment="Left" Margin="4" Padding="8 2" Command="{Binding ApplyOptionsCommand}">Apply</Button>
             </StackPanel>
         </GroupBox>
         <StackPanel Orientation="Horizontal">
-            <Button Name="btnStart" Margin="4" Padding="8 2" Click="BtnStart_OnClick">Start</Button>
-            <Button Name="btnPause" Margin="4" Padding="8 2" Click="BtnPause_OnClick">Pause</Button>
-            <Button Name="btnResume" Margin="4" Padding="8 2" Click="BtnResume_OnClick">Resume</Button>
+            <Button Margin="4" Padding="8 2" Command="{Binding StartResumeCommand}">Start / Resume</Button>
+            <Button Margin="4" Padding="8 2" Command="{Binding PauseCommand}">Pause</Button>
         </StackPanel>
-        <Button Name="btnLoadNetwork" Margin="4" Padding="8 2" Click="BtnLoadNetwork_OnClick">Load network</Button>
     </StackPanel>
 </UserControl>
 

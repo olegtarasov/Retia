@@ -2,7 +2,6 @@
 using System.Linq;
 using OxyPlot;
 using PropertyChanged;
-using Retia.Gui.Messages;
 using Retia.Gui.OxyPlot;
 using Retia.Training.Trainers;
 
@@ -37,6 +36,8 @@ namespace Retia.Gui.Models
 
         public string Message { get; set; } = string.Empty;
 
+        public int PlotRange { get; set; } = 500;
+
         internal void AddTestError(double error)
         {
             _testErrorSeries.AddPoint(new DataPoint(_errorSeries.SeriesPoints.Count, error));
@@ -51,13 +52,13 @@ namespace Retia.Gui.Models
                 _errorSeries.AddPoint(new DataPoint(_errorSeries.SeriesPoints.Count, error));
             }
 
-            if (_errorSeries.SeriesPoints.Count < 500)
+            if (PlotRange == 0 || _errorSeries.SeriesPoints.Count < PlotRange)
             {
                 PlotModel.ZoomX();
             }
             else
             {
-                PlotModel.XAxis.Zoom(_errorSeries.SeriesPoints.Count - 500, _errorSeries.SeriesPoints.Count);
+                PlotModel.XAxis.Zoom(_errorSeries.SeriesPoints.Count - PlotRange, _errorSeries.SeriesPoints.Count);
             }
 
             PlotModel.ZoomY();

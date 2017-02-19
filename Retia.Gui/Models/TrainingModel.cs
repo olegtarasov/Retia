@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using PropertyChanged;
 using Retia.Integration;
 using Retia.Training.Trainers;
@@ -17,15 +20,63 @@ namespace Retia.Gui.Models
     {
         private readonly OptimizingTrainer<T> _trainer;
 
+        private Task _trainingTask;
+        private CancellationTokenSource _tokenSource;
+        
         public TypedTrainingModel(OptimizingTrainer<T> trainer)
         {
             _trainer = trainer;
 
             OptionsModel = GetTrainOptionsModel();
+            OptionsModel.StartResumeCommand = new RelayCommand(StartResume, CanStartResume);
+            OptionsModel.PauseCommand = new RelayCommand(Pause, CanPause);
+            OptionsModel.ApplyOptionsCommand = new RelayCommand(ApplyOptions);
+
             ReportModel = new TrainingReportModel();
 
             _trainer.TrainReport += TrainerOnTrainReport;
             _trainer.Message += TrainerOnMessage;
+        }
+
+        private void ApplyOptions(object o)
+        {
+            _trainer.Options.ErrorFilterSize = OptionsModel.ErrorFilterSize;
+            _trainer.LearningRate = OptionsModel.LearningRate;
+            _trainer.Options.ScaleLearningRate.EachIteration(OptionsModel.LearningRateScalePeriod, OptionsModel.LearningRateScaleFactor);
+            _trainer.Options.MaxEpoch = OptionsModel.MaxEpoch;
+        }
+
+        private bool CanPause(object o)
+        {
+            return _trainer.IsTraining && !_trainer.IsPaused;
+        }
+
+        private bool CanStartResume(object o)
+        {
+            return !_trainer.IsTraining || _trainer.IsPaused;
+        }
+
+        private void Pause(object o)
+        {
+            _trainer.Pause();
+            OptionsModel.PauseCommand.RaiseCanExecuteChanged();
+            OptionsModel.StartResumeCommand.RaiseCanExecuteChanged();
+        }
+
+        private void StartResume(object o)
+        {
+            if (_trainer.IsTraining && _trainer.IsPaused)
+            {
+                _trainer.Resume();
+            }
+            else if (!_trainer.IsTraining)
+            {
+                _tokenSource = new CancellationTokenSource();
+                _trainingTask = _trainer.Train(_tokenSource.Token);
+            }
+
+            OptionsModel.PauseCommand.RaiseCanExecuteChanged();
+            OptionsModel.StartResumeCommand.RaiseCanExecuteChanged();
         }
 
         private void TrainerOnMessage(object sender, LogEventArgs e)
@@ -36,6 +87,7 @@ namespace Retia.Gui.Models
         private void TrainerOnTrainReport(object sender, OptimizationReportEventArgs e)
         {
             ReportModel.UpdateReport(e);
+            OptionsModel.LearningRate = e.LearningRate;
         }
 
         private TrainOptionsModel GetTrainOptionsModel()

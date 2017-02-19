@@ -54,11 +54,10 @@
     <Compile Include="Helpers\ICompositeConverter.cs" />
     <Compile Include="Helpers\IInlineConverter.cs" />
     <Compile Include="Helpers\InlineConverter.cs" />
-    <Compile Include="Messages\Post.cs" />
+    <Compile Include="Models\RelayCommand.cs" />
     <Compile Include="Models\TrainingModel.cs" />
     <Compile Include="Models\TrainingReportModel.cs" />
     <Compile Include="Models\TrainOptionsModel.cs" />
-    <Compile Include="Msg.cs" />
     <Compile Include="OxyPlot\OxyPlotController.cs" />
     <Compile Include="OxyPlot\PlotModelEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -110,6 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Messages\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.29.2\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" />

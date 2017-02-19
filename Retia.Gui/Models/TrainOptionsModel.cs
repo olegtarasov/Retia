@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using PropertyChanged;
-using Retia.Training.Trainers;
 
 namespace Retia.Gui.Models
 {
@@ -12,25 +12,9 @@ namespace Retia.Gui.Models
         public int LearningRateScalePeriod { get; set; } = 50;
         public double LearningRateScaleFactor { get; set; } = 0.01f;
         public int MaxEpoch { get; set; } = 100000;
-        //public int SequenceLenght { get; set; } = 2000;
 
-        internal OptimizingTrainerOptions GetOptions()
-        {
-            var options = new OptimizingTrainerOptions
-                          {
-                              ErrorFilterSize = ErrorFilterSize,
-                              ScaleLearningRate = new LearningRateScalingAction(LearningRateScalePeriod, LearningRateScaleFactor),
-                              MaxEpoch = MaxEpoch,
-                              ReportMesages = true,
-                              //SequenceLength = SequenceLenght
-                          };
-
-            options.ReportProgress.EachIteration(5);
-            options.ResetMemory.Never();
-            options.RunTests.Never();
-            options.RunUserTests.EachIteration(5);
-
-            return options;
-        }
+        public RelayCommand StartResumeCommand { get; set; }
+        public RelayCommand PauseCommand { get; set; }
+        public RelayCommand ApplyOptionsCommand { get; set; }
     }
 }

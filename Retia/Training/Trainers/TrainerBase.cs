@@ -37,6 +37,7 @@ namespace Retia.Training.Trainers
         public abstract NeuralNet<T> TestableNetwork { get; }
 
         public bool IsTraining { get; private set; }
+        public bool IsPaused { get; private set; }
         public long Epoch { get; protected set; }
         
         public long Iteration { get; protected set; }
@@ -52,11 +53,13 @@ namespace Retia.Training.Trainers
 
         public void Pause()
         {
+            IsPaused = true;
             _pauseHandle.Reset();
         }
 
         public void Resume()
         {
+            IsPaused = false;
             _pauseHandle.Set();
         }
 
@@ -68,6 +71,7 @@ namespace Retia.Training.Trainers
             }
 
             IsTraining = true;
+            IsPaused = false;
 
             try
             {
