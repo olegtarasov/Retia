@@ -98,11 +98,6 @@ namespace Retia.Neural
             return totalErr;
         }
 
-        public virtual void UpdateLearningRate(float learningRate)
-        {
-            Optimizer.LearningRate = learningRate;
-        }
-
         #region Candidates for removal
 
         public virtual List<Matrix<T>[]> InternalState { get; set; }

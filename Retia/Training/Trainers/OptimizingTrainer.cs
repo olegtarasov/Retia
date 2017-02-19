@@ -170,7 +170,7 @@ namespace Retia.Training.Trainers
         private void ScaleLearingRate()
         {
             _scailingTicks++;
-            _network.UpdateLearningRate((float)(_initialLr / (1.0 + _scailingTicks * Options.ScaleLearningRate.ScaleFactor)));
+            _optimizer.LearningRate = (float)(_initialLr / (1.0 + _scailingTicks * Options.ScaleLearningRate.ScaleFactor));
         }
     }
 }

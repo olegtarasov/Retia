@@ -24,6 +24,7 @@ namespace Retia.Neural
         protected readonly List<NeuroLayer<T>> Layers = new List<NeuroLayer<T>>();
 
         private GpuNetwork _gpuNetwork;
+        private OptimizerBase<T> _optimizer;
 
         public LayeredNet(int batchSize, int seqLen, params NeuroLayer<T>[] layers)
         {
@@ -70,6 +71,16 @@ namespace Retia.Neural
 
         public override int InputSize => InLayer.InputSize;
         public override int OutputSize => OutLayer.OutputSize;
+
+        public override OptimizerBase<T> Optimizer
+        {
+            get { return _optimizer; }
+            set
+            {
+                _optimizer = value;
+                _optimizer.GpuOptimizer = _gpuNetwork;
+            }
+        }
 
         public override int TotalParamCount
         {
@@ -217,12 +228,6 @@ namespace Retia.Neural
             _gpuNetwork.TransferStatesToHost(spec);
         }
 
-        public override void UpdateLearningRate(float learningRate)
-        {
-            base.UpdateLearningRate(learningRate);
-            _gpuNetwork?.UpdateLearningRate(learningRate);
-        }
-
         public void UseGpu()
         {
             if (_gpuNetwork != null)
@@ -231,12 +236,14 @@ namespace Retia.Neural
             }
 
             _gpuNetwork = new GpuNetwork(CreateSpec());
+            _optimizer.GpuOptimizer = _gpuNetwork;
         }
 
         public void UseCpu()
         {
             _gpuNetwork?.Dispose();
             _gpuNetwork = null;
+            _optimizer.GpuOptimizer = null;
         }
 
         public override void Save(Stream s)

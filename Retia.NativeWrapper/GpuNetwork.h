@@ -18,7 +18,7 @@ using namespace MathNet::Numerics::LinearAlgebra;
 
 namespace Retia::NativeWrapper {
 
-	public ref class GpuNetwork : IDisposable
+	public ref class GpuNetwork : public IGpuOptimizerProxy, public IDisposable
 	{
 	public:
 		GpuNetwork(LayeredNetSpec^ spec)
@@ -86,7 +86,7 @@ namespace Retia::NativeWrapper {
 			_network->ResetOptimizerCache();
 		}
 
-		void UpdateLearningRate(float learningRate)
+		virtual void SetLearningRate(float learningRate)
 		{
 			_network->UpdateLearningRate(learningRate);
 		}

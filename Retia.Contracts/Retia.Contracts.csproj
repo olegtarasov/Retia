@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="GruLayerSpec.cs" />
     <Compile Include="GruLayerWeights.cs" />
+    <Compile Include="IGpuOptimizerProxy.cs" />
     <Compile Include="LayeredNetSpec.cs" />
     <Compile Include="LayerSpecBase.cs" />
     <Compile Include="LayerType.cs" />
