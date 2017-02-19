@@ -14,20 +14,17 @@ namespace Retia.Training.Trainers
         protected readonly NeuralNet<T> _network;
         private readonly OptimizerBase<T> _optimizer;
 
-        private double _initialLr;
         private List<double> _errors;
         private MAV _mav;
         private double _lastError;
 
         private double _dErr = 0;
-        private int _scailingTicks = 0;
-
+        
         public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataProvider<T> dataProvider, ITester<T> tester, OptimizingTrainerOptions options) : base(dataProvider, tester, options)
         {
             _network = network;
             _optimizer = optimizer;
-            _initialLr = _optimizer.LearningRate;
-
+            
             if (DataProvider.TrainingSet != null)
             {
                 DataProvider.TrainingSet.DataSetReset += TrainingSetOnDataSetReset;
@@ -45,8 +42,7 @@ namespace Retia.Training.Trainers
             set
             {
                 _optimizer.LearningRate = value;
-                _initialLr = value;
-                // Maybe we need to reset scaling ticks as well
+                Options.LearningRateScaler?.Initialize(value);
             }
         }
 
@@ -111,7 +107,7 @@ namespace Retia.Training.Trainers
             _errors = new List<double>();
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
-            _scailingTicks = 0;
+            Options.LearningRateScaler.Initialize(_optimizer.LearningRate);
 
             OnMessage($"Sequence length: {Options.SequenceLength}");
             OnMessage($"Using network with total param count {_network.TotalParamCount}");
@@ -147,8 +143,10 @@ namespace Retia.Training.Trainers
             ProcessError(error);
 
             // Check for learning rate per-iter scaling
-            if (Options.ScaleLearningRate.ShouldDoOnIteration(Iteration))
+            if (Options.LearningRateScaler.Schedule.ShouldDoOnIteration(Iteration))
+            {
                 ScaleLearingRate();
+            }
         }
 
         protected override void ResetMemory()
@@ -176,14 +174,15 @@ namespace Retia.Training.Trainers
             }
 
             // Check for learning rate per-epoch scaling
-            if (Options.ScaleLearningRate.ShouldDoOnEpoch(Epoch))
-                 ScaleLearingRate();
+            if (Options.LearningRateScaler.Schedule.ShouldDoOnEpoch(Epoch))
+            {
+                ScaleLearingRate();
+            }
         }
 
         private void ScaleLearingRate()
         {
-            _scailingTicks++;
-            _optimizer.LearningRate = (float)(_initialLr / (1.0 + _scailingTicks * Options.ScaleLearningRate.ScaleFactor));
+            _optimizer.LearningRate = Options.LearningRateScaler.ScaleLearningRate();
         }
     }
 }

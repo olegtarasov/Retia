@@ -20,6 +20,7 @@ using Retia.Neural.Layers;
 using Retia.Optimizers;
 using Retia.RandomGenerator;
 using Retia.Training.Trainers;
+using Retia.Training.Trainers.Actions;
 using Window = System.Windows.Window;
 
 // Learn -b="D:\__RNN\ook.bin"
@@ -109,7 +110,7 @@ namespace LanguageModel
 		                       };
 
             trainOptions.RunTests.Never();
-            trainOptions.ScaleLearningRate.EachIteration(1, 9.9e-5);
+            trainOptions.LearningRateScaler = ProportionalLearningRateScaler.EachIteration(1, 9.9e-5f);
             trainOptions.ReportProgress.EachIteration(10);
             trainOptions.RunUserTests.EachIteration(100);
 			var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions);

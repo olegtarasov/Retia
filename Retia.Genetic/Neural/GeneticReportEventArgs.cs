@@ -4,7 +4,7 @@ namespace Retia.Genetic.Neural
 {
     public class GeneticReportEventArgs : TrainReportEventArgsBase
     {
-        public GeneticReportEventArgs(double epoch, long iteration, double maxFitness) : base(epoch, iteration)
+        public GeneticReportEventArgs(long epoch, long iteration, double maxFitness) : base(epoch, iteration)
         {
             MaxFitness = maxFitness;
         }

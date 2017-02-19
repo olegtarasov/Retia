@@ -1,4 +1,4 @@
-﻿namespace Retia.Training.Trainers
+﻿namespace Retia.Training.Trainers.Actions
 {
     /// <summary>
     /// Frequency type.
@@ -20,12 +20,11 @@
         /// </summary>
         Epoch
     }
-
-
+    
     /// <summary>
     /// A periodical action with a switch and a period.
     /// </summary>
-    public abstract class PeriodicalAction
+    public abstract class PeriodicActionSchedule
     {
         /// <summary>
         /// Gets or sets whether action is enabled.
@@ -70,13 +69,13 @@
         }
     }
 
-    public class IterationAction : PeriodicalAction
+    public class IterationActionSchedule : PeriodicActionSchedule
     {
-        public IterationAction()
+        public IterationActionSchedule()
         {
         }
 
-        public IterationAction(int period)
+        public IterationActionSchedule(int period)
         {
             EachIteration(period);
         }
@@ -87,13 +86,13 @@
         }
     }
 
-    public class EpochAction : PeriodicalAction
+    public class EpochActionSchedule : PeriodicActionSchedule
     {
-        public EpochAction()
+        public EpochActionSchedule()
         {
         }
 
-        public EpochAction(int period)
+        public EpochActionSchedule(int period)
         {
             EachEpoch(period);
         }
@@ -104,13 +103,13 @@
         }
     }
 
-    public class MultiPeriodAction : IterationAction
+    public class MultiPeriodActionSchedule : IterationActionSchedule
     {
-        public MultiPeriodAction()
+        public MultiPeriodActionSchedule()
         {
         }
 
-        public MultiPeriodAction(int period, PeriodType type) : base(period)
+        public MultiPeriodActionSchedule(int period, PeriodType type) : base(period)
         {
             PeriodType = type;
         }
@@ -118,39 +117,6 @@
         public void EachEpoch(int period)
         {
             EachEpochInternal(period);
-        }
-    }
-
-    /// <summary>
-    /// An action to scale learning rate.
-    /// </summary>
-    public class LearningRateScalingAction : PeriodicalAction
-    {
-        public LearningRateScalingAction()
-        {
-        }
-
-        public LearningRateScalingAction(int period, double scaleFactor)
-        {
-            EachEpochInternal(period);
-            ScaleFactor = scaleFactor;
-        }
-
-        /// <summary>
-        /// Learning rate scale factor.
-        /// </summary>
-        public double ScaleFactor { get; private set; }
-
-        public void EachEpoch(int period, double scaleFactor)
-        {
-            EachEpochInternal(period);
-            ScaleFactor = scaleFactor;
-        }
-
-        public void EachIteration(int period, double scaleFactor)
-        {
-            EachIterationInternal(period);
-            ScaleFactor = scaleFactor;
         }
     }
 }

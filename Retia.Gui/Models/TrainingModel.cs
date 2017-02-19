@@ -5,6 +5,7 @@ using System.Windows.Input;
 using PropertyChanged;
 using Retia.Integration;
 using Retia.Training.Trainers;
+using Retia.Training.Trainers.Actions;
 
 namespace Retia.Gui.Models
 {
@@ -41,8 +42,12 @@ namespace Retia.Gui.Models
         private void ApplyOptions(object o)
         {
             _trainer.Options.ErrorFilterSize = OptionsModel.ErrorFilterSize;
-            _trainer.LearningRate = OptionsModel.LearningRate;
-            _trainer.Options.ScaleLearningRate.EachIteration(OptionsModel.LearningRateScalePeriod, OptionsModel.LearningRateScaleFactor);
+            if (Math.Abs(_trainer.LearningRate - OptionsModel.LearningRate) > 1e-5)
+            {
+                _trainer.LearningRate = OptionsModel.LearningRate;
+            }
+            ((MultiPeriodActionSchedule)_trainer.Options.LearningRateScaler.Schedule).EachIteration(OptionsModel.LearningRateScalePeriod);
+            ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor = OptionsModel.LearningRateScaleFactor;
             _trainer.Options.MaxEpoch = OptionsModel.MaxEpoch;
         }
 
@@ -96,8 +101,8 @@ namespace Retia.Gui.Models
                    {
                        ErrorFilterSize = _trainer.Options.ErrorFilterSize,
                        LearningRate = _trainer.LearningRate,
-                       LearningRateScaleFactor = _trainer.Options.ScaleLearningRate.ScaleFactor,
-                       LearningRateScalePeriod = _trainer.Options.ScaleLearningRate.Period,
+                       LearningRateScaleFactor = ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor,
+                       LearningRateScalePeriod = _trainer.Options.LearningRateScaler.Schedule.Period,
                        MaxEpoch = _trainer.Options.MaxEpoch
                    };
         }

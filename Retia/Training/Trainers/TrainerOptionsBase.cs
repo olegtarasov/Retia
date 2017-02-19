@@ -1,3 +1,5 @@
+using Retia.Training.Trainers.Actions;
+
 namespace Retia.Training.Trainers
 {
     public abstract class TrainerOptionsBase
@@ -5,9 +7,9 @@ namespace Retia.Training.Trainers
         public int MaxEpoch { get; set; } = 80;
         public bool ReportMesages { get; set; } = false;
 
-        public IterationAction ReportProgress { get; } = new IterationAction(10);
-        public IterationAction RunUserTests { get; } = new IterationAction();
-        public IterationAction RunTests { get; } = new IterationAction(100);
-        public MultiPeriodAction ResetMemory { get; set; } = new MultiPeriodAction(1, PeriodType.Epoch);
+        public IterationActionSchedule ReportProgress { get; } = new IterationActionSchedule(10);
+        public IterationActionSchedule RunUserTests { get; } = new IterationActionSchedule();
+        public IterationActionSchedule RunTests { get; } = new IterationActionSchedule(100);
+        public MultiPeriodActionSchedule ResetMemory { get; set; } = new MultiPeriodActionSchedule(1, PeriodType.Epoch);
     }
 }

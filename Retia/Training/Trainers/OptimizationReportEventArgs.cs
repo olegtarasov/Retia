@@ -4,7 +4,7 @@ namespace Retia.Training.Trainers
 {
 	public class OptimizationReportEventArgs : TrainReportEventArgsBase
 	{
-		public OptimizationReportEventArgs(List<double> errors, double epoch, long iteration, float learningRate) : base(epoch, iteration)
+		public OptimizationReportEventArgs(List<double> errors, long epoch, long iteration, float learningRate) : base(epoch, iteration)
 		{
 			Errors = errors;
 			LearningRate = learningRate;

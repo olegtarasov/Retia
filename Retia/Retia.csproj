@@ -122,11 +122,15 @@
     <Compile Include="Training\Testers\ITester.cs" />
     <Compile Include="Training\Testers\TesterBase.cs" />
     <Compile Include="Training\Testers\TestResultBase.cs" />
+    <Compile Include="Training\Trainers\Actions\PeriodicActionBase.cs" />
+    <Compile Include="Training\Trainers\Actions\ProportionalLearningRateScaler.cs" />
+    <Compile Include="Training\Trainers\Actions\LearningRateScalerBase.cs" />
     <Compile Include="Training\Trainers\ITrainingReporter.cs" />
     <Compile Include="Training\Trainers\OptimizationReportEventArgs.cs" />
     <Compile Include="Training\Trainers\OptimizingTrainer.cs" />
     <Compile Include="Training\Trainers\OptimizingTrainerOptions.cs" />
-    <Compile Include="Training\Trainers\PeriodicalAction.cs" />
+    <Compile Include="Training\Trainers\Actions\PeriodicActionSchedule.cs" />
+    <Compile Include="Training\Trainers\PeriodicalActionSchedule.cs" />
     <Compile Include="Training\Trainers\TrainerBase.cs" />
     <Compile Include="Training\Trainers\TrainerOptionsBase.cs" />
     <Compile Include="Training\Trainers\TrainReportEventArgsBase.cs" />
@@ -163,6 +167,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="NugetRelativeRefs.targets" />
   <Import Project="$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets" Condition="Exists('$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" />
