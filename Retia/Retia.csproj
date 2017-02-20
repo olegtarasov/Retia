@@ -96,6 +96,7 @@
     <Compile Include="Neural\NeuralNet.cs" />
     <Compile Include="Neural\NeuroWeight.cs" />
     <Compile Include="Optimizers\AdagradOptimizer.cs" />
+    <Compile Include="Optimizers\IOptimizer.cs" />
     <Compile Include="Optimizers\OptimizerBase.cs" />
     <Compile Include="Optimizers\RMSPropOptimizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -125,12 +126,15 @@
     <Compile Include="Training\Trainers\Actions\PeriodicActionBase.cs" />
     <Compile Include="Training\Trainers\Actions\ProportionalLearningRateScaler.cs" />
     <Compile Include="Training\Trainers\Actions\LearningRateScalerBase.cs" />
+    <Compile Include="Training\Trainers\Actions\UserAction.cs" />
+    <Compile Include="Training\Trainers\ConsoleStatusWriter.cs" />
+    <Compile Include="Training\Trainers\ITrainerEvents.cs" />
     <Compile Include="Training\Trainers\ITrainingReporter.cs" />
+    <Compile Include="Training\Trainers\ITrainingStatusWriter.cs" />
     <Compile Include="Training\Trainers\OptimizationReportEventArgs.cs" />
     <Compile Include="Training\Trainers\OptimizingTrainer.cs" />
     <Compile Include="Training\Trainers\OptimizingTrainerOptions.cs" />
-    <Compile Include="Training\Trainers\Actions\PeriodicActionSchedule.cs" />
-    <Compile Include="Training\Trainers\PeriodicalActionSchedule.cs" />
+    <Compile Include="Training\Trainers\Actions\ActionSchedule.cs" />
     <Compile Include="Training\Trainers\TrainerBase.cs" />
     <Compile Include="Training\Trainers\TrainerOptionsBase.cs" />
     <Compile Include="Training\Trainers\TrainReportEventArgsBase.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Retia.Mathematics;
 using Retia.Neural;
 using Retia.Optimizers;
@@ -19,6 +20,7 @@ namespace Retia.Training.Trainers
         private double _lastError;
 
         private double _dErr = 0;
+        private int _processedSamples = 0;
         
         public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataProvider<T> dataProvider, ITester<T> tester, OptimizingTrainerOptions options) : base(dataProvider, tester, options)
         {
@@ -33,6 +35,7 @@ namespace Retia.Training.Trainers
 
         public override NeuralNet<T> TestableNetwork => _network;
 
+        // TODO: Find a better way to set learning rate manually
         public float LearningRate
         {
             get
@@ -42,7 +45,7 @@ namespace Retia.Training.Trainers
             set
             {
                 _optimizer.LearningRate = value;
-                Options.LearningRateScaler?.Initialize(value);
+                Options.LearningRateScaler.Reset();
             }
         }
 
@@ -86,6 +89,24 @@ namespace Retia.Training.Trainers
             _lastError = filteredError;
         }
 
+        protected override string GetIterationProgress()
+        {
+            if (DataProvider.TrainingSet.SampleCount > 0)
+            {
+                return $"I:{Iteration}/{DataProvider.TrainingSet.SampleCount / Options.SequenceLength}|{GetIterationProgressBar()}|";
+            }
+
+            return base.GetIterationProgress();
+        }
+
+        private string GetIterationProgressBar()
+        {
+            int n = (int)Math.Ceiling((_processedSamples / (double)DataProvider.TrainingSet.SampleCount) * 50);
+            var sb = new StringBuilder(50);
+            sb.Append('=', n).Append(' ', 50 - n);
+            return sb.ToString();
+        }
+
         protected override void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs<T> e)
         {
             if (e.OldSet != null)
@@ -107,20 +128,16 @@ namespace Retia.Training.Trainers
             _errors = new List<double>();
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
-            Options.LearningRateScaler.Initialize(_optimizer.LearningRate);
-
-            OnMessage($"Sequence length: {Options.SequenceLength}");
-            OnMessage($"Using network with total param count {_network.TotalParamCount}");
+            _processedSamples = 0;
+            
+            StatusWriter?.Message($"Sequence length: {Options.SequenceLength}");
+            StatusWriter?.Message($"Using network with total param count {_network.TotalParamCount}");
         }
 
-        protected override OptimizationReportEventArgs GetTrainingReport(bool userTest)
+        protected override OptimizationReportEventArgs GetTrainingReport()
         {
             var result = new OptimizationReportEventArgs(_errors.ToList(), Epoch, Iteration, _optimizer.LearningRate);
-
-            if (!userTest)
-            {
-                _errors.Clear();
-            }
+            _errors.Clear();
 
             return result;
         }
@@ -139,50 +156,52 @@ namespace Retia.Training.Trainers
         {
             var sequence = GetTrainSamples();
             double error = _network.TrainSequence(sequence.Inputs, sequence.Targets);
+
+            _processedSamples += sequence.Inputs.Count;
+
             _network.Optimize();
             ProcessError(error);
-
-            // Check for learning rate per-iter scaling
-            if (Options.LearningRateScaler.Schedule.ShouldDoOnIteration(Iteration))
-            {
-                ScaleLearingRate();
-            }
         }
 
         protected override void ResetMemory()
         {
-            OnMessage($"Network memory reset on iteration {Iteration}, epoch {Epoch}");
+            StatusWriter?.Message($"Network memory reset on iteration {Iteration}, epoch {Epoch}");
             _network.ResetMemory();
         }
 
         protected override string GetTrainingReportMessage()
         {
-            return $"\tLast error:\t{_lastError:0.0000}\n\tDelta error:\t{_dErr:0.0000}\n\tLearning rate:\t{_optimizer.LearningRate}";
+            return $"[E:{_lastError:0.0000} | dE:{_dErr:0.0000} | LR:{_optimizer.LearningRate}]";
+        }
+
+        protected override void SubscribeActions()
+        {
+            base.SubscribeActions();
+            Options.LearningRateScaler?.Subscribe(this);
+        }
+
+        protected override void UnsubscribeActions()
+        {
+            base.UnsubscribeActions();
+            Options.LearningRateScaler?.Unsubscribe();
         }
 
         private void TrainingSetOnDataSetReset(object sender, EventArgs eventArgs)
         {
             // An epoch was reached and data set rolled over.
-            OnMessage($"Epoch reached on iteration {Iteration}");
+            //OnMessage($"Epoch reached on iteration {Iteration}");
             Epoch++;
+            StatusWriter?.NewLine();
             OnEpochReached();
+
+            _processedSamples = 0;
+            Iteration = 0;
 
             // Check for epoch memory reset
             if (Options.ResetMemory.ShouldDoOnEpoch(Epoch))
             {
                 ResetMemory();
             }
-
-            // Check for learning rate per-epoch scaling
-            if (Options.LearningRateScaler.Schedule.ShouldDoOnEpoch(Epoch))
-            {
-                ScaleLearingRate();
-            }
-        }
-
-        private void ScaleLearingRate()
-        {
-            _optimizer.LearningRate = Options.LearningRateScaler.ScaleLearningRate();
         }
     }
 }

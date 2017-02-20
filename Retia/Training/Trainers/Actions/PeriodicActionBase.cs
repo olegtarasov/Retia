@@ -1,12 +1,51 @@
-﻿namespace Retia.Training.Trainers.Actions
+﻿using System;
+
+namespace Retia.Training.Trainers.Actions
 {
     public abstract class PeriodicActionBase
     {
-        protected PeriodicActionBase(PeriodicActionSchedule schedule)
+        private ITrainerEvents _trainerEvents;
+
+        protected PeriodicActionBase(ActionSchedule schedule)
         {
             Schedule = schedule;
         }
 
-        public PeriodicActionSchedule Schedule { get; private set; }
+        public ActionSchedule Schedule { get; private set; }
+
+        public virtual void Reset()
+        {
+        }
+
+        internal void Subscribe(ITrainerEvents trainerEvents)
+        {
+            _trainerEvents = trainerEvents;
+            _trainerEvents.EpochReached += TrainerEventsOnEpochReached;
+            _trainerEvents.SequenceTrained += TrainerEventsOnSequenceTrained;
+        }
+
+        internal void Unsubscribe()
+        {
+            _trainerEvents.EpochReached -= TrainerEventsOnEpochReached;
+            _trainerEvents.SequenceTrained -= TrainerEventsOnSequenceTrained;
+        }
+
+        protected abstract void DoAction();
+
+        private void TrainerEventsOnSequenceTrained()
+        {
+            if (Schedule.ShouldDoOnIteration(_trainerEvents.Iteration))
+            {
+                DoAction();
+            }
+        }
+
+        private void TrainerEventsOnEpochReached()
+        {
+            if (Schedule.ShouldDoOnEpoch(_trainerEvents.Epoch))
+            {
+                DoAction();
+            }
+        }
     }
 }

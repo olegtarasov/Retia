@@ -1,0 +1,9 @@
+<UserControl x:Class="Retia.Gui.Windows.ScheduleControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:AmmySidekick;assembly=AmmySidekick" ns0:Ammy.Register="/Retia.Gui;component/Windows/ScheduleControl.g.xaml">
+  <GroupBox Margin="4" Header="Schedule">
+    <ComboBox>
+      <ComboBox.ItemsSource>
+        <Binding Path="PeriodTypes"/>
+      </ComboBox.ItemsSource>
+    </ComboBox>
+  </GroupBox>
+</UserControl>

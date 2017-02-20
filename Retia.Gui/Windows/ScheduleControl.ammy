@@ -1,0 +1,10 @@
+﻿UserControl "Retia.Gui.Windows.ScheduleControl" {
+	GroupBox { 
+		Margin: 4
+		Header: "Schedule"
+
+		ComboBox { 
+			ItemsSource: bind PeriodTypes
+		}
+	}
+}

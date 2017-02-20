@@ -1,18 +1,23 @@
-﻿namespace Retia.Training.Trainers.Actions
+﻿using Retia.Optimizers;
+
+namespace Retia.Training.Trainers.Actions
 {
     public abstract class LearningRateScalerBase : PeriodicActionBase
     {
+        protected readonly IOptimizer Optimizer;
+
         protected float InitialRate;
         
-        public LearningRateScalerBase(MultiPeriodActionSchedule schedule) : base(schedule)
+        public LearningRateScalerBase(ActionSchedule schedule, IOptimizer optimizer) : base(schedule)
         {
+            Optimizer = optimizer;
+            InitialRate = optimizer.LearningRate;
         }
 
-        public virtual void Initialize(float initialRate)
+        public override void Reset()
         {
-            InitialRate = initialRate;
+            base.Reset();
+            InitialRate = Optimizer.LearningRate;
         }
-
-        public abstract float ScaleLearningRate();
     }
 }

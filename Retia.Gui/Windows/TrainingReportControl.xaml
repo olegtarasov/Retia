@@ -14,7 +14,7 @@
         <helpers:InlineConverter x:Key="lastErrorConverter" Converting="LastErrorConverter_OnConverting"/>
     </UserControl.Resources>
     <DockPanel>
-        <TextBox Name="tMessage" DockPanel.Dock="Bottom" Height="150" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Text="{Binding Message}" TextChanged="TMessage_OnTextChanged"/>
+        <!--<TextBox Name="tMessage" DockPanel.Dock="Bottom" Height="150" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" IsReadOnly="True" Text="{Binding Message}" TextChanged="TMessage_OnTextChanged"/>-->
         <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
             <StackPanel Orientation="Horizontal">
                 <Label FontWeight="Bold" Margin="4">Last error:</Label>

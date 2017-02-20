@@ -23,9 +23,9 @@ namespace Retia.Gui.Windows
             e.ConvertedValue = errors?[0];
         }
 
-        private void TMessage_OnTextChanged(object sender, TextChangedEventArgs e)
-        {
-            tMessage.ScrollToEnd();
-        }
+        //private void TMessage_OnTextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    tMessage.ScrollToEnd();
+        //}
     }
 }

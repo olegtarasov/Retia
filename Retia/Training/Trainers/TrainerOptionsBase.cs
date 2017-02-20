@@ -7,9 +7,8 @@ namespace Retia.Training.Trainers
         public int MaxEpoch { get; set; } = 80;
         public bool ReportMesages { get; set; } = false;
 
-        public IterationActionSchedule ReportProgress { get; } = new IterationActionSchedule(10);
-        public IterationActionSchedule RunUserTests { get; } = new IterationActionSchedule();
-        public IterationActionSchedule RunTests { get; } = new IterationActionSchedule(100);
-        public MultiPeriodActionSchedule ResetMemory { get; set; } = new MultiPeriodActionSchedule(1, PeriodType.Epoch);
+        public ActionSchedule ReportProgress { get; } = new ActionSchedule(10, PeriodType.Iteration);
+        public ActionSchedule RunTests { get; } = new ActionSchedule(100, PeriodType.Iteration);
+        public ActionSchedule ResetMemory { get; set; } = new ActionSchedule(1, PeriodType.Epoch);
     }
 }

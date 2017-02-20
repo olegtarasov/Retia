@@ -24,7 +24,7 @@ namespace Retia.Genetic.Neural
 
         public override NeuralNet<float> TestableNetwork => _alpha;
 
-	    protected override GeneticReportEventArgs GetTrainingReport(bool userTest)
+	    protected override GeneticReportEventArgs GetTrainingReport()
         {
             return new GeneticReportEventArgs(Epoch, Iteration, _evolver.MaxFitness);
         }

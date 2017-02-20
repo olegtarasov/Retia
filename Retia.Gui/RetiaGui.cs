@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using AmmySidekick;
 
 namespace Retia.Gui
 {
@@ -14,11 +15,13 @@ namespace Retia.Gui
 
         public RetiaGui()
         {
+            var dummy = Ammy.RegisterProperty; // We need this for AmmySidekick to get copied to output
+
             _thread = new Thread(RunApp);
             _thread.SetApartmentState(ApartmentState.STA);
         }
 
-        public void Run(Func<Window> windowFunc)
+        public void RunAsync(Func<Window> windowFunc)
         {
             _windowFunc = windowFunc;
             _thread.Start();

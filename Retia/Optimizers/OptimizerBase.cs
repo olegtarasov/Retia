@@ -6,7 +6,7 @@ using Retia.Neural;
 
 namespace Retia.Optimizers
 {
-	public abstract class OptimizerBase<T> : ICloneable<OptimizerBase<T>> where T : struct, IEquatable<T>, IFormattable
+	public abstract class OptimizerBase<T> : ICloneable<OptimizerBase<T>>, IOptimizer where T : struct, IEquatable<T>, IFormattable
 	{
 	    protected MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
 	    private float _learningRate;

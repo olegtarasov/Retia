@@ -36,7 +36,6 @@ namespace Retia.Gui.Models
             ReportModel = new TrainingReportModel();
 
             _trainer.TrainReport += TrainerOnTrainReport;
-            _trainer.Message += TrainerOnMessage;
         }
 
         private void ApplyOptions(object o)
@@ -46,7 +45,7 @@ namespace Retia.Gui.Models
             {
                 _trainer.LearningRate = OptionsModel.LearningRate;
             }
-            ((MultiPeriodActionSchedule)_trainer.Options.LearningRateScaler.Schedule).EachIteration(OptionsModel.LearningRateScalePeriod);
+            _trainer.Options.LearningRateScaler.Schedule.EachIteration(OptionsModel.LearningRateScalePeriod);
             ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor = OptionsModel.LearningRateScaleFactor;
             _trainer.Options.MaxEpoch = OptionsModel.MaxEpoch;
         }
@@ -82,11 +81,6 @@ namespace Retia.Gui.Models
 
             OptionsModel.PauseCommand.RaiseCanExecuteChanged();
             OptionsModel.StartResumeCommand.RaiseCanExecuteChanged();
-        }
-
-        private void TrainerOnMessage(object sender, LogEventArgs e)
-        {
-            ReportModel.AddMessage(e.Message);
         }
 
         private void TrainerOnTrainReport(object sender, OptimizationReportEventArgs e)

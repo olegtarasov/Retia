@@ -34,7 +34,7 @@ namespace Retia.Gui.Models
 
         public OptimizationReportEventArgs Report { get; set; }
 
-        public string Message { get; set; } = string.Empty;
+        //public string Message { get; set; } = string.Empty;
 
         public int PlotRange { get; set; } = 500;
 
@@ -66,14 +66,14 @@ namespace Retia.Gui.Models
             PlotModel.InvalidatePlot(true);
         }
 
-        internal void AddMessage(string message)
-        {
-            const int maxBuffer = 1024 * 100;
-            if (Message.Length >= maxBuffer)
-            {
-                Message = string.Empty;
-            }
-            Message += message + Environment.NewLine;
-        }
+        //internal void AddMessage(string message)
+        //{
+        //    const int maxBuffer = 1024 * 100;
+        //    if (Message.Length >= maxBuffer)
+        //    {
+        //        Message = string.Empty;
+        //    }
+        //    Message += message + Environment.NewLine;
+        //}
     }
 }

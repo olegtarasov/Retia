@@ -32,6 +32,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AmmySidekick, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7c1296d24569a67d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Ammy.1.1.35\lib\net40\AmmySidekick.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="PropertyChanged, Version=1.52.1.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
@@ -55,6 +59,7 @@
     <Compile Include="Helpers\IInlineConverter.cs" />
     <Compile Include="Helpers\InlineConverter.cs" />
     <Compile Include="Models\RelayCommand.cs" />
+    <Compile Include="Models\ScheduleModel.cs" />
     <Compile Include="Models\TrainingModel.cs" />
     <Compile Include="Models\TrainingReportModel.cs" />
     <Compile Include="Models\TrainOptionsModel.cs" />
@@ -66,6 +71,9 @@
     <Compile Include="OxyPlot\SeriesWrapper.cs" />
     <Compile Include="OxyPlot\TrackingLineSeries.cs" />
     <Compile Include="RetiaGui.cs" />
+    <Compile Include="Windows\ScheduleControl.ammy.cs">
+      <DependentUpon>ScheduleControl.ammy</DependentUpon>
+    </Compile>
     <Compile Include="Windows\TrainingReportControl.xaml.cs">
       <DependentUpon>TrainingReportControl.xaml</DependentUpon>
     </Compile>
@@ -108,19 +116,21 @@
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lib.ammy" />
     <None Include="packages.config" />
+    <None Include="Windows\ScheduleControl.ammy" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Messages\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.1.29.2\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.2\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.2\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Ammy.1.1.35\build\Ammy.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Ammy.1.1.35\build\Ammy.targets'))" />
+    <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
   </Target>
+  <Import Project="..\packages\Ammy.1.1.35\build\Ammy.targets" Condition="Exists('..\packages\Ammy.1.1.35\build\Ammy.targets')" />
+  <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

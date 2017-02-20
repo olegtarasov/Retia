@@ -110,13 +110,15 @@ namespace LanguageModel
 		                       };
 
             trainOptions.RunTests.Never();
-            trainOptions.LearningRateScaler = ProportionalLearningRateScaler.EachIteration(1, 9.9e-5f);
-            trainOptions.ReportProgress.EachIteration(10);
-            trainOptions.RunUserTests.EachIteration(100);
-			var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions);
+            trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), optimizer, 9.9e-5f);
+            trainOptions.ReportProgress.EachIteration(1);
+            var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions)
+                          {
+                              StatusWriter = new ConsoleStatusWriter(false) // True to always print on new line
+                          };
+
             var epochWatch = new Stopwatch();
            
-			trainer.Message += (sender, args) => Console.WriteLine(args.Message);
 			trainer.TrainReport += (sender, args) =>
 			{
 				foreach (var err in args.Errors)
@@ -127,26 +129,27 @@ namespace LanguageModel
 				errFile.Flush(true);
 				network.Save(rnnPath);
 			};
-			trainer.UserTest += (sender, args) =>
-			{
-			    if (gpu)
-			    {
-			        network.TransferStateToHost();
-			    }
-			    Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
-			};
-		    trainer.EpochReached += () =>
+			trainer.EpochReached += () =>
 		    {
                 epochWatch.Stop();
 		        Console.WriteLine($"Trained epoch in {epochWatch.Elapsed.TotalSeconds} s.");
 		        //Console.ReadKey();
 		    };
+            trainer.PeriodicActions.Add(new UserAction(new ActionSchedule(100, PeriodType.Iteration), () =>
+            {
+                if (gpu)
+                {
+                    network.TransferStateToHost();
+                }
+                Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
+                trainer.StatusWriter.NewLine();
+            }));
 
-		    RetiaGui retiaGui;
+            RetiaGui retiaGui;
 		    if (gui)
 		    {
 		        retiaGui = new RetiaGui();
-                retiaGui.Run(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
+                retiaGui.RunAsync(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
 		    }
 		   
 			var task = trainer.Train(cts.Token);
@@ -173,7 +176,6 @@ namespace LanguageModel
 			cts.Cancel();
 			Task.WaitAll(task);
 		}
-
   
         private static LayeredNet<float> CreateNetwork(string fileName)
 		{

@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Retia.Integration;
 using Retia.Neural;
 using Retia.Training.Data;
 using Retia.Training.Testers;
+using Retia.Training.Trainers.Actions;
 
 namespace Retia.Training.Trainers
 {
-    public abstract class TrainerBase<T, TOptions, TReport> : ILogReporter, ITrainingReporter<TReport>
-        where T : struct, IEquatable<T>, IFormattable
+    public abstract class TrainerBase<T, TOptions, TReport> : ITrainingReporter<TReport>, ITrainerEvents where T : struct, IEquatable<T>, IFormattable
         where TOptions : TrainerOptionsBase
         where TReport : TrainReportEventArgsBase
     {
@@ -19,8 +20,7 @@ namespace Retia.Training.Trainers
 
         private readonly ITester<T> _tester;
         private readonly ManualResetEventSlim _pauseHandle = new ManualResetEventSlim(true);
-
-
+        
         protected TrainerBase(IDataProvider<T> dataProvider, ITester<T> tester, TOptions options)
         {
             DataProvider = dataProvider;
@@ -36,19 +36,20 @@ namespace Retia.Training.Trainers
 
         public abstract NeuralNet<T> TestableNetwork { get; }
 
+        public ITrainingStatusWriter StatusWriter { get; set; }
+        public List<PeriodicActionBase> PeriodicActions { get; } = new List<PeriodicActionBase>();
         public bool IsTraining { get; private set; }
         public bool IsPaused { get; private set; }
         public long Epoch { get; protected set; }
         
         public long Iteration { get; protected set; }
 
-        protected abstract TReport GetTrainingReport(bool userTest);
+        protected abstract TReport GetTrainingReport();
 
         protected abstract void TrainIteration();
 
         protected abstract void ResetMemory();
 
-        public event EventHandler<LogEventArgs> Message;
         public event EventHandler<TReport> TrainReport;
 
         public void Pause()
@@ -79,11 +80,10 @@ namespace Retia.Training.Trainers
             }
             catch (Exception e)
             {
-                OnMessage(e.ToString());
+                StatusWriter?.Message(e.ToString());
             }
         }
 
-        public event EventHandler<TReport> UserTest;
         public event Action SequenceTrained;
         public event Action EpochReached;
 
@@ -108,16 +108,6 @@ namespace Retia.Training.Trainers
         {
         }
 
-        protected virtual void OnUserTest(TReport e)
-        {
-            UserTest?.Invoke(this, e);
-        }
-
-        protected void OnMessage(string message)
-        {
-            Message?.Invoke(this, new LogEventArgs(message));
-        }
-
         protected void OnTrainReport(TReport args)
         {
             TrainReport?.Invoke(this, args);
@@ -133,6 +123,7 @@ namespace Retia.Training.Trainers
             Iteration = 0;
 
             InitTraining();
+            SubscribeActions();
 
             var watch = new Stopwatch();
             var testWatch = new Stopwatch();
@@ -142,14 +133,14 @@ namespace Retia.Training.Trainers
             {
                 if (token.IsCancellationRequested)
                 {
-                    OnMessage("Stopped training manually");
+                    StatusWriter?.Message("Stopped training manually");
                     IsTraining = false;
                     return;
                 }
 
                 if (!_pauseHandle.IsSet)
                 {
-                    OnMessage("Training paused");
+                    StatusWriter?.Message("Training paused");
                     try
                     {
                         _pauseHandle.Wait(token);
@@ -158,7 +149,7 @@ namespace Retia.Training.Trainers
                     {
                         return;
                     }
-                    OnMessage("Training resumed");
+                    StatusWriter?.Message("Training resumed");
                 }
 
                 watch.Restart();
@@ -177,64 +168,63 @@ namespace Retia.Training.Trainers
 
                 if (Options.ReportProgress.ShouldDoOnIteration(Iteration))
                 {
-                    OnTrainReport(GetTrainingReport(false));
+                    OnTrainReport(GetTrainingReport());
 
                     if (Options.ReportMesages)
                     {
-                        string progress = $"Epoch #{Epoch:F3} - iter #{Iteration}:";
-
-                        OnMessage(progress);
-                        OnMessage("---------");
-
-                        string additionalReport = GetTrainingReportMessage();
-                        if (!string.IsNullOrEmpty(additionalReport))
-                        {
-                            OnMessage(additionalReport);
-                        }
-
-                        OnMessage($"\tDuration:\t{watch.Elapsed.TotalSeconds:0.0000}s");
-                        OnMessage("---------\n");
+                        string progress = $"#{Epoch}[{GetIterationProgress()} {watch.Elapsed.TotalSeconds:0.0000}s] {GetTrainingReportMessage()}";
+                        StatusWriter?.UpdateEpochStatus(progress);
                     }
-                }
-
-                if (Options.RunUserTests.ShouldDoOnIteration(Iteration))
-                {
-                    OnUserTest(GetTrainingReport(true));
                 }
 
                 if (_tester != null && Options.RunTests.ShouldDoOnIteration(Iteration))
                 {
                     if (DataProvider.TestSet == null)
                     {
-                        OnMessage("=========");
-                        OnMessage("Trying to run network on test set, but test data set was not created!");
-                        OnMessage("=========\n");
+                        throw new InvalidOperationException("Test set was not created!");
                     }
-                    else
-                    {
-                        DataProvider.TestSet.Reset();
-                        testWatch.Restart();
-                        var result = _tester.Test(TestableNetwork.Clone(), DataProvider.TestSet);
-                        testWatch.Stop();
 
-                        if (Options.ReportMesages)
-                        {
-                            OnMessage("=========");
-                            OnMessage($"\tTested in:\t{testWatch.Elapsed.TotalSeconds:0.0000}s");
-                            OnMessage(result.GetReport());
-                            OnMessage("=========\n");
-                        }
+                    DataProvider.TestSet.Reset();
+                    testWatch.Restart();
+                    var result = _tester.Test(TestableNetwork.Clone(), DataProvider.TestSet);
+                    testWatch.Stop();
+
+                    if (Options.ReportMesages)
+                    {
+                        StatusWriter?.Message($"=========\n\tTested in:\t{testWatch.Elapsed.TotalSeconds:0.0000}s\n{result.GetReport()}\n=========\n");
                     }
                 }
 
                 if (Epoch > Options.MaxEpoch)
                 {
-                    OnMessage($"{Options.MaxEpoch} reached, stopped training.");
+                    StatusWriter?.Message($"{Options.MaxEpoch} reached, stopped training.");
                     return;
                 }
             }
+
+            UnsubscribeActions();
         }
 
+        protected virtual string GetIterationProgress()
+        {
+            return $"I:{Iteration}";
+        }
+
+        protected virtual void SubscribeActions()
+        {
+            foreach (var action in PeriodicActions)
+            {
+                action.Subscribe(this);
+            }
+        }
+
+        protected virtual void UnsubscribeActions()
+        {
+            foreach (var action in PeriodicActions)
+            {
+                action.Unsubscribe();
+            }
+        }
 
         private void OnSequenceTrained()
         {

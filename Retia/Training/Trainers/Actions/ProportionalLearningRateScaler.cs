@@ -1,35 +1,28 @@
-﻿namespace Retia.Training.Trainers.Actions
+﻿using Retia.Optimizers;
+
+namespace Retia.Training.Trainers.Actions
 {
     public class ProportionalLearningRateScaler : LearningRateScalerBase
     {
         private int _scalingTicks = 0;
 
-        public ProportionalLearningRateScaler(MultiPeriodActionSchedule schedule, float scalingFactor) : base(schedule)
+        public ProportionalLearningRateScaler(ActionSchedule schedule, IOptimizer optimizer, float scalingFactor) : base(schedule, optimizer)
         {
             ScalingFactor = scalingFactor;
         }
 
         public float ScalingFactor { get; set; }
 
-        public override void Initialize(float initialRate)
+        public override void Reset()
         {
-            base.Initialize(initialRate);
+            base.Reset();
             _scalingTicks = 0;
         }
 
-        public override float ScaleLearningRate()
+        protected override void DoAction()
         {
-            return InitialRate / (1.0f + _scalingTicks * ScalingFactor);
-        }
-
-        public static ProportionalLearningRateScaler EachIteration(int period, float scalingFactor)
-        {
-            return new ProportionalLearningRateScaler(new MultiPeriodActionSchedule(period, PeriodType.Iteration), scalingFactor);
-        }
-
-        public static ProportionalLearningRateScaler EachEpoch(int period, float scalingFactor)
-        {
-            return new ProportionalLearningRateScaler(new MultiPeriodActionSchedule(period, PeriodType.Epoch), scalingFactor);
+            _scalingTicks++;
+            Optimizer.LearningRate = InitialRate / (1.0f + _scalingTicks * ScalingFactor);
         }
     }
 }
