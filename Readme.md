@@ -21,6 +21,18 @@ deep learning framework!
 
 ## Building from source
 
+You can build Retia with or without GPU support. If you just want to take a look at the source
+and tinker around for a bit, build without GPU support. You can always build the full
+version later.
+
+### Building without GPU support
+
+You will need Visual Studio with C# and basic C++ capabilities. 
+
+The process is very simple: just build Retia.CPUOnly.sln and you are done :)
+
+### Building with GPU support
+
 You will need a couple of things to build Retia from source:
 
 * Visual Studio 2015
