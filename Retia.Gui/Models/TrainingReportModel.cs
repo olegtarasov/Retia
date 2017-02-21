@@ -32,9 +32,10 @@ namespace Retia.Gui.Models
 
         public PlotModelEx PlotModel { get; set; }
 
-        public OptimizationReportEventArgs Report { get; set; }
+        // Workaround for Ammy's faulty support for class instances in resources
+        public OxyPlotController PlotController { get; } = new OxyPlotController();
 
-        //public string Message { get; set; } = string.Empty;
+        public OptimizationReportEventArgs Report { get; set; }
 
         public int PlotRange { get; set; } = 500;
 

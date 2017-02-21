@@ -1,12 +1,7 @@
-﻿using Retia.Gui.Helpers
-using Retia.Gui.OxyPlot
-using OxyPlot.Wpf
+﻿using Retia.Gui.Helpers;
+using OxyPlot.Wpf;
 
 UserControl "Retia.Gui.Windows.TrainingReportControl" {
-	Resources: [
-		OxyPlotController Key="plotController" {}
-	]
-
 	DockPanel { 
 		WrapPanel { 
 			DockPanel.Dock: Bottom
@@ -24,6 +19,7 @@ UserControl "Retia.Gui.Windows.TrainingReportControl" {
 			TextBox { 
 				#VCenter
 				Margin: 4
+				Width: 40
 				Text: bind PlotRange
 			}
 		}
@@ -31,7 +27,7 @@ UserControl "Retia.Gui.Windows.TrainingReportControl" {
 		PlotView { 
 			DockPanel.Dock: Top
 			Model: bind PlotModel
-			Controller: resource "plotController"
+			Controller: bind PlotController
 		}
 	}
 }

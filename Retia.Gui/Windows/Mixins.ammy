@@ -1,22 +1,43 @@
-﻿alias LabeledControl(text) {
+﻿alias LabeledControl(caption) {
 	StackPanel {
 		Orientation: Horizontal
 
 		Label { 
 			Margin: 4
-			Content: $text
+			Content: $caption
 		}		
 	}
 }
 
-alias LabeledText(text, binding)
+alias LabeledText(caption, binding)
 {
-	@LabeledControl($text) {
+	@LabeledControl($caption) {
 		TextBlock { 
-			VerticalAlignment: Center
+			#VCenter
+
 			Margin: 4
 			Text: $binding
 		}
+	}
+}
+
+alias LabeledTextBox(caption, binding, width=40) {
+	@LabeledControl($caption) {
+		TextBox { 
+			#VCenter
+
+			Margin: 4
+			Width: $width
+			Text: $binding
+		}
+	}
+}
+
+alias PaddedButton(text) {
+	Button { 
+		Margin: 4
+		Padding: "8 2"
+		Content: $text
 	}
 }
 

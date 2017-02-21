@@ -1,0 +1,36 @@
+﻿UserControl "Retia.Gui.Windows.TrainOptionsControl" {
+	StackPanel { 
+		Orientation: Vertical
+
+		GroupBox { 
+			Margin: 4
+			Header: "Train options"
+
+			StackPanel { 
+				Orientation: Vertical
+
+				@LabeledTextBox("Error filter:", bind ErrorFilterSize) {}
+				@LabeledTextBox("Max epoch:", bind MaxEpoch) {}
+				@LabeledTextBox("Learning rate:", bind LearningRate) {}
+				@LabeledTextBox("LR scale factor:", bind LearningRateScaleFactor) {}
+				@LabeledTextBox("LR scale period:", bind LearningRateScalePeriod) {}
+
+				@PaddedButton("Apply") {
+					HorizontalAlignment: Left
+					Command: bind ApplyOptionsCommand
+				}
+			}
+		}
+
+		StackPanel { 
+			Orientation: Horizontal
+
+			@PaddedButton("Start / Resume") {
+				Command: bind StartResumeCommand
+			}
+			@PaddedButton("Pause") {
+				Command: bind PauseCommand
+			}
+		}
+	}
+}

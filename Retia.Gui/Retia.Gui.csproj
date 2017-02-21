@@ -75,14 +75,17 @@
     <Compile Include="Windows\ScheduleControl.ammy.cs">
       <DependentUpon>ScheduleControl.ammy</DependentUpon>
     </Compile>
+    <Compile Include="Windows\TrainingControl.ammy.cs">
+      <DependentUpon>TrainingControl.ammy</DependentUpon>
+    </Compile>
     <Compile Include="Windows\TrainingReportControl.ammy.cs">
       <DependentUpon>TrainingReportControl.ammy</DependentUpon>
     </Compile>
-    <Compile Include="Windows\TrainingWindow.xaml.cs">
-      <DependentUpon>TrainingWindow.xaml</DependentUpon>
+    <Compile Include="Windows\TrainingWindow.ammy.cs">
+      <DependentUpon>TrainingWindow.ammy</DependentUpon>
     </Compile>
-    <Compile Include="Windows\TrainOptionsControl.xaml.cs">
-      <DependentUpon>TrainOptionsControl.xaml</DependentUpon>
+    <Compile Include="Windows\TrainOptionsControl.ammy.cs">
+      <DependentUpon>TrainOptionsControl.ammy</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -100,16 +103,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Windows\TrainingWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\TrainOptionsControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -117,7 +110,10 @@
     <None Include="packages.config" />
     <None Include="Windows\Mixins.ammy" />
     <None Include="Windows\ScheduleControl.ammy" />
+    <None Include="Windows\TrainingControl.ammy" />
     <None Include="Windows\TrainingReportControl.ammy" />
+    <None Include="Windows\TrainingWindow.ammy" />
+    <None Include="Windows\TrainOptionsControl.ammy" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

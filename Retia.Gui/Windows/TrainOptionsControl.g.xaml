@@ -1,0 +1,65 @@
+<UserControl x:Class="Retia.Gui.Windows.TrainOptionsControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:AmmySidekick;assembly=AmmySidekick" ns0:Ammy.Register="/Retia.Gui;component/Windows/TrainOptionsControl.g.xaml">
+  <StackPanel Orientation="Vertical">
+    <GroupBox Margin="4" Header="Train options">
+      <StackPanel Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+          <Label Margin="4" Content="Error filter:"/>
+          <TextBox VerticalAlignment="Center" Margin="4" Width="40">
+            <TextBox.Text>
+              <Binding Path="ErrorFilterSize"/>
+            </TextBox.Text>
+          </TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+          <Label Margin="4" Content="Max epoch:"/>
+          <TextBox VerticalAlignment="Center" Margin="4" Width="40">
+            <TextBox.Text>
+              <Binding Path="MaxEpoch"/>
+            </TextBox.Text>
+          </TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+          <Label Margin="4" Content="Learning rate:"/>
+          <TextBox VerticalAlignment="Center" Margin="4" Width="40">
+            <TextBox.Text>
+              <Binding Path="LearningRate"/>
+            </TextBox.Text>
+          </TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+          <Label Margin="4" Content="LR scale factor:"/>
+          <TextBox VerticalAlignment="Center" Margin="4" Width="40">
+            <TextBox.Text>
+              <Binding Path="LearningRateScaleFactor"/>
+            </TextBox.Text>
+          </TextBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+          <Label Margin="4" Content="LR scale period:"/>
+          <TextBox VerticalAlignment="Center" Margin="4" Width="40">
+            <TextBox.Text>
+              <Binding Path="LearningRateScalePeriod"/>
+            </TextBox.Text>
+          </TextBox>
+        </StackPanel>
+        <Button Margin="4" Padding="8 2" Content="Apply" HorizontalAlignment="Left">
+          <Button.Command>
+            <Binding Path="ApplyOptionsCommand"/>
+          </Button.Command>
+        </Button>
+      </StackPanel>
+    </GroupBox>
+    <StackPanel Orientation="Horizontal">
+      <Button Margin="4" Padding="8 2" Content="Start / Resume">
+        <Button.Command>
+          <Binding Path="StartResumeCommand"/>
+        </Button.Command>
+      </Button>
+      <Button Margin="4" Padding="8 2" Content="Pause">
+        <Button.Command>
+          <Binding Path="PauseCommand"/>
+        </Button.Command>
+      </Button>
+    </StackPanel>
+  </StackPanel>
+</UserControl>

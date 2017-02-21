@@ -1,0 +1,39 @@
+﻿using Retia.Gui.Windows;
+
+UserControl "Retia.Gui.Windows.TrainingControl" {
+	Grid { 
+		ColumnDefinitions: [
+			ColumnDefinition {Width: Auto}
+			ColumnDefinition {Width: "*"}
+		]
+
+		Expander { 
+			Grid.Column: 0
+			ExpandDirection: Right
+			IsExpanded: true
+			UseLayoutRounding: true
+
+			Header: TextBlock { 
+				Text: "Settings" 
+				LayoutTransform: RotateTransform {Angle: -90}
+			}
+
+			ScrollViewer { 
+				VerticalScrollBarVisibility: Auto
+				HorizontalScrollBarVisibility: Disabled
+				MaxWidth: 300
+
+				StackPanel { 
+					Orientation: Vertical
+
+					TrainOptionsControl { DataContext: bind OptionsModel }
+				}
+			}
+		}
+
+		TrainingReportControl { 
+			Grid.Column: 1
+			DataContext: bind ReportModel
+		}
+	}
+}
