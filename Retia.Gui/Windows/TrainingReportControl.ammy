@@ -1,0 +1,37 @@
+﻿using Retia.Gui.Helpers
+using Retia.Gui.OxyPlot
+using OxyPlot.Wpf
+
+UserControl "Retia.Gui.Windows.TrainingReportControl" {
+	Resources: [
+		OxyPlotController Key="plotController" {}
+	]
+
+	DockPanel { 
+		WrapPanel { 
+			DockPanel.Dock: Bottom
+			Orientation: Horizontal
+
+			@LabeledText("Error:", bind Report.Errors convert (object errors) => GuiConvert.ToLastError(errors)) {}
+			@LabeledText("Learning rate:", bind Report.LearningRate) {}
+			@LabeledText("Iteration:", bind Report.Iteration) {}
+			@LabeledText("Epoch:", bind Report.Epoch) {}
+		}
+
+		@LabeledControl("Plot range (iters):") {
+			DockPanel.Dock: Bottom
+
+			TextBox { 
+				#VCenter
+				Margin: 4
+				Text: bind PlotRange
+			}
+		}
+
+		PlotView { 
+			DockPanel.Dock: Top
+			Model: bind PlotModel
+			Controller: resource "plotController"
+		}
+	}
+}

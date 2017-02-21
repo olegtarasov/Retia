@@ -1,0 +1,54 @@
+<UserControl x:Class="Retia.Gui.Windows.TrainingReportControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.OxyPlot" xmlns:ns1="clr-namespace:AmmySidekick;assembly=AmmySidekick" xmlns:ns2="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf" ns1:Ammy.Register="/Retia.Gui;component/Windows/TrainingReportControl.g.xaml">
+  <UserControl.Resources>
+    <ns0:OxyPlotController x:Key="plotController"/>
+  </UserControl.Resources>
+  <DockPanel>
+    <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+      <StackPanel Orientation="Horizontal">
+        <Label Margin="4" Content="Error:"/>
+        <TextBlock VerticalAlignment="Center" Margin="4">
+          <TextBlock.Text>
+            <Binding Path="Report.Errors" Converter="{x:Static ns1:ExpressionConverter.Instance}" ConverterParameter="&lt;expr id=&quot;0&quot;&gt;&lt;lambda isaction=&quot;False&quot;&gt;&lt;staticcall method=&quot;ToLastError&quot;&gt;&lt;typeinfo typename=&quot;Retia.Gui.Helpers.GuiConvert&quot; isarray=&quot;False&quot;&gt;&lt;/typeinfo&gt;&lt;parameter name=&quot;errors&quot; type=&quot;System.Object&quot; /&gt;&lt;/staticcall&gt;&lt;parameter name=&quot;errors&quot; type=&quot;System.Object&quot; /&gt;&lt;/lambda&gt;&lt;/expr&gt;"/>
+          </TextBlock.Text>
+        </TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <Label Margin="4" Content="Learning rate:"/>
+        <TextBlock VerticalAlignment="Center" Margin="4">
+          <TextBlock.Text>
+            <Binding Path="Report.LearningRate"/>
+          </TextBlock.Text>
+        </TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <Label Margin="4" Content="Iteration:"/>
+        <TextBlock VerticalAlignment="Center" Margin="4">
+          <TextBlock.Text>
+            <Binding Path="Report.Iteration"/>
+          </TextBlock.Text>
+        </TextBlock>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal">
+        <Label Margin="4" Content="Epoch:"/>
+        <TextBlock VerticalAlignment="Center" Margin="4">
+          <TextBlock.Text>
+            <Binding Path="Report.Epoch"/>
+          </TextBlock.Text>
+        </TextBlock>
+      </StackPanel>
+    </WrapPanel>
+    <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+      <Label Margin="4" Content="Plot range (iters):"/>
+      <TextBox VerticalAlignment="Center" Margin="4">
+        <TextBox.Text>
+          <Binding Path="PlotRange"/>
+        </TextBox.Text>
+      </TextBox>
+    </StackPanel>
+    <ns2:PlotView DockPanel.Dock="Top" Controller="{StaticResource plotController}">
+      <ns2:PlotView.Model>
+        <Binding Path="PlotModel"/>
+      </ns2:PlotView.Model>
+    </ns2:PlotView>
+  </DockPanel>
+</UserControl>

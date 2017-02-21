@@ -1,0 +1,25 @@
+﻿alias LabeledControl(text) {
+	StackPanel {
+		Orientation: Horizontal
+
+		Label { 
+			Margin: 4
+			Content: $text
+		}		
+	}
+}
+
+alias LabeledText(text, binding)
+{
+	@LabeledControl($text) {
+		TextBlock { 
+			VerticalAlignment: Center
+			Margin: 4
+			Text: $binding
+		}
+	}
+}
+
+mixin VCenter() for FrameworkElement {
+	VerticalAlignment: Center
+}

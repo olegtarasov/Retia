@@ -11,10 +11,10 @@ with your data, and it's fast on GPU leveraging the latest technologies like cuD
 
 ## Features
 
-Retia is in an early stage of development. We focused on recurrent networks to start
-somewhere. So now you can build deep GRU models to create language models and other fun
-stuff. We will be adding more layer types in the future. As a matter of fact, Retia is
-so easily customizable that you can start making your own layers in not time at all!
+Retia is in an early stage of development. We focused on recurrent networks in order to 
+start somewhere. So now you can build deep GRU models to create language models and other 
+fun stuff. We will be adding more layer types in the future. As a matter of fact, Retia is
+so easily customizable that you can start making your own layers in no time at all!
 
 We are eager to see you pull requests, so that together we can build a simple but powerful
 deep learning framework!

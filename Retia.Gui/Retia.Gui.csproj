@@ -54,6 +54,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\GuiConvert.cs" />
     <Compile Include="Helpers\FileDialogHelpers.cs" />
     <Compile Include="Helpers\ICompositeConverter.cs" />
     <Compile Include="Helpers\IInlineConverter.cs" />
@@ -74,8 +75,8 @@
     <Compile Include="Windows\ScheduleControl.ammy.cs">
       <DependentUpon>ScheduleControl.ammy</DependentUpon>
     </Compile>
-    <Compile Include="Windows\TrainingReportControl.xaml.cs">
-      <DependentUpon>TrainingReportControl.xaml</DependentUpon>
+    <Compile Include="Windows\TrainingReportControl.ammy.cs">
+      <DependentUpon>TrainingReportControl.ammy</DependentUpon>
     </Compile>
     <Compile Include="Windows\TrainingWindow.xaml.cs">
       <DependentUpon>TrainingWindow.xaml</DependentUpon>
@@ -99,10 +100,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Windows\TrainingReportControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Windows\TrainingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -118,7 +115,9 @@
   <ItemGroup>
     <None Include="lib.ammy" />
     <None Include="packages.config" />
+    <None Include="Windows\Mixins.ammy" />
     <None Include="Windows\ScheduleControl.ammy" />
+    <None Include="Windows\TrainingReportControl.ammy" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
