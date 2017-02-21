@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿#if !CPUONLY
+using System.Collections.Generic;
 using Retia.Mathematics;
+using Retia.NativeWrapper;
 using Retia.Neural;
 using Retia.Tests.Plumbing;
 using Xunit;
@@ -97,3 +99,5 @@ namespace Retia.Tests.Mathematics
         }
     }
 }
+
+#endif

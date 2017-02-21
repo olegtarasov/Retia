@@ -33,6 +33,26 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug [CPUOnly]|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\$(Platform)\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CPUONLY</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release [CPUOnly]|x64'">
+    <OutputPath>bin\$(Platform)\Release\</OutputPath>
+    <DefineConstants>TRACE;CPUONLY</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="MarkdownLog, Version=0.9.3.36, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MarkdownLog.0.9.3\lib\portable-net45+sl50+MonoAndroid10+MonoTouch10\MarkdownLog.dll</HintPath>
@@ -144,11 +164,19 @@
     <None Include="NugetRelativeRefs.targets" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\FastFuncs\bin\$(Platform)\$(Configuration)\FastFuncs.dll">
+  <ItemGroup Condition="'$(Configuration)' == 'Debug [CPUOnly]' Or '$(Configuration)' == 'Debug'">
+    <Content Include="..\FastFuncs\bin\$(Platform)\Debug\FastFuncs.dll">
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release [CPUOnly]' Or '$(Configuration)' == 'Release'">
+    <Content Include="..\FastFuncs\bin\$(Platform)\Release\FastFuncs.dll">
+      <Link>FastFuncs.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="DoubleClassGenerator.ttinclude">
       <LastGenOutput>DoubleClassGenerator.txt</LastGenOutput>
     </None>
@@ -163,6 +191,8 @@
       <Project>{d9562091-9caa-4b3e-92a1-746642339f1f}</Project>
       <Name>Retia.Contracts</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
     <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
       <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
       <Name>Retia.NativeWrapper</Name>

@@ -9,60 +9,63 @@ using namespace System::Collections::Generic;
 using namespace Retia::Contracts;
 using namespace MathNet::Numerics::LinearAlgebra;
 
-public ref class LayerTester
-{
-public:
+namespace Retia::NativeWrapper {
 
-	LayerTester(LayerSpecBase^ layerSpec)
+	public ref class LayerTester
 	{
-		auto states = LayerStateFactory::GetLayerState(layerSpec);
+	public:
 
-		if (layerSpec->LayerType == LayerType::Linear)
+		LayerTester(LayerSpecBase^ layerSpec)
 		{
-			auto ls = (LinearLayerSpec^)layerSpec;
+			auto states = LayerStateFactory::GetLayerState(layerSpec);
 
-			_container = LayerContainerBase::LinearLayerContainer(ls->InputSize, ls->OutSize, ls->BatchSize, ls->SeqLen, states->matrices());
-		}
-		else if (layerSpec->LayerType == LayerType::Gru)
-		{
-			auto gs = (GruLayerSpec^)layerSpec;
+			if (layerSpec->LayerType == LayerType::Linear)
+			{
+				auto ls = (LinearLayerSpec^)layerSpec;
 
-			_container = LayerContainerBase::GruLayersContainer(gs->Layers, gs->InputSize, gs->HSize, gs->BatchSize, gs->SeqLen, states->matrices());
-		}
-		else if (layerSpec->LayerType == LayerType::Softmax)
-		{
-			_container = LayerContainerBase::SoftmaxLayerContainer(layerSpec->InputSize, layerSpec->BatchSize, layerSpec->SeqLen);
-		}
-		else
-		{
-			throw gcnew InvalidOperationException();
-		}
+				_container = LayerContainerBase::LinearLayerContainer(ls->InputSize, ls->OutSize, ls->BatchSize, ls->SeqLen, states->matrices());
+			}
+			else if (layerSpec->LayerType == LayerType::Gru)
+			{
+				auto gs = (GruLayerSpec^)layerSpec;
 
-		delete states;
-	}
+				_container = LayerContainerBase::GruLayersContainer(gs->Layers, gs->InputSize, gs->HSize, gs->BatchSize, gs->SeqLen, states->matrices());
+			}
+			else if (layerSpec->LayerType == LayerType::Softmax)
+			{
+				_container = LayerContainerBase::SoftmaxLayerContainer(layerSpec->InputSize, layerSpec->BatchSize, layerSpec->SeqLen);
+			}
+			else
+			{
+				throw gcnew InvalidOperationException();
+			}
 
-	~LayerTester()
-	{
-		delete _container;
-	}
-
-	void TestForward(List<Matrix<float>^>^ inputs, List<Matrix<float>^>^ outputs)
-	{
-		auto inMatrices = gcnew ManagedMatrixContainer();
-		auto outMatrices = gcnew ManagedMatrixContainer();
-
-		for (int i = 0; i < inputs->Count; i++)
-		{
-			inMatrices->AddMatrix(inputs[i]);
-			outMatrices->AddMatrix(outputs[i]);
+			delete states;
 		}
 
-		_container->ForwardSequence(inMatrices->matrices());
-		_container->TransferOutputToHost(outMatrices->matrices());
+		~LayerTester()
+		{
+			delete _container;
+		}
 
-		delete inMatrices;
-		delete outMatrices;
-	}
-private:
-	LayerContainerBase* _container;
-};
+		void TestForward(List<Matrix<float>^>^ inputs, List<Matrix<float>^>^ outputs)
+		{
+			auto inMatrices = gcnew ManagedMatrixContainer();
+			auto outMatrices = gcnew ManagedMatrixContainer();
+
+			for (int i = 0; i < inputs->Count; i++)
+			{
+				inMatrices->AddMatrix(inputs[i]);
+				outMatrices->AddMatrix(outputs[i]);
+			}
+
+			_container->ForwardSequence(inMatrices->matrices());
+			_container->TransferOutputToHost(outMatrices->matrices());
+
+			delete inMatrices;
+			delete outMatrices;
+		}
+	private:
+		LayerContainerBase* _container;
+	};
+}

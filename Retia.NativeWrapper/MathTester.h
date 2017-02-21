@@ -4,56 +4,58 @@
 
 using namespace MathNet::Numerics::LinearAlgebra;
 
-public ref class MathTester
-{
-public:
-
-	static double TestCrossEntropyError(Matrix<float>^ output, Matrix<float>^ target)
+namespace Retia::NativeWrapper {
+	public ref class MathTester
 	{
-		auto matrices = gcnew ManagedMatrixContainer();
-		matrices->AddMatrix(output);
-		matrices->AddMatrix(target);
+	public:
 
-		double result = AlgorithmTester::CrossEntropyError(*matrices->matrices()[0], *matrices->matrices()[1]);
+		static double TestCrossEntropyError(Matrix<float>^ output, Matrix<float>^ target)
+		{
+			auto matrices = gcnew ManagedMatrixContainer();
+			matrices->AddMatrix(output);
+			matrices->AddMatrix(target);
 
-		delete matrices;
+			double result = AlgorithmTester::CrossEntropyError(*matrices->matrices()[0], *matrices->matrices()[1]);
 
-		return result;
-	}
+			delete matrices;
 
-	static void TestCrossEntropyBackpropagation(Matrix<float>^ output, Matrix<float>^ target, Matrix<float>^ result)
-	{
-		auto matrices = gcnew ManagedMatrixContainer();
-		matrices->AddMatrix(output);
-		matrices->AddMatrix(target);
-		matrices->AddMatrix(result);
+			return result;
+		}
 
-		AlgorithmTester::BackpropagateCrossEntropy(*matrices->matrices()[0], *matrices->matrices()[1], *matrices->matrices()[2]);
+		static void TestCrossEntropyBackpropagation(Matrix<float>^ output, Matrix<float>^ target, Matrix<float>^ result)
+		{
+			auto matrices = gcnew ManagedMatrixContainer();
+			matrices->AddMatrix(output);
+			matrices->AddMatrix(target);
+			matrices->AddMatrix(result);
 
-		delete matrices;
-	}
+			AlgorithmTester::BackpropagateCrossEntropy(*matrices->matrices()[0], *matrices->matrices()[1], *matrices->matrices()[2]);
 
-	static void RMSPropOptimize(Matrix<float>^ weight, Matrix<float>^ gradient, Matrix<float>^ cache1, Matrix<float>^ cache2, Matrix<float>^ cacheM,
-		float learningRate, float decayRate, float momentum, float weightDecay)
-	{
-		auto matrices = gcnew ManagedMatrixContainer();
-		matrices->AddMatrix(weight);
-		matrices->AddMatrix(gradient);
-		matrices->AddMatrix(cache1);
-		matrices->AddMatrix(cache2);
-		matrices->AddMatrix(cacheM);
+			delete matrices;
+		}
 
-		AlgorithmTester::RMSPropOptimize(*matrices->matrices()[0], *matrices->matrices()[1], *matrices->matrices()[2], *matrices->matrices()[3], *matrices->matrices()[4],
-			learningRate, decayRate, momentum, weightDecay);
-	}
+		static void RMSPropOptimize(Matrix<float>^ weight, Matrix<float>^ gradient, Matrix<float>^ cache1, Matrix<float>^ cache2, Matrix<float>^ cacheM,
+			float learningRate, float decayRate, float momentum, float weightDecay)
+		{
+			auto matrices = gcnew ManagedMatrixContainer();
+			matrices->AddMatrix(weight);
+			matrices->AddMatrix(gradient);
+			matrices->AddMatrix(cache1);
+			matrices->AddMatrix(cache2);
+			matrices->AddMatrix(cacheM);
 
-	static void TestClampMatrix(Matrix<float>^ matrix, float value)
-	{
-		auto matrices = gcnew ManagedMatrixContainer();
-		matrices->AddMatrix(matrix);
-		
-		AlgorithmTester::ClampMatrix(*matrices->matrices()[0], value);
+			AlgorithmTester::RMSPropOptimize(*matrices->matrices()[0], *matrices->matrices()[1], *matrices->matrices()[2], *matrices->matrices()[3], *matrices->matrices()[4],
+				learningRate, decayRate, momentum, weightDecay);
+		}
 
-		delete matrices;
-	}
-};
+		static void TestClampMatrix(Matrix<float>^ matrix, float value)
+		{
+			auto matrices = gcnew ManagedMatrixContainer();
+			matrices->AddMatrix(matrix);
+
+			AlgorithmTester::ClampMatrix(*matrices->matrices()[0], value);
+
+			delete matrices;
+		}
+	};
+}

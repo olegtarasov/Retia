@@ -7,6 +7,9 @@ using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.Common.Mkl;
 using Retia.Mathematics;
+#if !CPUONLY
+using Retia.NativeWrapper;
+#endif
 using Retia.Neural;
 using Retia.Neural.Initializers;
 using Retia.Neural.Layers;
@@ -18,6 +21,7 @@ namespace Benchmark
 {
     public class App
     {
+#if !CPUONLY
         [Verb]
         public void TestGpuLayers()
         {
@@ -88,5 +92,6 @@ namespace Benchmark
 
             gpuTester.Dispose();
         }
+#endif
     }
 }

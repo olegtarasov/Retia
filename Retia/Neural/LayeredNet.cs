@@ -7,7 +7,9 @@ using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
+#if !CPUONLY
 using Retia.NativeWrapper;
+#endif
 using Retia.Neural.Layers;
 using Retia.Optimizers;
 
@@ -23,7 +25,9 @@ namespace Retia.Neural
         protected readonly int BatchSize, SeqLen;
         protected readonly List<NeuroLayer<T>> Layers = new List<NeuroLayer<T>>();
 
+#if !CPUONLY
         private GpuNetwork _gpuNetwork;
+#endif
         private OptimizerBase<T> _optimizer;
 
         public LayeredNet(int batchSize, int seqLen, params NeuroLayer<T>[] layers)
@@ -78,7 +82,9 @@ namespace Retia.Neural
             set
             {
                 _optimizer = value;
+#if !CPUONLY
                 _optimizer.GpuOptimizer = _gpuNetwork;
+#endif
             }
         }
 
@@ -204,6 +210,7 @@ namespace Retia.Neural
 
         public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
+#if !CPUONLY
             if (_gpuNetwork != null)
             {
                 if (typeof(T) != typeof(float))
@@ -213,12 +220,14 @@ namespace Retia.Neural
 
                 return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
             }
+#endif
 
             return base.TrainSequence(inputs, targets);
         }
 
         public void TransferStateToHost()
         {
+#if !CPUONLY
             if (_gpuNetwork == null)
             {
                 throw new InvalidOperationException("You are not using GPU!");
@@ -226,10 +235,14 @@ namespace Retia.Neural
 
             var spec = CreateSpec();
             _gpuNetwork.TransferStatesToHost(spec);
+#else
+            throw new InvalidOperationException("Library was compiled without GPU support!");
+#endif
         }
 
         public void UseGpu()
         {
+#if !CPUONLY
             if (_gpuNetwork != null)
             {
                 return;
@@ -237,13 +250,18 @@ namespace Retia.Neural
 
             _gpuNetwork = new GpuNetwork(CreateSpec());
             _optimizer.GpuOptimizer = _gpuNetwork;
+#else
+            throw new InvalidOperationException("Library was compiled without GPU support!");
+#endif
         }
 
         public void UseCpu()
         {
+#if !CPUONLY
             _gpuNetwork?.Dispose();
             _gpuNetwork = null;
             _optimizer.GpuOptimizer = null;
+#endif
         }
 
         public override void Save(Stream s)
@@ -282,11 +300,13 @@ namespace Retia.Neural
 
         public override void Optimize()
         {
+#if !CPUONLY
             if (_gpuNetwork != null)
             {
                 _gpuNetwork.Optimize();
                 return;
             }
+#endif
 
             foreach (var layer in Layers)
                 layer.Optimize(Optimizer);
@@ -320,11 +340,13 @@ namespace Retia.Neural
 
         public override void ResetMemory()
         {
+#if !CPUONLY
             if (_gpuNetwork != null)
             {
                 _gpuNetwork.ResetMemory();
                 return;
             }
+#endif
 
             foreach (var layer in Layers)
                 layer.ResetMemory();
@@ -332,11 +354,13 @@ namespace Retia.Neural
 
         public override void ResetOptimizer()
         {
+#if !CPUONLY
             if (_gpuNetwork != null)
             {
                 _gpuNetwork.ResetOptimizerCache();
                 return;
             }
+#endif
 
             foreach (var layer in Layers)
                 layer.ResetOptimizer();
@@ -418,10 +442,12 @@ namespace Retia.Neural
 
         public void Dispose()
         {
+#if !CPUONLY
             _gpuNetwork?.Dispose();
+#endif
         }
 
-        #region Candidates for removal
+#region Candidates for removal
 
         public override List<Matrix<T>[]> InternalState
         {
@@ -447,6 +473,6 @@ namespace Retia.Neural
             }
         }
 
-        #endregion
+#endregion
     }
 }
