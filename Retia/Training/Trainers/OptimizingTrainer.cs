@@ -191,7 +191,7 @@ namespace Retia.Training.Trainers
             // An epoch was reached and data set rolled over.
             //OnMessage($"Epoch reached on iteration {Iteration}");
             Epoch++;
-            StatusWriter?.NewLine();
+            StatusWriter?.ItemComplete();
             OnEpochReached();
 
             _processedSamples = 0;

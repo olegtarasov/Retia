@@ -173,7 +173,7 @@ namespace Retia.Training.Trainers
                     if (Options.ReportMesages)
                     {
                         string progress = $"#{Epoch}[{GetIterationProgress()} {watch.Elapsed.TotalSeconds:0.0000}s] {GetTrainingReportMessage()}";
-                        StatusWriter?.UpdateEpochStatus(progress);
+                        StatusWriter?.UpdateItemStatus(progress);
                     }
                 }
 

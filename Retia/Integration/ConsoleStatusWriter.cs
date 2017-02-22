@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text;
+using Retia.Training.Trainers;
 
-namespace Retia.Training.Trainers
+namespace Retia.Integration
 {
     public class ConsoleStatusWriter : ITrainingStatusWriter
     {
@@ -14,7 +15,7 @@ namespace Retia.Training.Trainers
             _alwaysNewLine = alwaysNewLine;
         }
 
-        public void UpdateEpochStatus(string status)
+        public void UpdateItemStatus(string status)
         {
             if (_alwaysNewLine)
             {
@@ -35,13 +36,17 @@ namespace Retia.Training.Trainers
                 Console.CursorTop = _curEpochTop;
                 Console.CursorLeft = 0;
                 Console.Write(status);
-                Console.Write(new StringBuilder().Append(' ', Console.BufferWidth - status.Length).ToString());
+                int blanks = Console.BufferWidth - status.Length;
+                if (blanks > 0)
+                {
+                    Console.Write(new StringBuilder().Append(' ', Console.BufferWidth - status.Length).ToString());
+                }
                 Console.CursorTop = lastTop;
                 Console.CursorLeft = lastLeft;
             }
         }
 
-        public void NewLine()
+        public void ItemComplete()
         {
             _curEpochTop = -1;
         }
@@ -49,7 +54,7 @@ namespace Retia.Training.Trainers
         public void Message(string message)
         {
             Console.WriteLine(message);
-            NewLine();
+            ItemComplete();
         }
     }
 }

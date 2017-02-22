@@ -2,8 +2,8 @@
 {
     public interface ITrainingStatusWriter
     {
-        void UpdateEpochStatus(string status);
-        void NewLine();
+        void UpdateItemStatus(string status);
+        void ItemComplete();
         void Message(string message);
     }
 }

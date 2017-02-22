@@ -147,7 +147,7 @@
     <Compile Include="Training\Trainers\Actions\ProportionalLearningRateScaler.cs" />
     <Compile Include="Training\Trainers\Actions\LearningRateScalerBase.cs" />
     <Compile Include="Training\Trainers\Actions\UserAction.cs" />
-    <Compile Include="Training\Trainers\ConsoleStatusWriter.cs" />
+    <Compile Include="Integration\ConsoleStatusWriter.cs" />
     <Compile Include="Training\Trainers\ITrainerEvents.cs" />
     <Compile Include="Training\Trainers\ITrainingReporter.cs" />
     <Compile Include="Training\Trainers\ITrainingStatusWriter.cs" />
