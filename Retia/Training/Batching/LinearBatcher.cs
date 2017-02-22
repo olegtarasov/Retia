@@ -40,7 +40,7 @@ namespace Retia.Training.Batching
 
 				if (tracker.ShouldReport(sampleIdx))
 				{
-                    progressWriter?.SetProgress(sampleIdx, batchCount, "Batching");
+                    progressWriter?.SetItemProgress(sampleIdx, batchCount, "Batching");
 				}
 
 				var sample = new Sample<T>(inputSize, targetSize, batchSize);
@@ -62,7 +62,7 @@ namespace Retia.Training.Batching
 				result.Add(sample);
 			}
 
-            progressWriter?.Complete();
+            progressWriter?.ItemComplete();
 
 			return result;
 		}

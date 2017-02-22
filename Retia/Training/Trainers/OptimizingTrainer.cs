@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural;
 using Retia.Optimizers;
@@ -89,22 +90,21 @@ namespace Retia.Training.Trainers
             _lastError = filteredError;
         }
 
-        protected override string GetIterationProgress()
+        protected override string GetIterationProgress(int otherLen)
         {
             if (DataProvider.TrainingSet.SampleCount > 0)
             {
-                return $"I:{Iteration}/{DataProvider.TrainingSet.SampleCount / Options.SequenceLength}|{GetIterationProgressBar()}|";
+                var sb = new StringBuilder();
+
+                int total = DataProvider.TrainingSet.SampleCount / Options.SequenceLength;
+
+                sb.Append(Iteration).Append('/').Append(total);
+                sb.Append(ConsoleProgressWriter.GetProgressbar(Iteration, total, otherLen + sb.Length));
+
+                return sb.ToString();
             }
 
-            return base.GetIterationProgress();
-        }
-
-        private string GetIterationProgressBar()
-        {
-            int n = (int)Math.Ceiling((_processedSamples / (double)DataProvider.TrainingSet.SampleCount) * 50);
-            var sb = new StringBuilder(50);
-            sb.Append('=', n).Append(' ', 50 - n);
-            return sb.ToString();
+            return base.GetIterationProgress(otherLen);
         }
 
         protected override void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs<T> e)

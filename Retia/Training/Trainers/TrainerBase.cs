@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Retia.Integration;
 using Retia.Neural;
 using Retia.Training.Data;
 using Retia.Training.Testers;
@@ -36,7 +38,7 @@ namespace Retia.Training.Trainers
 
         public abstract NeuralNet<T> TestableNetwork { get; }
 
-        public ITrainingStatusWriter StatusWriter { get; set; }
+        public IProgressWriter StatusWriter { get; set; }
         public List<PeriodicActionBase> PeriodicActions { get; } = new List<PeriodicActionBase>();
         public bool IsTraining { get; private set; }
         public bool IsPaused { get; private set; }
@@ -170,10 +172,17 @@ namespace Retia.Training.Trainers
                 {
                     OnTrainReport(GetTrainingReport());
 
-                    if (Options.ReportMesages)
+                    if (Options.ReportMesages && StatusWriter != null)
                     {
-                        string progress = $"#{Epoch}[{GetIterationProgress()} {watch.Elapsed.TotalSeconds:0.0000}s] {GetTrainingReportMessage()}";
-                        StatusWriter?.UpdateItemStatus(progress);
+                        var preIter = new StringBuilder();
+                        preIter.Append('#').Append(Epoch).Append('[');
+
+                        var postIter = new StringBuilder();
+                        postIter.Append(' ').AppendFormat("{0:0.0000}", watch.Elapsed.TotalSeconds).Append("s] ").Append(GetTrainingReportMessage());
+
+                        preIter.Append(GetIterationProgress(preIter.Length + postIter.Length)).Append(postIter);
+
+                        StatusWriter.SetItemProgress(preIter.ToString());
                     }
                 }
 
@@ -205,7 +214,7 @@ namespace Retia.Training.Trainers
             UnsubscribeActions();
         }
 
-        protected virtual string GetIterationProgress()
+        protected virtual string GetIterationProgress(int otherLen)
         {
             return $"I:{Iteration}";
         }

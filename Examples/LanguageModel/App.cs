@@ -111,10 +111,10 @@ namespace LanguageModel
 
             trainOptions.RunTests.Never();
             trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), optimizer, 9.9e-5f);
-            trainOptions.ReportProgress.EachIteration(1);
+            trainOptions.ReportProgress.EachIteration(10);
             var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions)
                           {
-                              StatusWriter = new ConsoleStatusWriter(false) // True to always print on new line
+                              StatusWriter = ConsoleProgressWriter.Instance
                           };
 
             var epochWatch = new Stopwatch();

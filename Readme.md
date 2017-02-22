@@ -57,4 +57,19 @@ vcpkg integrate install
 vcpkg install gtest gtest:x64-windows
 ```
 
-Restart Visual Studio if you had it open. Now you can hopefully build the test project.
+Restart Visual Studio if you had it open. Now you can build the test project.
+
+### Ammy UI
+
+Retia uses [Ammy UI](http://www.ammyui.com/) for its GUI features. You don't need to install additional tools to build
+the GUI, since Ammy is included as a self-contained NuGet package. But if you want to tinker with GUI code, we highly
+recommend installing Ammy extension from [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=ionoy.Ammy).
+
+### OxyPlot
+
+Retia also uses OxyPlot for plots. It's included as Git submodule. The reason we don't use the official NuGet package is that sometimes
+we contribute performance optimizations to OxyPlot and we don't want to wait until they make it to the release version :)
+
+Our fork is in no way a custom OxyPlot version — we always keep it in sync with upstream and there are no changes that don't eventually
+get accepted into upstream repository. If we encounter some change that doesn't get accepted right away, we will do everything to resolve
+the issue or rollback the change.
