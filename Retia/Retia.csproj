@@ -72,18 +72,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\MathHelpers.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
+    <Compile Include="Helpers\MinMax.cs" />
     <Compile Include="Helpers\MinMaxTracker.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
     <Compile Include="Integration\ConsoleProgressWriter.cs" />
     <Compile Include="Integration\ICloneable.cs" />
     <Compile Include="Integration\IFileWritable.cs" />
-    <Compile Include="Integration\ILogReporter.cs" />
     <Compile Include="Integration\IProgressWriter.cs" />
     <Compile Include="Integration\IStreamWritable.cs" />
-    <Compile Include="Integration\LogEventArgs.cs" />
-    <Compile Include="Integration\ProgressEventArgs.cs" />
     <Compile Include="Integration\ProgressTracker.cs" />
     <Compile Include="Mathematics\MathProviderImplD.cs">
       <AutoGen>True</AutoGen>

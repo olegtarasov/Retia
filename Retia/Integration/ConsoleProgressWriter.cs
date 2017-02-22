@@ -33,7 +33,7 @@ namespace Retia.Integration
         }
 
         /// <summary>
-        /// Gets a text progress bar useful for monotype display such as a console.
+        /// Gets a text progress bar for a console.
         /// Returns an empty string if progress bar can't occupy at least 12 characters.
         /// </summary>
         /// <param name="value">Current progress.</param>

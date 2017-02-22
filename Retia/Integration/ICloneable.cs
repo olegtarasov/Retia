@@ -1,7 +1,13 @@
 ﻿namespace Retia.Integration
 {
-	public interface ICloneable<T>
+    /// <summary>
+    /// Typed cloneable interface.
+    /// </summary>
+    public interface ICloneable<T>
 	{
-		T Clone();
+        /// <summary>
+        /// Performs a deep clone of an object.
+        /// </summary>
+        T Clone();
 	}
 }

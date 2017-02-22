@@ -1,5 +1,8 @@
 ﻿namespace Retia.Integration
 {
+    /// <summary>
+    /// Tracks the progress of an operation and indicates when to report progress.
+    /// </summary>
 	public class ProgressTracker
 	{
 	    private readonly int _count;
@@ -7,6 +10,11 @@
 
 	    private int _nextReport;
 
+        /// <summary>
+        /// Creates a new tracker with specified reporting frequency.
+        /// </summary>
+        /// <param name="count">The total number of operation ticks.</param>
+        /// <param name="reportPercent">Report frequency in percent [0..100].</param>
 	    public ProgressTracker(int count, int reportPercent = 100)
 		{
 			_count = count;
@@ -14,9 +22,17 @@
 			_nextReport = _reportCount;
 		}
 
+        /// <summary>
+        /// The number of tracked ticks.
+        /// </summary>
 	    public int Current { get; private set; }
 
-	    public bool ShouldReport(int current)
+        /// <summary>
+        /// Indicates whether the progress should be reported according to
+        /// reporting frequency.
+        /// </summary>
+        /// <param name="current">Current tick.</param>
+        public bool ShouldReport(int current)
 		{
 			if (current > _nextReport)
 			{
@@ -27,7 +43,11 @@
 			return false;
 		}
 
-	    public bool ShouldReport()
+        /// <summary>
+        /// Indicates whether the progress should be reported according to
+        /// reporting frequency. Increases tick count by 1.
+        /// </summary>
+        public bool ShouldReport()
 	    {
 	        return ShouldReport(Current++);
 	    }

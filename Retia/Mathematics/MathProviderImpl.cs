@@ -11,6 +11,9 @@ using Float = System.Single;
 
 namespace Retia.Mathematics
 {
+    /// <summary>
+    /// Math provider for the float type. Double-precision is generated from the single-precision source.
+    /// </summary>
     public class MathProviderImpl : MathProviderBase<Float>
     {
         [DllImport("FastFuncs", EntryPoint="ApplySigmoid2S")] private static extern void ApplySigmoid2(IntPtr a, IntPtr b, int n);

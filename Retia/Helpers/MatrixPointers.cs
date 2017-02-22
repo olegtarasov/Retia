@@ -5,12 +5,22 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace Retia.Helpers
 {
+    /// <summary>
+    /// A collection of pinned matrix pointers.
+    /// Pointers are unpinned when an object is disposed.
+    /// </summary>
+    /// <typeparam name="T">Data type.</typeparam>
     public struct MatrixPointers<T> : IDisposable where T : struct, IEquatable<T>, IFormattable
     {
         private readonly GCHandle[] _handles;
 
         private bool _disposed;
 
+        /// <summary>
+        /// Pins pointers to underlying matrix arrays and stores them for later use.
+        /// The order of matrices is preserved.
+        /// </summary>
+        /// <param name="matrices">Matrices to pin pointers to.</param>
         public MatrixPointers(params Matrix<T>[] matrices)
         {
             _disposed = false;
@@ -22,6 +32,11 @@ namespace Retia.Helpers
             }
         }
 
+        /// <summary>
+        /// Get a pointer to the matrix.
+        /// </summary>
+        /// <param name="idx">Matrix index.</param>
+        /// <returns>Pointer to an underlying matrix array.</returns>
         public IntPtr this[int idx]
         {
             get

@@ -7,23 +7,43 @@ using MathNet.Numerics.Providers.LinearAlgebra;
 
 namespace Retia.Mathematics
 {
+    /// <summary>
+    /// Useful matrix operations that are not present in Math.NET.
+    /// </summary>
     public static class MatrixExtensions
     {
+        /// <summary>
+        /// Returns the matrix underlying array length.
+        /// </summary>
         public static int Length<T>(this Matrix<T> matrix) where T : struct, IEquatable<T>, IFormattable
         {
             return matrix.RowCount * matrix.ColumnCount;
         }
 
+        /// <summary>
+        /// Clones a matrix. New matrix storage is separated from the source matrix.
+        /// </summary>
         public static Matrix<T> CloneMatrix<T>(this Matrix<T> matrix) where T : struct, IEquatable<T>, IFormattable
         {
             return Matrix<T>.Build.DenseOfMatrix(matrix);
         }
 
+        /// <summary>
+        /// Clips matrix values to the range of [min;max].
+        /// </summary>
+        /// <param name="matrix">Matrix to clamp.</param>
+        /// <param name="min">Minimum value.</param>
+        /// <param name="max">Maximum value.</param>
         public static void Clamp<T>(this Matrix<T> matrix, T min, T max) where T : struct, IEquatable<T>, IFormattable
         {
             MathProvider<T>.Instance.ClampMatrix(matrix, min, max);
         }
 
+        /// <summary>
+        /// Tiles a matrix horizontally <see cref="count" /> times and returns the result.
+        /// </summary>
+        /// <param name="matrix">Matrix to tile.</param>
+        /// <param name="count">The number of times to tile.</param>
         public static Matrix<T> TileColumns<T>(this Matrix<T> matrix, int count) where T : struct, IEquatable<T>, IFormattable
         {
             var src = matrix.AsColumnMajorArray();
@@ -37,6 +57,11 @@ namespace Retia.Mathematics
             return Matrix<T>.Build.Dense(matrix.RowCount, matrix.ColumnCount * count, dst);
         }
 
+        /// <summary>
+        /// Tiles a matrix vertically <see cref="count" /> times and returns the result.
+        /// </summary>
+        /// <param name="matrix">Matrix to tile.</param>
+        /// <param name="count">The number of times to tile.</param>
         public static Matrix<T> TileRows<T>(this Matrix<T> matrix, int count) where T : struct, IEquatable<T>, IFormattable
         {
             var src = matrix.AsColumnMajorArray();
@@ -54,6 +79,8 @@ namespace Retia.Mathematics
         }
 
         /// <summary>
+        /// Performs a BLAS operation:
+        /// 
         ///     C = AB + (useC ? 1 : 0)*C
         /// </summary>
         public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose, bool useC = true) where T : struct, IEquatable<T>, IFormattable
@@ -61,21 +88,19 @@ namespace Retia.Mathematics
             ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).MatrixMultiplyWithUpdate(transposeA, transposeB, Matrix<T>.One, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, useC ? Matrix<T>.One : Matrix<T>.Zero, C.AsColumnMajorArray());
         }
 
-        ///// <summary>
-        /////     C = alpha*AB + beta*C
-        ///// </summary>
-        //public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, float beta = 0.0f, float alpha = 1.0f, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose) where T : struct, IEquatable<T>, IFormattable
-        //{
-        //    if (typeof(T) == typeof(float))
-        //    {
-        //        Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, alpha, A.AsColumnMajorArray() as float[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as float[], B.RowCount, B.ColumnCount, beta, C.AsColumnMajorArray() as float[]);
-        //    }
-        //    else
-        //    {
-        //        Control.LinearAlgebraProvider.MatrixMultiplyWithUpdate(transposeA, transposeB, (double)alpha, A.AsColumnMajorArray() as double[], A.RowCount, A.ColumnCount, B.AsColumnMajorArray() as double[], B.RowCount, B.ColumnCount, (double)beta, C.AsColumnMajorArray() as double[]);
-        //    }
-        //}
-
+        /// <summary>
+        /// If A has more than one column, computes
+        /// 
+        ///     C = C + AB, where B is usually a singular column vector
+        /// 
+        /// If A has one column, computes
+        /// 
+        ///     C = C + A
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="C"></param>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
         public static void CollapseColumnsAndAccumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B) where T : struct, IEquatable<T>, IFormattable
         {
             if (A.ColumnCount > 1)
@@ -89,18 +114,20 @@ namespace Retia.Mathematics
         }
 
         /// <summary>
-        ///     this = alpha*A + this
+        /// Computes
+        /// 
+        ///     C = A + C
         /// </summary>
-        public static void Accumulate<T>(this Matrix<T> x, Matrix<T> A/*, float alpha = 1.0f*/) where T : struct, IEquatable<T>, IFormattable
+        public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A/*, float alpha = 1.0f*/) where T : struct, IEquatable<T>, IFormattable
         {
             if (A.ColumnCount == 1)
             {
-                SumVec(A, x/*, alpha*/);
+                SumVec(A, C/*, alpha*/);
             }
             else
             {
                 var aa = A.AsColumnMajorArray();
-                var xa = x.AsColumnMajorArray();
+                var xa = C.AsColumnMajorArray();
                 //if (alpha != 1.0f)
                 //{
                 //    if (typeof(T) == typeof(float))
@@ -113,6 +140,11 @@ namespace Retia.Mathematics
             }
         }
 
+        /// <summary>
+        /// Splits a Nx(MxK) matrix into K NxM matrices.
+        /// </summary>
+        /// <param name="matrix">Nx(MxK) matrix</param>
+        /// <param name="columnCount">M</param>
         public static List<Matrix<T>> SplitColumns<T>(this Matrix<T> matrix, int columnCount) where T : struct, IEquatable<T>, IFormattable
         {
             if (matrix.ColumnCount < columnCount || matrix.ColumnCount % columnCount != 0)
@@ -128,6 +160,12 @@ namespace Retia.Mathematics
             return result;
         }
 
+        /// <summary>
+        /// Copies underlying matrix array to another array.
+        /// </summary>
+        /// <param name="matrix">Matrix to copy.</param>
+        /// <param name="dest">Destination array.</param>
+        /// <param name="idx">Destination start index which is increased after copying.</param>
         public static void CopyToArray<T>(this Matrix<T> matrix, T[] dest, ref int idx) where T : struct, IEquatable<T>, IFormattable
         {
             var ma = matrix.AsColumnMajorArray();
@@ -140,6 +178,12 @@ namespace Retia.Mathematics
             idx += ma.Length;
         }
 
+        /// <summary>
+        /// Copies an array into underlying matrix array.
+        /// </summary>
+        /// <param name="matrix">Matrix to copy to.</param>
+        /// <param name="src">Source array.</param>
+        /// <param name="idx">Source start index which is increased after copying.</param>
         public static void CopyFromArray<T>(this Matrix<T> matrix, T[] src, ref int idx) where T : struct, IEquatable<T>, IFormattable
         {
             var ma = matrix.AsColumnMajorArray();
@@ -152,13 +196,16 @@ namespace Retia.Mathematics
             idx += ma.Length;
         }
 
+        /// <summary>
+        /// Tests two matrices for equality with error margin of 10e-7.
+        /// </summary>
         public static bool EqualsTo<T>(this Matrix<T> matrix, Matrix<T> other) where T : struct, IEquatable<T>, IFormattable
         {
             return MathProvider<T>.Instance.MatricesEqual(matrix, other);
         }
 
         /// <summary>
-        ///     result=x + y;
+        ///     result=C + y;
         /// </summary>
         private static void SumVec<T>(Matrix<T> x, Matrix<T> y/*, float alpha*/) where T : struct, IEquatable<T>, IFormattable
         {
