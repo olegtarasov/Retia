@@ -142,7 +142,7 @@ namespace LanguageModel
                     network.TransferStateToHost();
                 }
                 Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
-                trainer.StatusWriter.NewLine();
+                trainer.StatusWriter.ItemComplete();
             }));
 
             RetiaGui retiaGui;
