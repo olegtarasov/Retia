@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AmmySidekick, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7c1296d24569a67d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ammy.1.1.35\lib\net40\AmmySidekick.dll</HintPath>
+      <HintPath>..\packages\Ammy.WPF.1.2.10\lib\net40\AmmySidekick.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -121,11 +121,11 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Ammy.1.1.35\build\Ammy.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Ammy.1.1.35\build\Ammy.targets'))" />
     <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Ammy.1.2.10\build\Ammy.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Ammy.1.2.10\build\Ammy.targets'))" />
   </Target>
-  <Import Project="..\packages\Ammy.1.1.35\build\Ammy.targets" Condition="Exists('..\packages\Ammy.1.1.35\build\Ammy.targets')" />
   <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
+  <Import Project="..\packages\Ammy.1.2.10\build\Ammy.targets" Condition="Exists('..\packages\Ammy.1.2.10\build\Ammy.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
