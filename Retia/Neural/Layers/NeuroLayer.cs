@@ -143,7 +143,7 @@ namespace Retia.Neural.Layers
                 throw new InvalidOperationException("Layer error function is not specified!");
             }
 
-            return ErrorFunction.LayerError(y, target);
+            return ErrorFunction.GetError(y, target);
         }
 
         public virtual void SetParam(int i, T value)

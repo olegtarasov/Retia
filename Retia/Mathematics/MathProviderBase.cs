@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Neural;
@@ -53,14 +54,30 @@ namespace Retia.Mathematics
         public abstract void ClampMatrix(Matrix<T> matrix, T min, T max);
 
         /// <summary>
-        /// Gets a random matrix in the range of [min;max).
+        /// Creates a random matrix in the range of [min;max).
         /// </summary>
         /// <param name="rows">Number of rows.</param>
         /// <param name="cols">Number of columns.</param>
         /// <param name="min">Minimum value.</param>
         /// <param name="max">Maximum value.</param>
-        /// <returns></returns>
         public abstract Matrix<T> RandomMatrix(int rows, int cols, float min, float max);
+
+        /// <summary>
+        /// Creates a random mask matrix. For each element roll the dice in range of [0..1) and
+        /// if the value is less than <see cref="trueProb"/> set the element to 1. Otherwise set
+        /// to 0.
+        /// </summary>
+        /// <param name="rows">Number of rows.</param>
+        /// <param name="cols">Number of columns.</param>
+        /// <param name="trueProb">Probability of setting an element to 1, range [0..1].</param>
+        public abstract Matrix<T> RandomMaskMatrix(int rows, int cols, float trueProb);
+
+        /// <summary>
+        /// Saves a matrix to a stream.
+        /// </summary>
+        /// <param name="matrix">Matrix to save.</param>
+        /// <param name="stream">Stream.</param>
+        public abstract void SaveMatrix(Matrix<T> matrix, Stream stream);
 
         /// <summary>
         /// Tests two matrices for equality with error margin of 10e-7.

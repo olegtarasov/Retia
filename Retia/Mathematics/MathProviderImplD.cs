@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
@@ -294,6 +295,30 @@ namespace Retia.Mathematics
         protected override bool AlmostEqual(Float a, Float b)
         {
             return Math.Abs(a - b) < 10e-7f;
+        }
+
+        public override void SaveMatrix(Matrix<Float> matrix, Stream stream)
+        {
+            using (var writer = stream.NonGreedyWriter())
+            {
+                writer.Write(matrix.RowCount);
+                writer.Write(matrix.ColumnCount);
+
+                var arr = matrix.AsColumnMajorArray();
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    writer.Write(arr[i]);
+                }
+            }
+        }
+
+        public override Matrix<Float> RandomMaskMatrix(int rows, int cols, float trueProb)
+        {
+            var random = SafeRandom.Generator;
+            var arr = new Float[rows * cols];
+            for (int i = 0; i < arr.Length; i++)
+                arr[i] = random.NextDouble() < trueProb ? 1.0f : 0.0f;
+            return Matrix<Float>.Build.Dense(rows, cols, arr);
         }
     }
 }

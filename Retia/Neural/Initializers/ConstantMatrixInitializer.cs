@@ -1,11 +1,18 @@
 ﻿using System;
 using MathNet.Numerics.LinearAlgebra;
+using Retia.Mathematics;
 
 namespace Retia.Neural.Initializers
 {
+    /// <summary>
+    /// Creates matrices with all elements set to a specified value.
+    /// </summary>
     public class ConstantMatrixInitializer<T> : IMatrixInitializer<T> where T : struct, IEquatable<T>, IFormattable
     {
-        public T Value { get; set; } = (T)Convert.ChangeType(0.0f, typeof(T));
+        /// <summary>
+        /// Value of all matrix elements.
+        /// </summary>
+        public T Value { get; set; } = MathProvider<T>.Instance.Scalar(0.0f);
 
         public Matrix<T> CreateMatrix(int rows, int columns)
         {

@@ -4,9 +4,12 @@ using MathNet.Numerics.LinearAlgebra;
 
 namespace Retia.Neural.ErrorFunctions
 {
+    /// <summary>
+    /// Cross-entropy error function.
+    /// </summary>
     public class CrossEntropyError<T> : ErrorFunctionBase<T> where T : struct, IEquatable<T>, IFormattable
     {
-        public override double LayerError(Matrix<T> output, Matrix<T> target)
+        public override double GetError(Matrix<T> output, Matrix<T> target)
         {
             return MathProvider.CrossEntropyError(output, target);
         }

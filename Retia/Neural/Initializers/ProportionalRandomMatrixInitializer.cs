@@ -6,13 +6,19 @@ using Retia.RandomGenerator;
 
 namespace Retia.Neural.Initializers
 {
+    /// <summary>
+    /// Creates random matrices with specified dispersion with values proportional to column count.
+    /// </summary>
     public class ProportionalRandomMatrixInitializer<T> : IMatrixInitializer<T> where T : struct, IEquatable<T>, IFormattable
     {
-        public double Dispersion { get; set; } = 5e-2;
+        /// <summary>
+        /// Dispersion for random matrices.
+        /// </summary>
+        public float Dispersion { get; set; } = 5e-2f;
 
         public Matrix<T> CreateMatrix(int rows, int columns)
         {
-            return Matrix<T>.Build.Random(rows, columns, new ContinuousUniform(0.0f, Dispersion / columns));
+            return MatrixFactory.RandomMatrix<T>(rows, columns, Dispersion);
         }
     }
 }

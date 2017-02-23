@@ -8,8 +8,18 @@ using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
+    /// <summary>
+    /// Helpers for matrix creation, saving and loading.
+    /// </summary>
     public static class MatrixFactory
     {
+        /// <summary>
+        /// Create a new column-major matrix with specified data. The resulting matrix will be decoupled
+        /// from the <see cref="data"/> array.
+        /// </summary>
+        /// <param name="rows">Number of rows.</param>
+        /// <param name="columns">Number of columns.</param>
+        /// <param name="data">Data to create matrix from. Matrix will receive a <b>copy</b> of this data.</param>
         public static Matrix<T> Create<T>(int rows, int columns, params float[] data) where T : struct, IEquatable<T>, IFormattable
         {
             if (rows * columns != data.Length)
@@ -19,53 +29,20 @@ namespace Retia.Mathematics
             return Matrix<T>.Build.Dense(rows, columns, array);
         }
 
+        /// <summary>
+        /// Creates a new column-major matrix.
+        /// </summary>
+        /// <param name="rows">Number of rows.</param>
+        /// <param name="columns">Number of columns.</param>
         public static Matrix<T> Create<T>(int rows, int columns) where T : struct, IEquatable<T>, IFormattable
         {
             return Matrix<T>.Build.Dense(rows, columns);
         }
 
-        public static void Save<T>(this Matrix<T> matrix, Stream stream) where T : struct, IEquatable<T>, IFormattable
-        {
-            if (typeof(T) == typeof(float))
-            {
-                Save(matrix as Matrix<float>, stream);
-            }
-            else
-            {
-                Save(matrix as Matrix<double>, stream);
-            }
-        }
-
-        public static void Save(this Matrix<float> matrix, Stream stream) 
-        {
-            using (var writer = stream.NonGreedyWriter())
-            {
-                writer.Write(matrix.RowCount);
-                writer.Write(matrix.ColumnCount);
-
-                var arr = matrix.AsColumnMajorArray();
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    writer.Write(arr[i]);
-                }
-            }
-        }
-
-        public static void Save(this Matrix<double> matrix, Stream stream)
-        {
-            using (var writer = stream.NonGreedyWriter())
-            {
-                writer.Write(matrix.RowCount);
-                writer.Write(matrix.ColumnCount);
-
-                var arr = matrix.AsColumnMajorArray();
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    writer.Write(arr[i]);
-                }
-            }
-        }
-
+        /// <summary>
+        /// Loads matrix from the stream.
+        /// </summary>
+        /// <param name="stream">The stream.</param>
         public static Matrix<T> Load<T>(Stream stream) where T : struct, IEquatable<T>, IFormattable
         {
             if (typeof(T) == typeof(float))
@@ -78,41 +55,10 @@ namespace Retia.Mathematics
             }
         }
 
-
-        public static Matrix<float> LoadS(Stream stream)
-        {
-            using (var reader = stream.NonGreedyReader())
-            {
-                int rows = reader.ReadInt32();
-                int cols = reader.ReadInt32();
-
-                var arr = new float[rows * cols];
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    arr[i] = reader.ReadSingle();
-                }
-
-                return Matrix<float>.Build.Dense(rows, cols, arr);
-            }
-        }
-
-        public static Matrix<double> LoadD(Stream stream)
-        {
-            using (var reader = stream.NonGreedyReader())
-            {
-                int rows = reader.ReadInt32();
-                int cols = reader.ReadInt32();
-
-                var arr = new double[rows * cols];
-                for (int i = 0; i < arr.Length; i++)
-                {
-                    arr[i] = reader.ReadDouble();
-                }
-
-                return Matrix<double>.Build.Dense(rows, cols, arr);
-            }
-        }
-
+        /// <summary>
+        /// Parses a matrix from a string.
+        /// </summary>
+        /// <param name="input">String to parse.</param>
         public static Matrix<T> ParseString<T>(string input) where T : struct, IEquatable<T>, IFormattable
         {
             input = input.Replace(',', '.').Trim();
@@ -150,44 +96,85 @@ namespace Retia.Mathematics
             return matrix;
         }
 
+        /// <summary>
+        /// Creates a random mask matrix. For each element roll the dice in range of [0..1) and
+        /// if the value is less than <see cref="trueProb"/> set the element to 1. Otherwise set
+        /// to 0.
+        /// </summary>
+        /// <param name="rows">Number of rows.</param>
+        /// <param name="cols">Number of columns.</param>
+        /// <param name="trueProb">Probability of setting an element to 1, range [0..1].</param>
+        public static Matrix<T> RandomMaskMatrix<T>(int rows, int cols, float trueProb) where T : struct, IEquatable<T>, IFormattable
+        {
+            return MathProvider<T>.Instance.RandomMaskMatrix(rows, cols, trueProb);
+        }
+
+        /// <summary>
+        /// Creates a random matrix in the range of [min;max).
+        /// </summary>
+        /// <param name="rows">Number of rows.</param>
+        /// <param name="cols">Number of columns.</param>
+        /// <param name="min">Minimum value.</param>
+        /// <param name="max">Maximum value.</param>
         public static Matrix<T> RandomMatrix<T>(int rows, int cols, float min, float max) where T : struct, IEquatable<T>, IFormattable
         {
             return MathProvider<T>.Instance.RandomMatrix(rows, cols, min, max);
         }
 
+        /// <summary>
+        /// Creates a random matrix in the range of [-dispersion;dispersion).
+        /// </summary>
+        /// <param name="rows">Number of rows.</param>
+        /// <param name="cols">Number of columns.</param>
+        /// <param name="dispersion">Dispersion.</param>
         public static Matrix<T> RandomMatrix<T>(int rows, int cols, float dispersion) where T : struct, IEquatable<T>, IFormattable
         {
             return RandomMatrix<T>(rows, cols, -dispersion, dispersion);
         }
 
-        public static Matrix<T> RandomMaskMatrix<T>(int rows, int cols, float trueProb) where T : struct, IEquatable<T>, IFormattable
+        /// <summary>
+        /// Saves a matrix to a stream.
+        /// </summary>
+        /// <param name="matrix">Matrix to save.</param>
+        /// <param name="stream">Stream.</param>
+        public static void Save<T>(this Matrix<T> matrix, Stream stream) where T : struct, IEquatable<T>, IFormattable
         {
-            if (typeof(T) == typeof(float))
+            MathProvider<T>.Instance.SaveMatrix(matrix, stream);
+        }
+
+        private static Matrix<double> LoadD(Stream stream)
+        {
+            using (var reader = stream.NonGreedyReader())
             {
-                return RandomMaskMatrixS(rows, cols, trueProb) as Matrix<T>;
-            }
-            else
-            {
-                return RandomMaskMatrixD(rows, cols, trueProb) as Matrix<T>;
+                int rows = reader.ReadInt32();
+                int cols = reader.ReadInt32();
+
+                var arr = new double[rows * cols];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = reader.ReadDouble();
+                }
+
+                return Matrix<double>.Build.Dense(rows, cols, arr);
             }
         }
 
-        public static Matrix<float> RandomMaskMatrixS(int rows, int cols, float trueProb)
-        {
-            var random = SafeRandom.Generator;
-            var arr = new float[rows * cols];
-            for (int i = 0; i < arr.Length; i++)
-                arr[i] = random.NextDouble() < trueProb ? 1.0f : 0.0f;
-            return Matrix<float>.Build.Dense(rows, cols, arr);
-        }
 
-        public static Matrix<double> RandomMaskMatrixD(int rows, int cols, float trueProb)
+        private static Matrix<float> LoadS(Stream stream)
         {
-            var random = SafeRandom.Generator;
-            var arr = new double[rows * cols];
-            for (int i = 0; i < arr.Length; i++)
-                arr[i] = random.NextDouble() < trueProb ? 1.0d : 0.0d;
-            return Matrix<double>.Build.Dense(rows, cols, arr);
+            using (var reader = stream.NonGreedyReader())
+            {
+                int rows = reader.ReadInt32();
+                int cols = reader.ReadInt32();
+
+                var arr = new float[rows * cols];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = reader.ReadSingle();
+                }
+
+                return Matrix<float>.Build.Dense(rows, cols, arr);
+            }
         }
     }
 }
