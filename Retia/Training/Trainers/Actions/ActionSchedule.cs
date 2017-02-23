@@ -39,7 +39,7 @@
         /// <summary>
         /// Gets or sets whether action is enabled.
         /// </summary>
-        public bool IsEnabled { get { return PeriodType == PeriodType.None; } }
+        public bool IsEnabled => PeriodType != PeriodType.None;
 
         /// <summary>
         /// The frequency at which the action is performed.

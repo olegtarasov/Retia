@@ -7,7 +7,7 @@ using Retia.RandomGenerator;
 
 namespace Retia.Training.Data
 {
-    public class SetDataProvider<T> : DataProviderBase<T> where T : struct, IEquatable<T>, IFormattable
+    public class SetDataProvider<T> where T : struct, IEquatable<T>, IFormattable
     {
         public int BatchSize
         {
@@ -22,7 +22,9 @@ namespace Retia.Training.Data
         private readonly List<List<Matrix<T>>> _testInputs = new List<List<Matrix<T>>>();
         private readonly List<List<Matrix<T>>> _testTargets = new List<List<Matrix<T>>>();
         private int batchSize;
-        
+
+        public IDataSet<T> TrainingSet { get; set; }
+        public IDataSet<T> TestSet { get; set; }
 
         public SetDataProvider(IEnumerable<List<Matrix<T>>> trainingInputs, IEnumerable<List<Matrix<T>>> trainingOutputs,  IEnumerable<List<Matrix<T>>> testInputs = null, IEnumerable<List<Matrix<T>>> testOutputs = null)
         {
@@ -56,13 +58,12 @@ namespace Retia.Training.Data
                 {
                     var sequence = sequences[b];
                     for (int j = 0; j < ioCount; j++)
-                        batchedMatrix[j, b] = i < sequence.Count ? sequence[i][j, 0] : MathProvider.NaN();
+                        batchedMatrix[j, b] = i < sequence.Count ? sequence[i][j, 0] : MathProvider<T>.Instance.NaN();
                 }
                 result.Add(batchedMatrix);
             }
             return result;
         }
-
 
         private static List<Sample<T>> GenerateSamples(List<List<Matrix<T>>> inputs, List<List<Matrix<T>>> targets, int bsize, int seqLen)
         {
@@ -95,13 +96,13 @@ namespace Retia.Training.Data
             return result;
         } 
 
-        public override IDataSet<T> CreateTrainingSet()
+        public IDataSet<T> CreateTrainingSet()
         {
             TrainingSet = new LinearDataSet<T>(GenerateSamples(_trainingInputs, _trainingTargets, batchSize, SequenceLen));
             return TrainingSet;
         }
 
-        public override IDataSet<T> CreateTestSet()
+        public IDataSet<T> CreateTestSet()
         {
             // TODO: add some check or refactor. Implicit null return value is not good.
             if (_testInputs.Count > 0 && _testTargets.Count > 0)
@@ -109,8 +110,5 @@ namespace Retia.Training.Data
 
             return TestSet;
         }
-
-        public override int InputSize => _trainingInputs[0][0].RowCount;
-        public override int OutputSize => _trainingInputs[0][0].ColumnCount;
     }
 }

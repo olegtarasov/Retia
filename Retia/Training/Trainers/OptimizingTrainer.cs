@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Retia.Integration;
@@ -15,6 +16,7 @@ namespace Retia.Training.Trainers
     {
         protected readonly NeuralNet<T> _network;
         private readonly OptimizerBase<T> _optimizer;
+        private readonly ITester<T> _tester;
 
         private List<double> _errors;
         private MAV _mav;
@@ -22,19 +24,34 @@ namespace Retia.Training.Trainers
 
         private double _dErr = 0;
         private int _processedSamples = 0;
-        
-        public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataProvider<T> dataProvider, ITester<T> tester, OptimizingTrainerOptions options) : base(dataProvider, tester, options)
+        private IDataSet<T> _trainingSet;
+
+        public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, ITester<T> tester, OptimizingTrainerOptions options) : base(options)
         {
             _network = network;
             _optimizer = optimizer;
-            
-            if (DataProvider.TrainingSet != null)
-            {
-                DataProvider.TrainingSet.DataSetReset += TrainingSetOnDataSetReset;
-            }
+            _tester = tester;
         }
 
         public override NeuralNet<T> TestableNetwork => _network;
+
+        public IDataSet<T> TrainingSet
+        {
+            get
+            {
+                return _trainingSet;
+            }
+            set
+            {
+                if (_trainingSet != null)
+                    _trainingSet.DataSetReset -= TrainingSetOnDataSetReset;
+
+                _trainingSet = value;
+                _trainingSet.DataSetReset += TrainingSetOnDataSetReset;
+            }
+        }
+
+        public IDataSet<T> TestSet { get; set; }
 
         // TODO: Find a better way to set learning rate manually
         public float LearningRate
@@ -55,12 +72,12 @@ namespace Retia.Training.Trainers
             // We can get TrainingSetOnDataSetReset during this call
             TrainingSequence<T> result;
 
-            result = DataProvider.TrainingSet.GetNextSamples(Options.SequenceLength);
+            result = TrainingSet.GetNextSamples(Options.SequenceLength);
 
             if (result == null)
             {
                 // A new epoch has come, try to get the sequence again
-                result = DataProvider.TrainingSet.GetNextSamples(Options.SequenceLength);
+                result = TrainingSet.GetNextSamples(Options.SequenceLength);
 
                 // If we couldn't get a sequence at the start of the epoch, this is a _bug.
                 if (result == null)
@@ -92,11 +109,11 @@ namespace Retia.Training.Trainers
 
         protected override string GetIterationProgress(int otherLen)
         {
-            if (DataProvider.TrainingSet.SampleCount > 0)
+            if (TrainingSet.SampleCount > 0)
             {
                 var sb = new StringBuilder();
 
-                int total = DataProvider.TrainingSet.SampleCount / Options.SequenceLength;
+                int total = TrainingSet.SampleCount / Options.SequenceLength;
 
                 sb.Append(Iteration).Append('/').Append(total);
                 sb.Append(ConsoleProgressWriter.GetProgressbar(Iteration, total, otherLen + sb.Length));
@@ -107,31 +124,23 @@ namespace Retia.Training.Trainers
             return base.GetIterationProgress(otherLen);
         }
 
-        protected override void DataProviderOnTrainingSetChanged(object sender, DataSetChangedArgs<T> e)
-        {
-            if (e.OldSet != null)
-            {
-                e.OldSet.DataSetReset -= TrainingSetOnDataSetReset;
-            }
-
-            if (e.NewSet != null)
-            {
-                e.NewSet.DataSetReset += TrainingSetOnDataSetReset;
-            }
-        }
-
         protected override void InitTraining()
         {
             base.InitTraining();
-            DataProvider.CreateTrainingSet();
-            DataProvider.CreateTestSet();
+
+            if (TrainingSet == null)
+                throw new InvalidOperationException("Training set is not set!");
+
+            if (Options.RunTests.IsEnabled && TestSet == null)
+                throw new InvalidOperationException("Tests are enabled, but test set is not set!");
+
             _errors = new List<double>();
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
             _processedSamples = 0;
-            
-            StatusWriter?.Message($"Sequence length: {Options.SequenceLength}");
-            StatusWriter?.Message($"Using network with total param count {_network.TotalParamCount}");
+
+            Options.ProgressWriter?.Message($"Sequence length: {Options.SequenceLength}");
+            Options.ProgressWriter?.Message($"Using network with total param count {_network.TotalParamCount}");
         }
 
         protected override OptimizationReportEventArgs GetTrainingReport()
@@ -161,11 +170,15 @@ namespace Retia.Training.Trainers
 
             _network.Optimize();
             ProcessError(error);
+
+            if (_tester != null && Options.RunTests.ShouldDoOnIteration(Iteration))
+            {
+                RunTest();
+            }
         }
 
         protected override void ResetMemory()
         {
-            StatusWriter?.Message($"Network memory reset on iteration {Iteration}, epoch {Epoch}");
             _network.ResetMemory();
         }
 
@@ -186,22 +199,47 @@ namespace Retia.Training.Trainers
             Options.LearningRateScaler?.Unsubscribe();
         }
 
+        private void RunTest()
+        {
+            if (TestSet == null)
+            {
+                throw new InvalidOperationException("Test set was not created!");
+            }
+
+            TestSet.Reset();
+            var testWatch = new Stopwatch();
+            testWatch.Start();
+            var result = _tester.Test(TestableNetwork.Clone(), TestSet);
+            testWatch.Stop();
+
+            if (Options.ReportMesages)
+            {
+                Options.ProgressWriter?.Message($"=========\n\tTested in:\t{testWatch.Elapsed.TotalSeconds:0.0000}s\n{result.GetReport()}\n=========\n");
+            }
+        }
+
         private void TrainingSetOnDataSetReset(object sender, EventArgs eventArgs)
         {
             // An epoch was reached and data set rolled over.
             //OnMessage($"Epoch reached on iteration {Iteration}");
             Epoch++;
-            StatusWriter?.ItemComplete();
-            OnEpochReached();
-
-            _processedSamples = 0;
-            Iteration = 0;
+            Options.ProgressWriter?.ItemComplete();
+            
+            if (_tester != null && Options.RunTests.ShouldDoOnEpoch(Epoch))
+            {
+                RunTest();
+            }
 
             // Check for epoch memory reset
             if (Options.ResetMemory.ShouldDoOnEpoch(Epoch))
             {
                 ResetMemory();
             }
+
+            OnEpochReached();
+
+            _processedSamples = 0;
+            Iteration = 0;
         }
     }
 }

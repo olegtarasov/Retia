@@ -5,7 +5,6 @@ using Retia.Genetic.Breeders;
 using Retia.Genetic.Mutators;
 using Retia.Genetic.Selectors;
 using Retia.Neural;
-using Retia.Training.Testers;
 using Retia.Training.Trainers;
 
 namespace Retia.Genetic.Neural
@@ -17,7 +16,7 @@ namespace Retia.Genetic.Neural
 
         private TimeSpan _wtc, _ctw;
 
-        public GeneticTrainer(ITester<float> tester, Evolver<EvolvableNet> evolver, GeneticTrainerOptions options) : base(null, tester, options)
+        public GeneticTrainer(Evolver<EvolvableNet> evolver, GeneticTrainerOptions options) : base(options)
         {
 	        _evolver = evolver;
         }

@@ -84,7 +84,7 @@ namespace LanguageModel
 			LayeredNet<float> network;
 			if (string.IsNullOrEmpty(configPath))
 			{
-				network = CreateNetwork(_dataProvider.InputSize, 256, _dataProvider.OutputSize);
+				network = CreateNetwork(_dataProvider.TrainingSet.InputSize, 256, _dataProvider.TrainingSet.TargetSize);
                 network.Optimizer = optimizer;
 			}
 			else
@@ -100,21 +100,21 @@ namespace LanguageModel
 		        network.UseGpu();
 		    }
 
-			var cts = new CancellationTokenSource();
-		    var trainOptions = new OptimizingTrainerOptions
+			var trainOptions = new OptimizingTrainerOptions
 		                       {
 		                           ErrorFilterSize = 20,
 		                           SequenceLength = SEQ_LEN,
 		                           ReportMesages = true,
-		                           MaxEpoch = 1000
+		                           MaxEpoch = 1000,
+                                   ProgressWriter = ConsoleProgressWriter.Instance
 		                       };
 
             trainOptions.RunTests.Never();
             trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), optimizer, 9.9e-5f);
             trainOptions.ReportProgress.EachIteration(10);
-            var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider, null, trainOptions)
+            var trainer = new OptimizingTrainer<float>(network, optimizer, null, trainOptions)
                           {
-                              StatusWriter = ConsoleProgressWriter.Instance
+                              TrainingSet = _dataProvider.TrainingSet
                           };
 
             var epochWatch = new Stopwatch();
@@ -142,7 +142,7 @@ namespace LanguageModel
                     network.TransferStateToHost();
                 }
                 Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
-                trainer.StatusWriter.ItemComplete();
+                trainOptions.ProgressWriter.ItemComplete();
             }));
 
             RetiaGui retiaGui;
@@ -152,29 +152,7 @@ namespace LanguageModel
                 retiaGui.RunAsync(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
 		    }
 		   
-			var task = trainer.Train(cts.Token);
-            epochWatch.Start();
-		    var running = true;
-			while (running)
-			{
-                var c=Console.ReadKey().Key;
-			    switch (c)
-			    {
-                    case ConsoleKey.Q:
-			            running = false;
-                        break;
-                
-                    case ConsoleKey.R:
-                        Console.WriteLine("Reseting optimizer cache!");
-                        trainer.Pause();
-                        network.ResetOptimizer();
-                        trainer.Resume();
-                        break;
-			    }
-            }
-
-			cts.Cancel();
-			Task.WaitAll(task);
+			ConsoleRunner.RunTrainer(trainer, network);
 		}
   
         private static LayeredNet<float> CreateNetwork(string fileName)

@@ -13,7 +13,7 @@ using Retia.Training.Data;
 
 namespace LanguageModel
 {
-	public class TextDataProvider : DataProviderBase<float>
+	public class TextDataProvider
     {
 		private readonly int _batchSize;
 
@@ -24,19 +24,9 @@ namespace LanguageModel
 
 		public List<char> Vocab { get; private set; }
 
-	    public override IDataSet<float> CreateTrainingSet()
-	    {
-	        return TrainingSet;
-	    }
-
-	    public override IDataSet<float> CreateTestSet()
-	    {
-	        return TestSet;
-	    }
-
-	    public override int InputSize => TrainingSet.InputSize;
-		public override int OutputSize => TrainingSet.TargetSize;
-
+        public IDataSet<float> TrainingSet { get; set; }
+        public IDataSet<float> TestSet { get; set; }
+	    
 		public void PrepareTrainingSets(string path, IProgressWriter progressWriter = null)
 		{
             Vocab = File.ReadAllText(path).Distinct().OrderBy(x => x).ToList();

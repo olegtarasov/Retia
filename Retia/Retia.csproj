@@ -77,6 +77,7 @@
     <Compile Include="Helpers\MinMaxTracker.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
     <Compile Include="Integration\ConsoleProgressWriter.cs" />
+    <Compile Include="Integration\ConsoleRunner.cs" />
     <Compile Include="Integration\ICloneable.cs" />
     <Compile Include="Integration\IFileWritable.cs" />
     <Compile Include="Integration\IProgressWriter.cs" />
@@ -125,9 +126,7 @@
     <Compile Include="Training\Batching\LinearBatcher.cs" />
     <Compile Include="Training\Batching\LinearSample.cs" />
     <Compile Include="Training\Batching\SequenceBatcher.cs" />
-    <Compile Include="Training\Data\DataProviderBase.cs" />
     <Compile Include="Training\Data\DataSetChangedArgs.cs" />
-    <Compile Include="Training\Data\IDataProvider.cs" />
     <Compile Include="Training\Data\IDataSet.cs" />
     <Compile Include="Training\Data\LinearDataSet.cs" />
     <Compile Include="Training\Data\Sample.cs" />
