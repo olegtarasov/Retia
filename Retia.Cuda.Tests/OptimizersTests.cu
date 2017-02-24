@@ -39,12 +39,12 @@ TEST(RMSPropTests, CanOptimizeSimple)
 	cache2.ZeroMemory();
 	cacheM.ZeroMemory();
 
-	PrintWeights(weight, grad, cache1, cache2, cacheM, -1);
+	//PrintWeights(weight, grad, cache1, cache2, cacheM, -1);
 	for (int i = 0; i < 200; ++i)
 	{
 		Algorithms::PropagateError(weight, target, grad);
 		Algorithms::RMSPropOptimize(weight, grad, cache1, cache2, cacheM, 0.01f, 0.95f, 0.9f, 0.0f);
-		PrintWeights(weight, grad, cache1, cache2, cacheM, i);
+		//PrintWeights(weight, grad, cache1, cache2, cacheM, i);
 	}
 
 	auto tPtr = target.raw_ptr();
@@ -88,7 +88,7 @@ TEST(RMSPropTests, CanOptimizeRosenbrock)
 		ASSERT_NEAR(wPtr[i], 1.0f, 1e-2f);
 	}
 
-	cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
+	//cout << "Rosenbrock: " << Rosenbrock(weight) << endl;
 }
 
 

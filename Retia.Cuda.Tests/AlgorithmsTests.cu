@@ -16,16 +16,16 @@ TEST(AlgorithmsTests, CanPropagateError)
 	InitMatrix(output, new float[8] { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f });
 	InitMatrix(target, new float[8]{ 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f });
 
-	cout << "Output:" << endl;
+	/*cout << "Output:" << endl;
 	PrintMatrix(output);
 
 	cout << "Target:" << endl;
-	PrintMatrix(target);
+	PrintMatrix(target);*/
 	
 	Algorithms::PropagateError(output, target, result);
 
-	cout << "Result" << endl;
-	PrintMatrix(result);
+	/*cout << "Result" << endl;
+	PrintMatrix(result);*/
 
 	auto ptr = result.raw_ptr();
 	ASSERT_EQ(ptr[0], -3.5f);
@@ -46,11 +46,11 @@ TEST(AlgorithmsTests, CanCalculateCrossEntropyError)
 	InitMatrix(output, new float[8]{ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f });
 	InitMatrix(target, new float[8]{ 8.0f, 7.0f, 6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f });
 
-	cout << "Output:" << endl;
+	/*cout << "Output:" << endl;
 	PrintMatrix(output);
 
 	cout << "Target:" << endl;
-	PrintMatrix(target);
+	PrintMatrix(target);*/
 
 	auto result = Algorithms::CrossEntropyError(output, target);
 	auto ref = (
@@ -64,8 +64,8 @@ TEST(AlgorithmsTests, CanCalculateCrossEntropyError)
 		(-(log(8.0f) * 1.0f) / 2)
 		) / 2; // Normalize with seq len
 
-	cout << "Result: " << result << endl;
-	cout << "Ref: " << ref;
+	/*cout << "Result: " << result << endl;
+	cout << "Ref: " << ref;*/
 
 	ASSERT_EQ(result, ref);
 }
