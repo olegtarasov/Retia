@@ -155,7 +155,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="NugetRelativeRefs.targets" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug [CPUOnly]' Or '$(Configuration)' == 'Debug'">
@@ -178,7 +177,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MathProviderImplD.cs</LastGenOutput>
     </Content>
-    <Content Include="NugetRelativeRefs.xslt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Retia.Contracts\Retia.Contracts.csproj">
@@ -187,17 +185,19 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
+    <Reference Include="Retia.NativeWrapper, Version=1.0.0.0, Culture=neutral">
+      <HintPath>$(ProjectDir)..\Retia.NativeWrapper\bin\$(Platform)\$(Configuration)\Retia.NativeWrapper.dll</HintPath>
+    </Reference>
+    <!--<ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
       <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
       <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>
+    </ProjectReference>-->
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="NugetRelativeRefs.targets" />
   <Import Project="$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets" Condition="Exists('$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

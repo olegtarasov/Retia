@@ -81,7 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="NugetRelativeRefs.targets" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
@@ -100,9 +99,5 @@
       <Name>Retia</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="NugetRelativeRefs.xslt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="NugetRelativeRefs.targets" />
 </Project>
