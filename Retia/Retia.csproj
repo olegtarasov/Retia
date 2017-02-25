@@ -185,13 +185,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <Reference Include="Retia.NativeWrapper, Version=1.0.0.0, Culture=neutral">
-      <HintPath>$(ProjectDir)..\Retia.NativeWrapper\bin\$(Platform)\$(Configuration)\Retia.NativeWrapper.dll</HintPath>
-    </Reference>
-    <!--<ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
+    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
       <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
       <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>-->
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
