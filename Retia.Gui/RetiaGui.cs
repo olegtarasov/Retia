@@ -9,7 +9,7 @@ namespace Retia.Gui
     public class RetiaGui
     {
         private readonly Thread _thread;
-
+        
         private Application _application;
         private Func<Window> _windowFunc = null;
 
@@ -25,6 +25,11 @@ namespace Retia.Gui
         {
             _windowFunc = windowFunc;
             _thread.Start();
+        }
+
+        public void ShowWindow(Func<Window> windowFunc)
+        {
+            _application.Dispatcher.Invoke(() => windowFunc().Show());
         }
 
         private void RunApp()
