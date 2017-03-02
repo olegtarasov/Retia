@@ -3,6 +3,6 @@
 Window "Retia.Gui.Windows.TrainingWindow" {
 	Width: 1024
 	Height: 600
-
+	
 	TrainingControl { DataContext: bind }
 }

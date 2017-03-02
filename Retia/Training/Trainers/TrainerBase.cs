@@ -143,14 +143,14 @@ namespace Retia.Training.Trainers
                 Iteration++;
 
                 // Check for memory reset on iteration.
-                if (Options.ResetMemory.ShouldDoOnIteration(Iteration))
+                if (Options.ResetMemory?.ShouldDoOnIteration(Iteration) == true)
                 {
                     ResetMemory();
                 }
 
                 OnSequenceTrained();
 
-                if (Options.ReportProgress.ShouldDoOnIteration(Iteration))
+                if (Options.ReportProgress?.ShouldDoOnIteration(Iteration) == true)
                 {
                     OnTrainReport(GetTrainingReport());
 

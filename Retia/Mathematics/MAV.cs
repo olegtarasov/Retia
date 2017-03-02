@@ -8,7 +8,6 @@ namespace Retia.Mathematics
     /// </summary>
     public class MAV
     {
-        private readonly int _order;
         private readonly LinkedList<double> _buffer; 
 
         /// <summary>
@@ -17,9 +16,14 @@ namespace Retia.Mathematics
         /// <param name="order">MAV order.</param>
         public MAV(int order)
         {
-            _order = order;
+            Order = order;
             _buffer = new LinkedList<double>();
         }
+
+        /// <summary>
+        /// Gets the order of the filter.
+        /// </summary>
+        public int Order { get; set; }
 
         /// <summary>
         /// Filters the next value.
@@ -29,7 +33,7 @@ namespace Retia.Mathematics
         public double Filter(double value)
         {
             _buffer.AddLast(value);
-            if(_buffer.Count > _order)
+            if(_buffer.Count > Order)
                 _buffer.RemoveFirst();
             return _buffer.Sum() / _buffer.Count;
         }

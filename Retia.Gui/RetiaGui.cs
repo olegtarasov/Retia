@@ -13,6 +13,8 @@ namespace Retia.Gui
         private Application _application;
         private Func<Window> _windowFunc = null;
 
+        private ManualResetEventSlim _appStarted = new ManualResetEventSlim(false);
+
         public RetiaGui()
         {
             var dummy = Ammy.RegisterProperty; // We need this for AmmySidekick to get copied to output
@@ -29,6 +31,7 @@ namespace Retia.Gui
 
         public void ShowWindow(Func<Window> windowFunc)
         {
+            _appStarted.Wait();
             _application.Dispatcher.Invoke(() => windowFunc().Show());
         }
 
@@ -46,6 +49,7 @@ namespace Retia.Gui
             }
 
             _application = new Application();
+            _appStarted.Set();
             _application.Run(window);
         }
     }

@@ -106,12 +106,11 @@ namespace LanguageModel
 		                           SequenceLength = SEQ_LEN,
 		                           ReportMesages = true,
 		                           MaxEpoch = 1000,
-                                   ProgressWriter = ConsoleProgressWriter.Instance
+                                   ProgressWriter = ConsoleProgressWriter.Instance,
+                                   ReportProgress = new EachIteration(10)
 		                       };
 
-            trainOptions.RunTests.Never();
             trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), optimizer, 9.9e-5f);
-            trainOptions.ReportProgress.EachIteration(10);
             var trainer = new OptimizingTrainer<float>(network, optimizer, null, trainOptions)
                           {
                               TrainingSet = _dataProvider.TrainingSet

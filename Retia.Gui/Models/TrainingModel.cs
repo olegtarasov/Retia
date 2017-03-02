@@ -45,7 +45,7 @@ namespace Retia.Gui.Models
             {
                 _trainer.LearningRate = OptionsModel.LearningRate;
             }
-            _trainer.Options.LearningRateScaler.Schedule.EachIteration(OptionsModel.LearningRateScalePeriod);
+            _trainer.Options.LearningRateScaler.Schedule = new EachIteration(OptionsModel.LearningRateScalePeriod);
             ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor = OptionsModel.LearningRateScaleFactor;
             _trainer.Options.MaxEpoch = OptionsModel.MaxEpoch;
         }

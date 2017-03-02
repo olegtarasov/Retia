@@ -36,6 +36,8 @@
             PeriodType = periodType;
         }
 
+        public static ActionSchedule Disabled => new ActionSchedule(0, PeriodType.None);
+
         /// <summary>
         /// Gets or sets whether action is enabled.
         /// </summary>
@@ -44,29 +46,12 @@
         /// <summary>
         /// The frequency at which the action is performed.
         /// </summary>
-        public int Period { get; protected set; }
+        public int Period { get; }
 
         /// <summary>
         /// Frequency type.
         /// </summary>
-        public PeriodType PeriodType { get; protected set; }
-
-        public void Never()
-        {
-            PeriodType = PeriodType.None;
-        }
-
-        public void EachIteration(int period)
-        {
-            PeriodType = PeriodType.Iteration;
-            Period = period;
-        }
-
-        public void EachEpoch(int period)
-        {
-            PeriodType = PeriodType.Epoch;
-            Period = period;
-        }
+        public PeriodType PeriodType { get; }
 
         public bool ShouldDoOnEpoch(long epoch)
         {
@@ -76,6 +61,20 @@
         public bool ShouldDoOnIteration(long iteration)
         {
             return PeriodType == PeriodType.Iteration && iteration % Period == 0;
+        }
+    }
+
+    public class EachIteration : ActionSchedule
+    {
+        public EachIteration(int period) : base(period, PeriodType.Iteration)
+        {
+        }
+    }
+
+    public class EachEpoch : ActionSchedule
+    {
+        public EachEpoch(int period) : base(period, PeriodType.Epoch)
+        {
         }
     }
 }

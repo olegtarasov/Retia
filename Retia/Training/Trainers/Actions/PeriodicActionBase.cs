@@ -11,7 +11,7 @@ namespace Retia.Training.Trainers.Actions
             Schedule = schedule;
         }
 
-        public ActionSchedule Schedule { get; private set; }
+        public ActionSchedule Schedule { get; set; }
 
         public virtual void Reset()
         {

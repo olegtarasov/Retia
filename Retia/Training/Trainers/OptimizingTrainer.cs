@@ -95,10 +95,24 @@ namespace Retia.Training.Trainers
 
             if (Options.ErrorFilterSize > 0)
             {
+                if (_mav == null)
+                {
+                    _mav = new MAV(Options.ErrorFilterSize);
+                }
+                else if (_mav.Order != Options.ErrorFilterSize)
+                {
+                    _mav.Order = Options.ErrorFilterSize;
+                }
+
                 filteredError = _mav.Filter(error);
             }
             else
             {
+                if (_mav != null)
+                {
+                    _mav = null;
+                }
+
                 filteredError = error;
             }
 
@@ -131,7 +145,7 @@ namespace Retia.Training.Trainers
             if (TrainingSet == null)
                 throw new InvalidOperationException("Training set is not set!");
 
-            if (Options.RunTests.IsEnabled && TestSet == null)
+            if (Options.RunTests?.IsEnabled == true && TestSet == null)
                 throw new InvalidOperationException("Tests are enabled, but test set is not set!");
 
             _errors = new List<double>();
@@ -171,7 +185,7 @@ namespace Retia.Training.Trainers
             _network.Optimize();
             ProcessError(error);
 
-            if (_tester != null && Options.RunTests.ShouldDoOnIteration(Iteration))
+            if (_tester != null && Options.RunTests?.ShouldDoOnIteration(Iteration) == true)
             {
                 RunTest();
             }
@@ -225,13 +239,13 @@ namespace Retia.Training.Trainers
             Epoch++;
             Options.ProgressWriter?.ItemComplete();
             
-            if (_tester != null && Options.RunTests.ShouldDoOnEpoch(Epoch))
+            if (_tester != null && Options.RunTests?.ShouldDoOnEpoch(Epoch) == true)
             {
                 RunTest();
             }
 
             // Check for epoch memory reset
-            if (Options.ResetMemory.ShouldDoOnEpoch(Epoch))
+            if (Options.ResetMemory?.ShouldDoOnEpoch(Epoch) == true)
             {
                 ResetMemory();
             }

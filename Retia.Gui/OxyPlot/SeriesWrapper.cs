@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OxyPlot.Series;
 using Retia.Helpers;
 
@@ -73,6 +74,11 @@ namespace Retia.Gui.OxyPlot
         public void AddPoint(TSourcePoint point)
         {
             _points.Add(_sourceToSeriesFunc(point));
+        }
+
+        public void AddPoints(IEnumerable<TSourcePoint> points)
+        {
+            _points.AddRange(points.Select(x => _sourceToSeriesFunc(x)));
         }
 
         public void ClearPoints()
