@@ -9,6 +9,7 @@ namespace Benchmark
 {
     internal class Program
     {
+        [STAThread]
         internal static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;

@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.Common.Mkl;
+using Retia.Gui;
+using Retia.Gui.Models;
+using Retia.Gui.Windows;
+using Retia.Integration;
 using Retia.Mathematics;
 #if !CPUONLY
 using Retia.NativeWrapper;
@@ -14,13 +20,96 @@ using Retia.Neural;
 using Retia.Neural.Initializers;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
-
+using Retia.RandomGenerator;
+using Retia.Training.Data;
+using Retia.Training.Trainers;
+using Retia.Training.Trainers.Actions;
 using df = System.Double;
 
 namespace Benchmark
 {
     public class App
     {
+        private class XorSet : IDataSet<float>
+        {
+            public IDataSet<float> Clone()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Save(Stream stream)
+            {
+                throw new NotImplementedException();
+            }
+
+            public event EventHandler DataSetReset;
+            public Sample<float> GetNextSample()
+            {
+                throw new NotImplementedException();
+            }
+
+            public TrainingSequence<float> GetNextSamples(int count)
+            {
+                var tuples = Enumerable.Range(0, count)
+                                       .Select(x =>
+                                       {
+                                           int a = SafeRandom.Generator.Next(2);
+                                           int b = SafeRandom.Generator.Next(2);
+
+                                           return new Tuple<int, int, int>(a, b, a ^ b);
+                                       }).ToList();
+                return new TrainingSequence<float>(tuples.Select(x => MatrixFactory.Create<float>(2, 1, x.Item1, x.Item2)).ToList(), tuples.Select(x => MatrixFactory.Create<float>(1, 1, x.Item3)).ToList());
+            }
+
+            public void Reset()
+            {
+            }
+
+            public int SampleCount { get; } = 0;
+            public int InputSize { get; } = 2;
+            public int TargetSize { get; } = 1;
+            public int BatchSize { get; } = 1;
+        }
+
+        [Verb]
+        public void TestXor()
+        {
+            //var optimizer = new RMSPropOptimizer<float>(2e-27f, 0.0f, 0.0f, 0.0f);
+            var optimizer = new SGDOptimizer<float>(2e-2f);
+            var net = new LayeredNet<float>(1, 1, new LinearLayer<float>(2, 1), new SigmoidLayer<float>(1), new LinearLayer<float>(1, 1), new SigmoidLayer<float>(1))
+            {
+                Optimizer = optimizer
+            };
+
+            var trainer = new OptimizingTrainer<float>(net, optimizer, null, new OptimizingTrainerOptions
+            {
+                ErrorFilterSize = 0,
+                SequenceLength = 1,
+                ReportProgress = new EachIteration(1),
+                ReportMesages = true,
+                ProgressWriter = ConsoleProgressWriter.Instance
+            })
+            {
+                TrainingSet = new XorSet()
+            };
+
+            trainer.TrainReport += (sender, args) =>
+            {
+                var n = net;
+                if (args.Errors.Last() < 1e-2f)
+                {
+                    
+                }
+
+                Thread.Sleep(100);
+            };
+
+            var gui = new RetiaGui();
+            gui.RunAsync(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
+
+            ConsoleRunner.RunTrainer(trainer, net);
+        }
+
 #if !CPUONLY
         [Verb]
         public void TestGpuLayers()

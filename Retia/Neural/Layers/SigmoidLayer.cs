@@ -1,52 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
-using Retia.Helpers;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class TanhLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class SigmoidLayer<T> : NeuroLayer<T> where T : struct, IFormattable, IEquatable<T>
     {
         private readonly int _size;
 
-        private TanhLayer(TanhLayer<T> other) : base(other)
-        {
-            _size = other._size;
-        }
-
-        public TanhLayer(int size)
+        public SigmoidLayer(int size)
         {
             _size = size;
+
+            ErrorFunction = new MeanSquareError<T>();
         }
 
-        public TanhLayer(BinaryReader reader) : base(reader)
+        public SigmoidLayer(BinaryReader reader) : base(reader)
         {
             _size = reader.ReadInt32();
+        }
+
+        private SigmoidLayer(SigmoidLayer<T> other) : base(other)
+        {
+            _size = other._size;
         }
 
         public override int InputSize => _size;
         public override int OutputSize => _size;
         public override int TotalParamCount => 0;
-        public override void Save(Stream s)
-        {
-            base.Save(s);
-
-            using (var writer = s.NonGreedyWriter())
-            {
-                writer.Write(_size);
-            }
-        }
 
         public override NeuroLayer<T> Clone()
         {
-            return new TanhLayer<T>(_size);
+            return new SigmoidLayer<T>(this);
         }
 
         public override void Optimize(OptimizerBase<T> optimizer)
@@ -57,7 +47,7 @@ namespace Retia.Neural.Layers
         {
             var output = input.CloneMatrix();
 
-            MathProvider.ApplyTanh(output);
+            MathProvider.ApplySigmoid(output);
 
             if (inTraining)
             {
@@ -65,6 +55,11 @@ namespace Retia.Neural.Layers
             }
 
             return output;
+        }
+
+        public override List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
+        {
+            return BackPropagate(base.ErrorPropagate(targets));
         }
 
         public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
@@ -80,9 +75,9 @@ namespace Retia.Neural.Layers
             {
                 var output = Outputs[t];
                 var osens = outSens[t];
-                
-                // osens ^ (1 - tanh(x)^2)
-                iSens.Add((ones - output.PointwiseMultiply(output)).PointwiseMultiply(osens));
+
+                // osens ^ s(x) ^ (1 - s(x))
+                iSens.Add((ones - output).PointwiseMultiply(output).PointwiseMultiply(osens));
             }
             return iSens;
         }
@@ -104,17 +99,17 @@ namespace Retia.Neural.Layers
         {
         }
 
+        public override LayerSpecBase CreateSpec()
+        {
+            throw new NotSupportedException();
+        }
+
         public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
         }
 
         public override void FromVectorState(T[] vector, ref int idx)
         {
-        }
-
-        public override LayerSpecBase CreateSpec()
-        {
-            throw new NotSupportedException();
         }
     }
 }

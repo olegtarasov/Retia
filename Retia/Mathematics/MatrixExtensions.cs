@@ -79,6 +79,19 @@ namespace Retia.Mathematics
         }
 
         /// <summary>
+        /// Subtracts <see cref="b"/> from <see cref="a"/> with result written to
+        /// </summary>
+        /// <param name="a">Minuend.</param>
+        /// <param name="b">Subtrahend.</param>
+        public static void SubtractInplace<T>(this Matrix<T> a, Matrix<T> b) where T : struct, IEquatable<T>, IFormattable
+        {
+            var aa = a.AsColumnMajorArray();
+            var ba = b.AsColumnMajorArray();
+
+            ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).SubtractArrays(aa, ba, aa);
+        }
+
+        /// <summary>
         /// Performs a BLAS operation:
         /// 
         ///     C = AB + (useC ? 1 : 0)*C

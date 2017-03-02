@@ -145,6 +145,11 @@ namespace Retia.Mathematics
         public abstract void CalculateH(Matrix<T> H, Matrix<T> hCandidate, Matrix<T> z, Matrix<T> lastH);
 
         /// <summary>
+        /// Applies sigmoid function to one matrix.
+        /// </summary>
+        public abstract void ApplySigmoid(Matrix<T> matrix);
+
+        /// <summary>
         /// Applies sigmoid function to two matrices in parallel.
         /// </summary>
         public abstract void ApplySigmoid2(Matrix<T> matrix1, Matrix<T> matrix2);

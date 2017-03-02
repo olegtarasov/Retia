@@ -21,7 +21,10 @@ deep learning framework!
 
 ## Building from source
 
-[![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia)
+| Branch | Status |
+|--------|:-------|
+| master | [![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr/branch/master?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia/branch/master) |
+| develop | [![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr/branch/develop?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia/branch/develop) |
 
 You can build Retia with or without GPU support. If you just want to take a look at the source
 and tinker around for a bit, build without GPU support. You can always build the full
