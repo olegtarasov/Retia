@@ -8,6 +8,7 @@ using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
@@ -24,6 +25,8 @@ namespace Retia.Neural.Layers
         public TanhLayer(int size)
         {
             _size = size;
+
+            ErrorFunction = new MeanSquareError<T>();
         }
 
         public TanhLayer(BinaryReader reader) : base(reader)

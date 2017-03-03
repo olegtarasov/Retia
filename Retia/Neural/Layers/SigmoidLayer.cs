@@ -16,8 +16,6 @@ namespace Retia.Neural.Layers
         public SigmoidLayer(int size)
         {
             _size = size;
-
-            ErrorFunction = new MeanSquareError<T>();
         }
 
         public SigmoidLayer(BinaryReader reader) : base(reader)

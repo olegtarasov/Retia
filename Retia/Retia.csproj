@@ -103,6 +103,7 @@
     <Compile Include="Neural\Initializers\ProportionalRandomMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\RandomMatrixInitializer.cs" />
     <Compile Include="Neural\LayeredNet.cs" />
+    <Compile Include="Neural\Layers\AffineLayer.cs" />
     <Compile Include="Neural\Layers\DropoutLayer.cs" />
     <Compile Include="Neural\Layers\GRULayer.cs" />
     <Compile Include="Neural\Layers\LinearLayer.cs" />

@@ -17,6 +17,7 @@ using Retia.Mathematics;
 using Retia.NativeWrapper;
 #endif
 using Retia.Neural;
+using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
@@ -74,12 +75,34 @@ namespace Benchmark
         [Verb]
         public void TestXor()
         {
-            //var optimizer = new RMSPropOptimizer<float>(2e-27f, 0.0f, 0.0f, 0.0f);
-            var optimizer = new SGDOptimizer<float>(2e-2f);
-            var net = new LayeredNet<float>(1, 1, new LinearLayer<float>(2, 1), new SigmoidLayer<float>(1), new LinearLayer<float>(1, 1), new SigmoidLayer<float>(1))
+            //var optimizer = new RMSPropOptimizer<float>(1e-7f, 0.0f, 0.0f, 0.9f);
+            var optimizer = new SGDOptimizer<float>(0.1f);
+            var net = new LayeredNet<float>(1, 1, new LinearLayer<float>(2, 2), new TanhLayer<float>(2), new LinearLayer<float>(2, 1), new SigmoidLayer<float>(1) {ErrorFunction = new CrossEntropyError<float>()})
             {
                 Optimizer = optimizer
             };
+
+            //double err = double.MaxValue;
+            //while (err > 1e-10f)
+            //{
+            //    int a = SafeRandom.Generator.Next(2), b = SafeRandom.Generator.Next(2);
+            //    int c = a ^ b;
+
+            //    var input = MatrixFactory.Create<float>(2, 1, a, b);
+            //    var target = MatrixFactory.Create<float>(1, 1, c);
+
+            //    net.InitSequence();
+            //    var output = net.Step(input, true);
+
+            //    err = net.Error(output, target);
+
+            //    Console.WriteLine($"Err: {err:0.00000000}");
+
+            //    net.BackPropagate(new List<Matrix<float>> {target});
+            //    net.Optimize();
+
+            //    Thread.Sleep(100);
+            //}
 
             var trainer = new OptimizingTrainer<float>(net, optimizer, null, new OptimizingTrainerOptions
             {
@@ -87,7 +110,8 @@ namespace Benchmark
                 SequenceLength = 1,
                 ReportProgress = new EachIteration(1),
                 ReportMesages = true,
-                ProgressWriter = ConsoleProgressWriter.Instance
+                ProgressWriter = ConsoleProgressWriter.Instance,
+                LearningRateScaler = new ProportionalLearningRateScaler(new EachIteration(1), optimizer, 9e-5f)
             })
             {
                 TrainingSet = new XorSet()
@@ -96,12 +120,11 @@ namespace Benchmark
             trainer.TrainReport += (sender, args) =>
             {
                 var n = net;
-                if (args.Errors.Last() < 1e-2f)
+                if (args.Errors.Last() < 1e-7f)
                 {
-                    
                 }
 
-                Thread.Sleep(100);
+                //Thread.Sleep(100);
             };
 
             var gui = new RetiaGui();

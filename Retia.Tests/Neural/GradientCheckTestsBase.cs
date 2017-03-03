@@ -2,33 +2,45 @@
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
+using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Layers;
 using Xunit;
 using XunitShould;
 
 namespace Retia.Tests.Neural
 {
-    public class GradientCheckTests
+    public class MSEGradientCheckTests : GradientCheckTestsBase
     {
+        protected override ErrorFunctionBase<double> ErrorFunction => new MeanSquareError<double>();
+    }
+
+    public class CrossEntropyGradientCheckTests : GradientCheckTestsBase
+    {
+        protected override ErrorFunctionBase<double> ErrorFunction => new CrossEntropyError<double>();
+    }
+
+    public abstract class GradientCheckTestsBase
+    {
+        protected abstract ErrorFunctionBase<double> ErrorFunction { get; }
+
         [Fact]
         public void CanGradientCheckLinearLayer()
         {
-            var layer = new LinearLayer<double>(5, 3);
+            var layer = new LinearLayer<double>(5, 3) { ErrorFunction = ErrorFunction};
             TestLayer(layer);
         }
 
         [Fact]
         public void CanGradientCheckGruLayer()
         {
-            var layer = new GruLayer<double>(5, 3);
+            var layer = new GruLayer<double>(5, 3) {ErrorFunction = ErrorFunction};
             TestLayer(layer);
         }
 
         [Fact]
-        public void CanGradientCheckSoftmaxLayer()
+        public void CanGradientCheckAffineSigmoidLayer()
         {
-            var layer = new GruLayer<double>(5, 3);
-            TestLayer(layer);
+            TestLayer(new AffineLayer<double>(5, 3, AffineActivation.Sigmoid) {ErrorFunction = ErrorFunction});
         }
 
         private void TestLayer(NeuroLayer<double> layer)
