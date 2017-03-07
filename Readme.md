@@ -26,43 +26,13 @@ deep learning framework!
 | master | [![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr/branch/master?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia/branch/master) |
 | develop | [![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr/branch/develop?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia/branch/develop) |
 
-You can build Retia with or without GPU support. If you just want to take a look at the source
-and tinker around for a bit, build without GPU support. You can always build the full
-version later.
+Retia is following the F5 build paradigm: you should just open the solution in Visual Studio,
+hit F5 and it should run. You can build CPU-only version just like that. All you need is a C++
+compiler installed as part of Visual Studio.
 
-### Building without GPU support
-
-You will need Visual Studio with C# and basic C++ capabilities. 
-
-The process is very simple: just build Retia.CPUOnly.sln and you are done :)
-
-### Building with GPU support
-
-You will need a couple of things to build Retia from source:
-
-* Visual Studio 2015
-* CUDA Toolkit from NVidia. Get it [here](https://developer.nvidia.com/cuda-downloads).
-* CuDNN library. [Download](https://developer.nvidia.com/cudnn) (you will need to register a free account with NVidia).
-* Visual C++ and C++\CLI (comes with Visual Studio, just be sure to check appropriate boxes during installation).
-
-### Building CUDA tests
-
-To build Retia.Cuda.Tests, you need to install vcpkg and Google Test. To do this you will need:
-
-* Visual Studio 2015 Update 3 or higher
-* git accesible from your command line
-
-Now open admin command prompt and execute:
-
-```
-git clone https://github.com/Microsoft/vcpkg.git [vcpkg install dir]
-cd [vcpkg install dir]
-powershell -exec bypass scripts\bootstrap.ps1
-vcpkg integrate install
-vcpkg install gtest gtest:x64-windows
-```
-
-Restart Visual Studio if you had it open. Now you can build the test project.
+However, if you are building with GPU support, there are some heavy-duty
+dependencies which you should install by yourself. Refer to Wiki page [Building from source](https://github.com/total-world-domination/Retia/wiki/Building-from-source)
+for detailed build instructions.
 
 ### Project dependencies and libraries
 
