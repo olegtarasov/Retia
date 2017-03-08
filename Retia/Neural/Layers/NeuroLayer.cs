@@ -31,7 +31,7 @@ namespace Retia.Neural.Layers
             SeqLen = other.SeqLen;
             Inputs = other.Inputs.Select(x => x.CloneMatrix()).ToList();
             Outputs = other.Outputs.Select(x => x.CloneMatrix()).ToList();
-            ErrorFunction = other.ErrorFunction.Clone();
+            ErrorFunction = other.ErrorFunction?.Clone();
         }
 
         protected NeuroLayer(BinaryReader reader)
