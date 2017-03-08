@@ -20,6 +20,8 @@ namespace Retia.Mathematics
     {
         [DllImport("FastFuncs", EntryPoint="ApplySigmoid2D")] private static extern void ApplySigmoid2(IntPtr a, IntPtr b, int n);
 
+        [DllImport("FastFuncs", EntryPoint = "ApplySigmoidD")] private static extern void ApplySigmoid(IntPtr matrix, int n);
+
         [DllImport("FastFuncs", EntryPoint="ApplyTanhD")] private static extern void ApplyTanh(IntPtr matrix, int n);
 
         [DllImport("FastFuncs", EntryPoint="CalculateHD")] private static extern void CalculateH(IntPtr H, IntPtr hCandidate, IntPtr z, IntPtr lastH, int n);
@@ -319,6 +321,14 @@ namespace Retia.Mathematics
             for (int i = 0; i < arr.Length; i++)
                 arr[i] = random.NextDouble() < trueProb ? 1.0f : 0.0f;
             return Matrix<Float>.Build.Dense(rows, cols, arr);
+        }
+
+        public override unsafe void ApplySigmoid(Matrix<Float> matrix)
+        {
+            fixed (void* arr = &matrix.AsColumnMajorArray()[0])
+            {
+                ApplySigmoid(new IntPtr(arr), matrix.Length());
+            }
         }
     }
 }

@@ -151,7 +151,8 @@ namespace LanguageModel
                 retiaGui.RunAsync(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
 		    }
 		   
-			ConsoleRunner.RunTrainer(trainer, network);
+            var runner = ConsoleRunner.Create(trainer, network);
+            runner.Run();
 		}
   
         private static LayeredNet<float> CreateNetwork(string fileName)

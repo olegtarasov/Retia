@@ -76,6 +76,15 @@ void ApplySigmoid2(T *a, T *b, int n)
 	});
 }
 
+template <class T>
+void ApplySigmoid(T *matrix, int n)
+{
+	parallel_for(0, n, [&](int i)
+	{
+		matrix[i] = Sigmoid(matrix[i]);
+	});
+}
+
 FASTFUNC ApplySigmoid2D(double *a, double *b, int n)
 {
 	ApplySigmoid2(a, b, n);
@@ -84,6 +93,16 @@ FASTFUNC ApplySigmoid2D(double *a, double *b, int n)
 FASTFUNC ApplySigmoid2S(float *a, float *b, int n)
 {
 	ApplySigmoid2(a, b, n);
+}
+
+FASTFUNC ApplySigmoidD(double *matrix, int n)
+{
+	ApplySigmoid(matrix, n);
+}
+
+FASTFUNC ApplySigmoidS(float *matrix, int n)
+{
+	ApplySigmoid(matrix, n);
 }
 
 template <class T>

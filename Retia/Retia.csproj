@@ -103,11 +103,13 @@
     <Compile Include="Neural\Initializers\ProportionalRandomMatrixInitializer.cs" />
     <Compile Include="Neural\Initializers\RandomMatrixInitializer.cs" />
     <Compile Include="Neural\LayeredNet.cs" />
+    <Compile Include="Neural\Layers\AffineLayer.cs" />
     <Compile Include="Neural\Layers\DropoutLayer.cs" />
     <Compile Include="Neural\Layers\GRULayer.cs" />
     <Compile Include="Neural\Layers\LinearLayer.cs" />
     <Compile Include="Neural\Layers\ModulusLayer.cs" />
     <Compile Include="Neural\Layers\NeuroLayer.cs" />
+    <Compile Include="Neural\Layers\SigmoidLayer.cs" />
     <Compile Include="Neural\Layers\SoftMaxLayer.cs" />
     <Compile Include="Neural\Layers\TanhLayer.cs" />
     <Compile Include="Neural\NeuralExtensions.cs" />

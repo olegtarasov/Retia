@@ -45,8 +45,8 @@ namespace Retia.Gui.Models
             {
                 _trainer.LearningRate = OptionsModel.LearningRate;
             }
-            _trainer.Options.LearningRateScaler.Schedule = new EachIteration(OptionsModel.LearningRateScalePeriod);
-            ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor = OptionsModel.LearningRateScaleFactor;
+            _trainer.Options.LearningRateScaler.Schedule = new EachIteration(OptionsModel.LearningRateScalePeriod.GetValueOrDefault());
+            ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor = OptionsModel.LearningRateScaleFactor.GetValueOrDefault();
             _trainer.Options.MaxEpoch = OptionsModel.MaxEpoch;
         }
 
@@ -95,8 +95,8 @@ namespace Retia.Gui.Models
                    {
                        ErrorFilterSize = _trainer.Options.ErrorFilterSize,
                        LearningRate = _trainer.LearningRate,
-                       LearningRateScaleFactor = ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor,
-                       LearningRateScalePeriod = _trainer.Options.LearningRateScaler.Schedule.Period,
+                       LearningRateScaleFactor = ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler)?.ScalingFactor,
+                       LearningRateScalePeriod = _trainer.Options.LearningRateScaler?.Schedule.Period,
                        MaxEpoch = _trainer.Options.MaxEpoch
                    };
         }

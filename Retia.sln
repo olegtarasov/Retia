@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Retia.Cuda", "Retia.Cuda\Retia.Cuda.vcxproj", "{33DEF350-DA8A-406C-A134-1324033E05B7}"
 EndProject
@@ -46,6 +46,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot.Wpf", "oxyplot\Source\OxyPlot.Wpf\OxyPlot.Wpf.csproj", "{698CCD8E-ADCC-4565-8517-5EDD36F07155}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Gui", "Retia.Gui\Retia.Gui.csproj", "{EB0005DB-E481-43EA-9802-352BAE4B0526}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleExamples", "Examples\SimpleExamples\SimpleExamples.csproj", "{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +161,14 @@ Global
 		{EB0005DB-E481-43EA-9802-352BAE4B0526}.Release  [CPUOnly]|x64.Build.0 = Release|x64
 		{EB0005DB-E481-43EA-9802-352BAE4B0526}.Release|x64.ActiveCfg = Release|x64
 		{EB0005DB-E481-43EA-9802-352BAE4B0526}.Release|x64.Build.0 = Release|x64
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Debug [CPUOnly]|x64.ActiveCfg = Debug|Any CPU
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Debug [CPUOnly]|x64.Build.0 = Debug|Any CPU
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Debug|x64.ActiveCfg = Debug|x64
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Debug|x64.Build.0 = Debug|x64
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release  [CPUOnly]|x64.ActiveCfg = Release|Any CPU
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release  [CPUOnly]|x64.Build.0 = Release|Any CPU
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release|x64.ActiveCfg = Release|Any CPU
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,5 +178,6 @@ Global
 		{7A0B35C0-DD17-4964-8E9A-44D6CECDC692} = {FE9F9AA9-DD09-4D28-960E-020B44345710}
 		{698CCD8E-ADCC-4565-8517-5EDD36F07155} = {FE9F9AA9-DD09-4D28-960E-020B44345710}
 		{EB0005DB-E481-43EA-9802-352BAE4B0526} = {FE9F9AA9-DD09-4D28-960E-020B44345710}
+		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6} = {64470CD0-0C60-4DAE-A76B-3BE23DC3652F}
 	EndGlobalSection
 EndGlobal

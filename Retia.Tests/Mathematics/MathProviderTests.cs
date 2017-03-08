@@ -74,6 +74,23 @@ namespace Retia.Tests.Mathematics
 
         [Theory]
         [MemberData(nameof(GetActivationFuncsTestData))]
+        public void CanApplySingleSigmoid(Matrix<T> matrix)
+        {
+            var src = matrix.CloneMatrix();
+            
+            MathProvider.ApplySigmoid(matrix);
+
+            var matArr = matrix.AsColumnMajorArray();
+            var sourceArr = src.AsColumnMajorArray();
+
+            for (int i = 0; i < sourceArr.Length; i++)
+            {
+                matArr[i].ShouldEqualWithinError(Sigmoid(sourceArr[i]));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(GetActivationFuncsTestData))]
         public void CanApplyTanh(Matrix<T> matrix)
         {
             TestMatrix(matrix, MathProvider.ApplyTanh, Tanh);
