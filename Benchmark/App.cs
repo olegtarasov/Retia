@@ -33,6 +33,13 @@ namespace Benchmark
     {
         private class XorSet : IDataSet<float>
         {
+            private int cnt = 0;
+            private bool _rand;
+
+            public XorSet(bool random)
+            {
+                _rand = random;
+            }
             public IDataSet<float> Clone()
             {
                 throw new NotImplementedException();
@@ -54,9 +61,18 @@ namespace Benchmark
                 var tuples = Enumerable.Range(0, count)
                                        .Select(x =>
                                        {
-                                           int a = SafeRandom.Generator.Next(2);
-                                           int b = SafeRandom.Generator.Next(2);
-
+                                           int a, b;
+                                           if (_rand)
+                                           {
+                                               a = SafeRandom.Generator.Next(2);
+                                               b = SafeRandom.Generator.Next(2);
+                                           }
+                                           else
+                                           {
+                                               a = cnt & 0x01;
+                                               b = (cnt & 0x02) >> 1;
+                                           }
+                                           cnt++;
                                            return new Tuple<int, int, int>(a, b, a ^ b);
                                        }).ToList();
                 return new TrainingSequence<float>(tuples.Select(x => MatrixFactory.Create<float>(2, 1, x.Item1, x.Item2)).ToList(), tuples.Select(x => MatrixFactory.Create<float>(1, 1, x.Item3)).ToList());
@@ -72,12 +88,14 @@ namespace Benchmark
             public int BatchSize { get; } = 1;
         }
 
+     
+
         [Verb]
         public void TestXor()
-        {
-            //var optimizer = new RMSPropOptimizer<float>(1e-7f, 0.0f, 0.0f, 0.9f);
-            var optimizer = new SGDOptimizer<float>(0.1f);
-            var net = new LayeredNet<float>(1, 1, new LinearLayer<float>(2, 2), new TanhLayer<float>(2), new LinearLayer<float>(2, 1), new SigmoidLayer<float>(1) {ErrorFunction = new CrossEntropyError<float>()})
+        {        
+            var optimizer = new RMSPropOptimizer<float>(1e-3f);
+            //var optimizer = new SGDOptimizer<float>(1e-3f);
+            var net = new LayeredNet<float>(1, 1, new AffineLayer<float>(2,3,AffineActivation.Tanh), new AffineLayer<float>(3, 1, AffineActivation.Tanh) { ErrorFunction = new MeanSquareError<float>()})
             {
                 Optimizer = optimizer
             };
@@ -114,7 +132,7 @@ namespace Benchmark
                 LearningRateScaler = new ProportionalLearningRateScaler(new EachIteration(1), optimizer, 9e-5f)
             })
             {
-                TrainingSet = new XorSet()
+                TrainingSet = new XorSet(true)
             };
 
             trainer.TrainReport += (sender, args) =>

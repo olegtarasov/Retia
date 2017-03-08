@@ -11,7 +11,8 @@ namespace Retia.Neural.Layers
     public enum AffineActivation
     {
         None,
-        Sigmoid
+        Sigmoid,
+        Tanh
     }
 
     public class AffineLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
@@ -132,6 +133,8 @@ namespace Retia.Neural.Layers
             {
                 case AffineActivation.Sigmoid:
                     return new SigmoidLayer<T>(ySize);
+                case AffineActivation.Tanh:
+                    return new TanhLayer<T>(ySize);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(activation), activation, null);
             }
