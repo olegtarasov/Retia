@@ -119,7 +119,6 @@
     <Compile Include="Optimizers\IOptimizer.cs" />
     <Compile Include="Optimizers\OptimizerBase.cs" />
     <Compile Include="Optimizers\RMSPropOptimizer.cs" />
-    <Compile Include="Optimizers\SGDOptimizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomGenerator\BaseRandom.cs" />
     <Compile Include="RandomGenerator\IRandom.cs" />

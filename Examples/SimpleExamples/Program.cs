@@ -5,16 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using CLAP;
 
-namespace Benchmark
+namespace SimpleExamples
 {
-    internal class Program
+    class Program
     {
-        [STAThread]
-        internal static void Main(string[] args)
+        static void Main(string[] args)
         {
             try
             {
-                new Parser<App>().Run(args, new App());
+                new Parser<Examples>().Run(args, new Examples());
                 Console.WriteLine("Done.");
 #if DEBUG
                 Console.ReadKey();
