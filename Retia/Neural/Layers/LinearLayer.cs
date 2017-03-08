@@ -11,7 +11,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class LinearLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class LinearLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         private NeuroWeight<T> _bias;
         private NeuroWeight<T> _weights;
@@ -103,7 +103,7 @@ namespace Retia.Neural.Layers
             _weights.Save(s);
         }
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new LinearLayer<T>(this);
         }

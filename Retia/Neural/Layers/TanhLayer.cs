@@ -13,7 +13,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class TanhLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class TanhLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
 
@@ -47,7 +47,7 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new TanhLayer<T>(_size);
         }

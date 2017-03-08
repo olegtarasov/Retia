@@ -9,7 +9,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class DropoutLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class DropoutLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
         private readonly float _dropout;
@@ -58,7 +58,7 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new DropoutLayer<T>(this);
         }

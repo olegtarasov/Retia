@@ -12,7 +12,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public abstract class NeuroLayer<T> : ICloneable<NeuroLayer<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
+    public abstract class LayerBase<T> : ICloneable<LayerBase<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
         protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         protected int BatchSize;
@@ -21,11 +21,11 @@ namespace Retia.Neural.Layers
         protected List<Matrix<T>> Inputs = new List<Matrix<T>>();
         protected List<Matrix<T>> Outputs = new List<Matrix<T>>();
 
-        protected NeuroLayer()
+        protected LayerBase()
         {
         }
 
-        protected NeuroLayer(NeuroLayer<T> other)
+        protected LayerBase(LayerBase<T> other)
         {
             BatchSize = other.BatchSize;
             SeqLen = other.SeqLen;
@@ -34,7 +34,7 @@ namespace Retia.Neural.Layers
             ErrorFunction = other.ErrorFunction?.Clone();
         }
 
-        protected NeuroLayer(BinaryReader reader)
+        protected LayerBase(BinaryReader reader)
         {
             BatchSize = reader.ReadInt32();
             SeqLen = reader.ReadInt32();
@@ -54,7 +54,7 @@ namespace Retia.Neural.Layers
         public abstract int TotalParamCount { get; }
         public virtual Matrix<T>[] InternalState { get;  set; }
 
-        public abstract NeuroLayer<T> Clone();
+        public abstract LayerBase<T> Clone();
 
         public virtual void Save(Stream s)
         {
@@ -108,26 +108,6 @@ namespace Retia.Neural.Layers
         public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             return outSens;
-        }
-
-
-        /// <summary>
-        ///     Propagates next layer sensitivity to input, calculating input sensitivity matrix
-        /// </summary>
-        /// <param name="outSens">Sequence of sensitivity matrices of next layer</param>
-        /// <returns></returns>
-        public virtual List<Matrix<T>> PropagateSensitivity(List<Matrix<T>> outSens)
-        {
-            var iSensList = new List<Matrix<T>>(Inputs.Count);
-            for (int step = 0; step < Inputs.Count; step++)
-            {
-                var oSens = outSens[step];
-                var iSens = Matrix<T>.Build.Dense(InputSize, BatchSize);
-                for (int b = 0; b < BatchSize; b++)
-                    CalcSens(step, b, iSens, oSens);
-                iSensList.Add(iSens);
-            }
-            return iSensList;
         }
 
         /// <summary>
@@ -187,20 +167,6 @@ namespace Retia.Neural.Layers
         {
         }
 
-        /// <summary>
-        ///     Get value of layer output derrivative with respect to input (dO/dI of [batch])
-        /// </summary>
-        /// <param name="input">Input value matrix</param>
-        /// <param name="output">Output value matrix</param>
-        /// <param name="batch">Batch index</param>
-        /// <param name="i">Input index</param>
-        /// <param name="o">Output index</param>
-        /// <returns>Derivative value</returns>
-        protected virtual T Derivative(Matrix<T> input, Matrix<T> output, int batch, int i, int o)
-        {
-            return default(T);
-        }
-
         internal void Initialize(int batchSize, int seqLen)
         {
             BatchSize = batchSize;
@@ -208,35 +174,5 @@ namespace Retia.Neural.Layers
 
             Initialize();
         }
-
-        private void CalcSens(int step, int batch, Matrix<T> iSens, Matrix<T> outSens)
-        {
-            // TODO: Support this
-            throw new NotSupportedException();
-            //for (int i = 0; i < InputSize; i++)
-            //{
-            //    for (int o = 0; o < OutputSize; o++)
-            //    {
-            //        iSens[i, batch] += Derivative(Inputs[step], Outputs[step], batch, i, o) * outSens[o, batch];
-            //    }
-            //}
-        }
-
-        //public virtual float NumDerrivative(Matrix input, Matrix output, int batch, int i, int o)
-        //{
-        //    const float delta = 1e-5f;
-
-        //    var pInput = input.CloneMatrix();
-        //    var nInput = input.CloneMatrix();
-        //    pInput[i, batch] += delta;
-        //    nInput[i, batch] -= delta;
-
-        //    var p = Step(pInput);
-        //    var n = Step(nInput);
-
-        //    var d = (0.5f / delta) * (p - n);
-        //    return d[o, batch];
-
-        //}
     }
 }

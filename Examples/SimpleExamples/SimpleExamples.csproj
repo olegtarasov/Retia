@@ -89,10 +89,6 @@
       <Project>{eb0005db-e481-43ea-9802-352bae4b0526}</Project>
       <Name>Retia.Gui</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
-      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
-      <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Retia\Retia.csproj">
       <Project>{80608848-f915-434c-a22c-62a2bb9de046}</Project>
       <Name>Retia</Name>

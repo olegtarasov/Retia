@@ -31,7 +31,7 @@ namespace Retia.Tests.Neural
             TestLayer(new AffineLayer<double>(5, 3, AffineActivation.Sigmoid) {ErrorFunction = new MeanSquareError<double>() });
         }
 
-        private void TestLayer(NeuroLayer<double> layer)
+        private void TestLayer(LayerBase<double> layer)
         {
             const double delta = 1e-5d;
 

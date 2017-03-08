@@ -9,7 +9,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class SigmoidLayer<T> : NeuroLayer<T> where T : struct, IFormattable, IEquatable<T>
+    public class SigmoidLayer<T> : LayerBase<T> where T : struct, IFormattable, IEquatable<T>
     {
         private readonly int _size;
 
@@ -32,7 +32,7 @@ namespace Retia.Neural.Layers
         public override int OutputSize => _size;
         public override int TotalParamCount => 0;
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new SigmoidLayer<T>(this);
         }

@@ -16,7 +16,7 @@ start somewhere. So now you can build deep GRU models to create language models 
 fun stuff. We will be adding more layer types in the future. As a matter of fact, Retia is
 so easily customizable that you can start making your own layers in no time at all!
 
-We are eager to see you pull requests, so that together we can build a simple but powerful
+We are eager to see you pull requests, so that together we can build a simple and powerful
 deep learning framework!
 
 ## Building from source
@@ -44,3 +44,11 @@ We also use some neat tools and libraries, so you might want to read this
 Of course you want some examples! The great place to start is a 
 [character-level language model](https://github.com/total-world-domination/Retia/wiki/Language-model-example).
 If fact, this is the only example so far, but there will be plenty more! :)
+
+## Interface compatibility policy
+
+Since Retia is in an early stage of development, please expect breaking changes in public interfaces.
+We feel that right now it's better to focus on development speed rather than strict backward compatibility.
+
+Of cource when the library reaches its first stable version, we will develop and uphold rather strict
+compatibility policy.
