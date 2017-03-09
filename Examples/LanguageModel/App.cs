@@ -71,9 +71,9 @@ namespace LanguageModel
             [DefaultValue(false)]       bool gpu,
             [DefaultValue(false)]       bool gui)
 		{
-            Control.UseNativeMKL();
+            MklProvider.TryUseMkl(true, ConsoleProgressWriter.Instance);
 
-		    string rnnPath = $"NETWORK_{DateTime.Now:dd_MM_yy-HH_mm_ss}.rnn";
+            string rnnPath = $"NETWORK_{DateTime.Now:dd_MM_yy-HH_mm_ss}.rnn";
 			var errFile = new FileStream($"ERR_{DateTime.Now:dd_MM_yy-HH_mm_ss}.txt", FileMode.Create);
 			var errWriter = new StreamWriter(errFile);
 

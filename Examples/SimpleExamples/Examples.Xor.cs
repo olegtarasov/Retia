@@ -80,6 +80,8 @@ namespace SimpleExamples
         [Verb]
         public void Xor()
         {
+            MklProvider.TryUseMkl(true, ConsoleProgressWriter.Instance);
+
             var optimizer = new RMSPropOptimizer<float>(1e-3f);
             var net = new LayeredNet<float>(1, 1, new AffineLayer<float>(2, 3, AffineActivation.Tanh), new AffineLayer<float>(3, 1, AffineActivation.Tanh) { ErrorFunction = new MeanSquareError<float>() })
             {

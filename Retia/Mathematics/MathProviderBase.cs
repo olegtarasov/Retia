@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Neural;
@@ -14,6 +15,12 @@ namespace Retia.Mathematics
     /// <typeparam name="T">Data type</typeparam>
     public abstract class MathProviderBase<T> where T : struct, IEquatable<T>, IFormattable
     {
+        static MathProviderBase()
+        {
+            // Try to use MKL as soon as possible
+            Control.TryUseNativeMKL();
+        }
+
         #region Generic ugliness
 
         /// <summary>
