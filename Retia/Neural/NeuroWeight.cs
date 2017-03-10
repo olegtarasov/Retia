@@ -34,6 +34,11 @@ namespace Retia.Neural
         /// </summary>
         public Matrix<T> CacheM { get; private set; }
 
+        /// <summary>
+        /// Timestep
+        /// </summary>
+        public int Timestep { get; set; } = 0;
+
         public NeuroWeight()
 		{
 		}
@@ -45,7 +50,8 @@ namespace Retia.Neural
             Cache1 = Matrix<T>.Build.Dense(weight.RowCount, weight.ColumnCount);
             Cache2 = Matrix<T>.Build.Dense(weight.RowCount, weight.ColumnCount);
             CacheM = Matrix<T>.Build.Dense(weight.RowCount, weight.ColumnCount);
-        }
+		    Timestep = 0;
+		}
 
 		private NeuroWeight(NeuroWeight<T> other)
 		{
@@ -54,7 +60,8 @@ namespace Retia.Neural
 			Cache1 = other.Cache1.CloneMatrix();
             Cache2 = other.Cache2.CloneMatrix();
             CacheM = other.CacheM.CloneMatrix();
-        }
+		    Timestep = other.Timestep;
+		}
 
 		public static NeuroWeight<T> Load(Stream stream)
 		{
@@ -70,7 +77,8 @@ namespace Retia.Neural
 			        result.Cache1 = MatrixFactory.Load<T>(stream);
                     result.Cache2 = MatrixFactory.Load<T>(stream);
                     result.CacheM = MatrixFactory.Load<T>(stream);
-                }
+			        result.Timestep = reader.ReadInt32();
+			    }
 			    else
 			    {
                     result.Cache1 = Matrix<T>.Build.Dense(result.Weight.RowCount, result.Weight.ColumnCount);
@@ -108,6 +116,7 @@ namespace Retia.Neural
                     Cache1.Save(s);
                     Cache2.Save(s);
                     CacheM.Save(s);
+                    writer.Write(Timestep);
 			    }
 			    if (saveGrad)
                     Gradient.Save(s);
@@ -124,7 +133,8 @@ namespace Retia.Neural
 			Cache1.Clear();
             Cache2.Clear();
             CacheM.Clear();
-        }
+		    Timestep = 0;
+		}
 
 		public static implicit operator NeuroWeight<T>(Matrix<T> weight)
 		{

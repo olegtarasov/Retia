@@ -125,6 +125,16 @@ namespace Retia.Mathematics
         #region Optimization
 
         /// <summary>
+        /// Performs Adam update on a weight.
+        /// </summary>
+        /// <remarks>See https://arxiv.org/pdf/1412.6980.pdf </remarks>
+        /// <param name="learningRate">Learning rate.</param>
+        /// <param name="b1">Decay rate of first order MAV.</param>
+        /// <param name="b2">Decay rate of second order MAV.</param>
+        /// <param name="weight">Weight.</param>
+        public abstract void AdamUpdate(float learningRate, float b1, float b2, NeuroWeight<T> weight);
+
+        /// <summary>
         /// Performs Adagrad update on a weight.
         /// </summary>
         /// <param name="learningRate">Learning rate.</param>

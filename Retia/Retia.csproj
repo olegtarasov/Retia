@@ -122,6 +122,7 @@
     <Compile Include="Neural\NeuralNet.cs" />
     <Compile Include="Neural\NeuroWeight.cs" />
     <Compile Include="Optimizers\AdagradOptimizer.cs" />
+    <Compile Include="Optimizers\AdamOptimizer.cs" />
     <Compile Include="Optimizers\IOptimizer.cs" />
     <Compile Include="Optimizers\OptimizerBase.cs" />
     <Compile Include="Optimizers\RMSPropOptimizer.cs" />

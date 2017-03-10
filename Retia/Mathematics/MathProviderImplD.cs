@@ -30,6 +30,8 @@ namespace Retia.Mathematics
 
         [DllImport("FastFuncs", EntryPoint = "AdagradUpdateD")] private static extern void AdagradUpdate(Float learningRate, IntPtr weightMatrix, IntPtr mem, IntPtr gradient, int n);
 
+        [DllImport("FastFuncs", EntryPoint = "AdamUpdateD")] private static extern void AdamUpdate(Float learningRate, Float b1, Float b2, int t, IntPtr weights, IntPtr cache1, IntPtr cache2, IntPtr grad, int n);
+
         public override void AdagradUpdate(Float learningRate, NeuroWeight<Float> weight)
         {
             using (var ptrs = new MatrixPointers<Float>(weight.Weight, weight.Cache2, weight.Gradient))
@@ -328,6 +330,14 @@ namespace Retia.Mathematics
             fixed (void* arr = &matrix.AsColumnMajorArray()[0])
             {
                 ApplySigmoid(new IntPtr(arr), matrix.Length());
+            }
+        }
+
+        public override void AdamUpdate(float learningRate, float b1, float b2, NeuroWeight<Float> weight)
+        {
+            using (var ptrs = new MatrixPointers<Float>(weight.Weight, weight.Cache1, weight.Cache2, weight.Gradient))
+            {
+                AdamUpdate(learningRate, b1, b2, weight.Timestep, ptrs[0], ptrs[1], ptrs[2], ptrs[3], weight.Weight.Length());
             }
         }
     }
