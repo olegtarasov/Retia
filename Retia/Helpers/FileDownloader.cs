@@ -25,6 +25,7 @@ namespace Retia.Helpers
 
         /// <summary>
         /// Downloads a file to <see cref="downloadFileName"/> and extracts contents using <see cref="extractor"/>.
+        /// If the file being downloaded already exists, it won't be redownloaded.
         /// </summary>
         /// <param name="url">Url to download the file from.</param>
         /// <param name="downloadFileName">Path to download the file to.</param>
@@ -33,28 +34,31 @@ namespace Retia.Helpers
         /// <returns>True if suceeded, false otherwise.</returns>
         public bool DownloadAndExtract(string url, string downloadFileName, Action<ZipFile> extractor, bool keepDownloaded = false)
         {
-            bool complete = false;
-            var client = new WebClient();
-            client.DownloadProgressChanged += (sender, args) =>
+            if (!File.Exists(downloadFileName))
             {
-                if (!complete)
+                bool complete = false;
+                var client = new WebClient();
+                client.DownloadProgressChanged += (sender, args) =>
                 {
-                    _progressWriter?.SetItemProgress(args.BytesReceived, args.TotalBytesToReceive, "Downloading MKL");
+                    if (!complete)
+                    {
+                        _progressWriter?.SetItemProgress(args.BytesReceived, args.TotalBytesToReceive, "Downloading MKL");
+                    }
+                };
+
+                try
+                {
+                    client.DownloadFileTaskAsync(url, downloadFileName).Wait();
                 }
-            };
+                catch (Exception e)
+                {
+                    _progressWriter?.Message($"Failed to download MKL: {e.Message}");
+                    return false;
+                }
 
-            try
-            {
-                client.DownloadFileTaskAsync(url, downloadFileName).Wait();
+                complete = true;
+                _progressWriter?.ItemComplete();
             }
-            catch (Exception e)
-            {
-                _progressWriter?.Message($"Failed to download MKL: {e.Message}");
-                return false;
-            }
-
-            complete = true;
-            _progressWriter?.ItemComplete();
 
             try
             {

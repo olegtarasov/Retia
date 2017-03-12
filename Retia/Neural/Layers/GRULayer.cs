@@ -68,6 +68,8 @@ namespace Retia.Neural.Layers
             ResetOptimizer();
 
             ErrorFunction = new MeanSquareError<T>();
+
+            RegisterWeights();
         }
 
         public GruLayer(BinaryReader reader) : base(reader)
@@ -90,6 +92,8 @@ namespace Retia.Neural.Layers
 
             _lastH = MatrixFactory.Load<T>(reader.BaseStream);
             _hiddenOnes = Matrix<T>.Build.Dense(_hSize, _lastH.ColumnCount, Matrix<T>.One);
+
+            RegisterWeights();
         }
 
         private GruLayer(GruLayer<T> other) : base(other)
@@ -120,16 +124,20 @@ namespace Retia.Neural.Layers
             _rVals = other._rVals.Clone();
             _zVals = other._zVals.Clone();
             _hSize = other._hSize;
+
+            RegisterWeights();
         }
 
-        public override Matrix<T>[] InternalState
+        public Matrix<T> HiddenState
         {
-            get { return new []{_lastH.CloneMatrix()}; }
+            get { return _lastH; }
             set
             {
-                if(value.Count()!=1)
-                    throw new Exception($"Internal state of {GetType().AssemblyQualifiedName} should consist of 1 matrix");
-                _lastH = value[0];
+                if (value == null) throw new ArgumentNullException(nameof(value));
+                if (value.RowCount != _lastH.RowCount || value.ColumnCount != _lastH.ColumnCount)
+                    throw new ArgumentOutOfRangeException(nameof(value), "Matrix dimensions mismatch!");
+
+                _lastH = value;
             }
         }
 
@@ -474,6 +482,12 @@ namespace Retia.Neural.Layers
             _lastH = Matrix<T>.Build.Dense(_hSize, BatchSize);
             _hiddenOnes = Matrix<T>.Build.Dense(_hSize, BatchSize, Matrix<T>.One);
             InitSequence();
+        }
+
+        private void RegisterWeights()
+        {
+            RegisterWeights(_bxr, _bxz, _bxh, _bhr, _bhz, _bhh,
+                _wxr, _wxz, _wxh, _whr, _whz, _whh);
         }
     }
 }

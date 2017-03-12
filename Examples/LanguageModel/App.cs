@@ -111,10 +111,7 @@ namespace LanguageModel
 		                       };
 
             trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), optimizer, 9.9e-5f);
-            var trainer = new OptimizingTrainer<float>(network, optimizer, null, trainOptions)
-                          {
-                              TrainingSet = _dataProvider.TrainingSet
-                          };
+            var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider.TrainingSet, trainOptions);
 
             var epochWatch = new Stopwatch();
            

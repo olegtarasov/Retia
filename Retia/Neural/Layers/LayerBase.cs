@@ -14,6 +14,8 @@ namespace Retia.Neural.Layers
 {
     public abstract class LayerBase<T> : ICloneable<LayerBase<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
+        private readonly List<NeuroWeight<T>> _weights = new List<NeuroWeight<T>>();
+
         protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         protected int BatchSize;
         protected int SeqLen;
@@ -52,7 +54,7 @@ namespace Retia.Neural.Layers
         public abstract int InputSize { get; }
         public abstract int OutputSize { get; }
         public abstract int TotalParamCount { get; }
-        public virtual Matrix<T>[] InternalState { get;  set; }
+        public virtual IReadOnlyList<NeuroWeight<T>> Weights => _weights;
 
         public abstract LayerBase<T> Clone();
 
@@ -108,6 +110,16 @@ namespace Retia.Neural.Layers
         public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
         {
             return outSens;
+        }
+
+        /// <summary>
+        /// Registers layer weights to return from <see cref="Weights"/>.
+        /// </summary>
+        /// <param name="weights">Weight collection.</param>
+        protected void RegisterWeights(params NeuroWeight<T>[] weights)
+        {
+            _weights.Clear();
+            _weights.AddRange(weights);
         }
 
         /// <summary>

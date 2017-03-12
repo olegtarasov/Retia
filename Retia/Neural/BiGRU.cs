@@ -158,7 +158,7 @@ namespace Retia.Neural
             return yList;
         }
 
-        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
+        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<Matrix<T>> outputs)
         {
             if (inputs.Count != targets.Count || targets.Count == 0)
                 throw new Exception("Not enough targets or inputs provided!");
@@ -178,6 +178,8 @@ namespace Retia.Neural
             }
             BackPropagate(targets);
             var totalErr = error.Sum() / error.Count;
+
+            outputs = outs;
             return totalErr;
         }
 
@@ -215,6 +217,19 @@ namespace Retia.Neural
             }
 
             return yList;
+        }
+
+        public override IReadOnlyList<NeuroWeight<T>> Weights
+        {
+            get
+            {
+                var result = new List<NeuroWeight<T>>();
+                result.AddRange(forward.Weights);
+                result.AddRange(backward.Weights);
+                result.AddRange(outNet.Weights);
+
+                return result;
+            }
         }
     }
 }

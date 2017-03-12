@@ -39,12 +39,19 @@ namespace Retia.Neural
         /// </summary>
         public int Timestep { get; set; } = 0;
 
+        /// <summary>
+        /// Unique identifier which is preserved during cloning.
+        /// </summary>
+        public Guid Id { get; set; }
+
         public NeuroWeight()
 		{
+            Id = Guid.NewGuid();
 		}
 
 		public NeuroWeight(Matrix<T> weight) : this()
 		{
+            Id = Guid.NewGuid();
 			Weight = weight.CloneMatrix();
 			Gradient = Matrix<T>.Build.Dense(weight.RowCount, weight.ColumnCount);
             Cache1 = Matrix<T>.Build.Dense(weight.RowCount, weight.ColumnCount);
@@ -55,6 +62,7 @@ namespace Retia.Neural
 
 		private NeuroWeight(NeuroWeight<T> other)
 		{
+		    Id = other.Id;
 		    Weight = other.Weight.CloneMatrix();
 			Gradient = other.Gradient.CloneMatrix();
 			Cache1 = other.Cache1.CloneMatrix();
@@ -68,6 +76,7 @@ namespace Retia.Neural
 			var result = new NeuroWeight<T>();
 			using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
 			{
+			    result.Id = Guid.Parse(reader.ReadString());
                 result.Weight = MatrixFactory.Load<T>(stream);
 				bool saveCache = reader.ReadBoolean();
 				bool saveGrad = reader.ReadBoolean();
@@ -108,6 +117,7 @@ namespace Retia.Neural
 		{
 			using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
 			{
+                writer.Write(Id.ToString());
 				Weight.Save(s);
 				writer.Write(saveCache);
 				writer.Write(saveGrad);

@@ -16,6 +16,7 @@ namespace Retia.Mathematics
     public static class MklProvider
     {
         private const string MKLPackage = "https://www.nuget.org/api/v2/package/MathNet.Numerics.MKL.Win-x64/2.2.0";
+        private const string FileName = "MathNet.Numerics.MKL.Win-x64.2.2.0.nupkg";
 
         /// <summary>
         /// Tries to enable Math.NET native MKL provider. If not found and download is enabled, downloads
@@ -40,7 +41,7 @@ namespace Retia.Mathematics
 
             progressWriter?.Message("Couldn't use MKL right away, trying to download...");
 
-            string tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName() + ".nupkg");
+            string tempPath = Path.Combine(Path.GetTempPath(), FileName);
             string extractDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "x64");
             var downloader = new FileDownloader(progressWriter);
 
@@ -58,7 +59,7 @@ namespace Retia.Mathematics
                         entry.Extract(stream);
                     }
                 }
-            }))
+            }, true))
             {
                 return false;
             }

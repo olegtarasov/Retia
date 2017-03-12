@@ -20,15 +20,12 @@ namespace Retia.Neural.Layers
         {
             _weights = other._weights.Clone();
             _bias = other._bias.Clone();
-        }
 
-        private LinearLayer()
-        {
+            RegisterWeights(_bias, _weights);
         }
 
         public LinearLayer(int xSize, int ySize) : this(xSize, ySize, new RandomMatrixInitializer<T>())
         {
-            
         }
 
         public LinearLayer(int xSize, int ySize, IMatrixInitializer<T> matrixInitializer)
@@ -37,12 +34,16 @@ namespace Retia.Neural.Layers
             _bias = matrixInitializer.CreateMatrix(ySize, 1);
 
             ErrorFunction = new MeanSquareError<T>();
+
+            RegisterWeights(_bias, _weights);
         }
 
         public LinearLayer(BinaryReader reader) : base(reader)
         {
             _bias = NeuroWeight<T>.Load(reader.BaseStream);
             _weights = NeuroWeight<T>.Load(reader.BaseStream);
+
+            RegisterWeights(_bias, _weights);
         }
 
         public override int InputSize => _weights.Weight.ColumnCount;

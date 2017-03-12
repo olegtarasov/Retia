@@ -58,7 +58,6 @@ namespace Retia.Neural.Layers
 
         public override int InputSize => _linearLayer.InputSize;
 
-        public override Matrix<T>[] InternalState => _linearLayer.InternalState;
         public override int OutputSize => _activationLayer.OutputSize;
         public override int TotalParamCount => _linearLayer.TotalParamCount + _activationLayer.TotalParamCount;
 
@@ -177,5 +176,7 @@ namespace Retia.Neural.Layers
                     throw new ArgumentOutOfRangeException(nameof(activation), activation, null);
             }
         }
+
+        public override IReadOnlyList<NeuroWeight<T>> Weights => _linearLayer.Weights;
     }
 }
