@@ -69,7 +69,7 @@ namespace SimpleExamples
             trainer.PeriodicActions.Add(new UserAction(new EachIteration(20), () =>
             {
                 var sens = network.Layers.Last().ErrorFunction.BackpropagateError(trainer.Outputs, trainer.Targets);
-                optimizer.MetaOptimize(sens);
+                optimizer.MetaOptimize();
 
                 trainer.Outputs.Clear();
                 trainer.Targets.Clear();

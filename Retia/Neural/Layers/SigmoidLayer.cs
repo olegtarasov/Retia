@@ -60,7 +60,7 @@ namespace Retia.Neural.Layers
             return BackPropagate(base.ErrorPropagate(targets));
         }
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
             if (Outputs.Count == 0)
                 throw new Exception("Empty inputs history, nothing to propagate!");
@@ -107,6 +107,10 @@ namespace Retia.Neural.Layers
         }
 
         public override void FromVectorState(T[] vector, ref int idx)
+        {
+        }
+
+        public override void ClearGradients()
         {
         }
     }

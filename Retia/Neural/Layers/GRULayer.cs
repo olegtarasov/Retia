@@ -280,23 +280,12 @@ namespace Retia.Neural.Layers
             return H;
         }
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
-            _bxr.ClearGrad();
-            _bxz.ClearGrad();
-            _bxh.ClearGrad();
-
-            _bhr.ClearGrad();
-            _bhz.ClearGrad();
-            _bhh.ClearGrad();
-
-            _wxr.ClearGrad();
-            _wxz.ClearGrad();
-            _wxh.ClearGrad();
-            
-            _whr.ClearGrad();
-            _whz.ClearGrad();
-            _whh.ClearGrad();
+            if (clearGrad)
+            {
+                ClearGradients();
+            }
 
             var dh = Enumerable.Range(0, outSens.Count).Select(x => (Matrix<T>)null).ToList();
             var di = Enumerable.Range(0, outSens.Count).Select(x => (Matrix<T>)null).ToList();
@@ -488,6 +477,25 @@ namespace Retia.Neural.Layers
         {
             RegisterWeights(_bxr, _bxz, _bxh, _bhr, _bhz, _bhh,
                 _wxr, _wxz, _wxh, _whr, _whz, _whh);
+        }
+
+        public override void ClearGradients()
+        {
+            _bxr.ClearGrad();
+            _bxz.ClearGrad();
+            _bxh.ClearGrad();
+
+            _bhr.ClearGrad();
+            _bhz.ClearGrad();
+            _bhh.ClearGrad();
+
+            _wxr.ClearGrad();
+            _wxz.ClearGrad();
+            _wxh.ClearGrad();
+
+            _whr.ClearGrad();
+            _whz.ClearGrad();
+            _whh.ClearGrad();
         }
     }
 }

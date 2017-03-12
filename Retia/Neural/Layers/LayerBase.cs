@@ -20,8 +20,8 @@ namespace Retia.Neural.Layers
         protected int BatchSize;
         protected int SeqLen;
 
-        protected List<Matrix<T>> Inputs = new List<Matrix<T>>();
-        protected List<Matrix<T>> Outputs = new List<Matrix<T>>();
+        public List<Matrix<T>> Inputs { get; set; } = new List<Matrix<T>>();
+        public List<Matrix<T>> Outputs { get; set; } = new List<Matrix<T>>();
 
         protected LayerBase()
         {
@@ -56,6 +56,7 @@ namespace Retia.Neural.Layers
         public abstract int TotalParamCount { get; }
         public virtual IReadOnlyList<NeuroWeight<T>> Weights => _weights;
 
+        public abstract void ClearGradients();
         public abstract LayerBase<T> Clone();
 
         public virtual void Save(Stream s)
@@ -106,8 +107,9 @@ namespace Retia.Neural.Layers
         /// </summary>
         /// <param name="outSens">Sequence of sensitivity matrices of next layer</param>
         /// <param name="needInputSens">Calculate input sensitivity for further propagation</param>
+        /// <param name="clearGrad">Clear gradients before backpropagation.</param>
         /// <returns></returns>
-        public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
             return outSens;
         }

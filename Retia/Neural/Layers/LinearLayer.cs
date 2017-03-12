@@ -137,10 +137,12 @@ namespace Retia.Neural.Layers
             return BackPropagate(base.ErrorPropagate(targets));
         }
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
-            _weights.ClearGrad();
-            _bias.ClearGrad();
+            if (clearGrad)
+            {
+                ClearGradients();
+            }
 
             if (Inputs.Count == 0)
                 throw new Exception("Empty inputs history, nothing to propagate!");
@@ -179,6 +181,12 @@ namespace Retia.Neural.Layers
             }
 
             return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight as Matrix<float>, _bias.Weight as Matrix<float>);
+        }
+
+        public override void ClearGradients()
+        {
+            _weights.ClearGrad();
+            _bias.ClearGrad();
         }
     }
 }

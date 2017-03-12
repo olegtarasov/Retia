@@ -12,6 +12,8 @@ namespace Retia.Optimizers
     public class MetaOptimizer : OptimizerBase<float>
     {
         private readonly Dictionary<Guid, Matrix<float>[][]> _hiddenStates;
+        private readonly Dictionary<Guid, List<Matrix<float>>[][]> _inputs, _outputs;
+        private readonly Dictionary<Guid, List<Matrix<float>>[]> _sens;
         private readonly LayeredNet<float> _network;
         private readonly OptimizerBase<float> _optimizer;
 
@@ -22,14 +24,29 @@ namespace Retia.Optimizers
             const int hSize = 20;
 
             _hiddenStates = new Dictionary<Guid, Matrix<float>[][]>();
+            _inputs = new Dictionary<Guid, List<Matrix<float>>[][]>();
+            _outputs = new Dictionary<Guid, List<Matrix<float>>[][]>();
+            _sens = new Dictionary<Guid, List<Matrix<float>>[]>();
             foreach (var weight in weights)
             {
-                var block = new Matrix<float>[2][];
-                _hiddenStates[weight.Id] = block;
+                var hBlock = new Matrix<float>[2][];
+                var iBlock = new List<Matrix<float>>[3][];
+                var oBlock = new List<Matrix<float>>[3][];
+                int length = weight.Weight.Length();
 
-                for (int layerIdx = 0; layerIdx < 2; layerIdx++)
+                _hiddenStates[weight.Id] = hBlock;
+                _inputs[weight.Id] = iBlock;
+                _outputs[weight.Id] = oBlock;
+                _sens[weight.Id] = Enumerable.Range(0, length).Select(x => new List<Matrix<float>>()).ToArray();
+                
+                for (int layerIdx = 0; layerIdx < 3; layerIdx++)
                 {
-                    block[layerIdx] = Enumerable.Range(0, weight.Weight.Length()).Select(x => MatrixFactory.Create<float>(hSize, 1)).ToArray();
+                    if (layerIdx < 2)
+                    {
+                        hBlock[layerIdx] = Enumerable.Range(0, length).Select(x => MatrixFactory.Create<float>(hSize, 1)).ToArray();
+                    }
+                    iBlock[layerIdx] = Enumerable.Range(0, length).Select(x => new List<Matrix<float>>()).ToArray();
+                    oBlock[layerIdx] = Enumerable.Range(0, length).Select(x => new List<Matrix<float>>()).ToArray();
                 }
             }
 
@@ -52,32 +69,77 @@ namespace Retia.Optimizers
             var wa = weight.Weight.AsColumnMajorArray();
             var ga = weight.Weight.AsColumnMajorArray();
             var stateBlock = _hiddenStates[weight.Id];
-
-            var layer1 = (GruLayer<float>)_network.Layers[0];
-            var layer2 = (GruLayer<float>)_network.Layers[1];
+            var iBlock = _inputs[weight.Id];
+            var oBlock = _outputs[weight.Id];
+            var sensBlock = _sens[weight.Id];
 
             for (int i = 0; i < wa.Length; i++)
             {
-                layer1.HiddenState = stateBlock[0][i];
-                layer2.HiddenState = stateBlock[1][i];
+                for (int layerIdx = 0; layerIdx < 3; layerIdx++)
+                {
+                    var layer = _network.Layers[layerIdx];
 
-                var step = _network.Step(ScaleInput(ga[i]));
+                    if (layerIdx < 2)
+                    {
+                        ((GruLayer<float>)layer).HiddenState = stateBlock[layerIdx][i];
+                    }
 
-                stateBlock[0][i] = layer1.HiddenState;
-                stateBlock[1][i] = layer2.HiddenState;
+                    layer.Inputs = iBlock[layerIdx][i];
+                    layer.Outputs = oBlock[layerIdx][i];
+                }
+
+                var step = _network.Step(ScaleInput(ga[i]), true);
+                sensBlock[i].Add(MatrixFactory.Create<float>(1, 1, ga[i] * step[0, 0]));
+                
+                for (int layerIdx = 0; layerIdx < 2; layerIdx++)
+                {
+                    var layer = (GruLayer<float>)_network.Layers[layerIdx];
+                    stateBlock[layerIdx][i] = layer.HiddenState;
+                }
 
                 ga[i] += step[0, 0] * 0.1f;
             }
         }
 
-        public void MetaOptimize(List<Matrix<float>> sensitivities)
+        public void MetaOptimize()
         {
-            if (sensitivities.Count != SeqLen) throw new InvalidOperationException("Wrong sensitivity count!");
+            if (_sens.Count != SeqLen) throw new InvalidOperationException("Wrong sensitivity count!");
 
-            var sens = sensitivities;
-            for (int i = _network.Layers.Count - 1; i >= 0; i--)
+            foreach (var layer in _network.Layers)
             {
-                sens = _network.Layers[i].BackPropagate(sens, true);
+                layer.ClearGradients();
+            }
+
+            foreach (var weightId in _hiddenStates.Keys)
+            {
+                var weightSens = _sens[weightId];
+                var weightInputs = _inputs[weightId];
+                var weightOutputs = _outputs[weightId];
+                var weightHidden = _hiddenStates[weightId];
+
+                for (int weightIdx = 0; weightIdx < weightSens.Length; weightIdx++)
+                {
+                    var curSens = weightSens[weightIdx];
+
+                    for (int layerIdx = 2; layerIdx >= 0; layerIdx--)
+                    {
+                        var layer = _network.Layers[layerIdx];
+                        if (layerIdx < 2)
+                        {
+                            ((GruLayer<float>)layer).HiddenState = weightHidden[layerIdx][weightIdx];
+                        }
+
+                        layer.Inputs = weightInputs[layerIdx][weightIdx];
+                        layer.Outputs = weightOutputs[layerIdx][weightIdx];
+
+                        curSens = layer.BackPropagate(curSens, true, false);
+
+                        layer.Inputs.Clear();
+                        layer.Outputs.Clear();
+                    }
+
+                    curSens.Clear();
+                }
             }
 
             _network.Optimize();
