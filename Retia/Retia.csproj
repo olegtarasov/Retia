@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\FileDownloader.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\MinMax.cs" />
     <Compile Include="Helpers\MinMaxTracker.cs" />

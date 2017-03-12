@@ -4,6 +4,7 @@ using System.Net;
 using System.Reflection;
 using Ionic.Zip;
 using MathNet.Numerics;
+using Retia.Helpers;
 using Retia.Integration;
 
 namespace Retia.Mathematics
@@ -39,60 +40,27 @@ namespace Retia.Mathematics
 
             progressWriter?.Message("Couldn't use MKL right away, trying to download...");
 
-            bool complete = false;
-            var client = new WebClient();
-            client.DownloadProgressChanged += (sender, args) =>
-            {
-                if (!complete)
-                {
-                    progressWriter?.SetItemProgress(args.BytesReceived, args.TotalBytesToReceive, "Downloading MKL");
-                }
-            };
+            string tempPath = Path.Combine(Path.GetTempPath(), Path.GetTempFileName() + ".nupkg");
+            string extractDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "x64");
+            var downloader = new FileDownloader(progressWriter);
 
-            string path = Path.Combine(Path.GetTempPath(), Path.GetTempFileName() + ".nupkg");
-            try
+            if (!Directory.Exists(extractDir))
             {
-                client.DownloadFileTaskAsync(MKLPackage, path).Wait();
+                Directory.CreateDirectory(extractDir);
             }
-            catch (Exception e)
+            if (!downloader.DownloadAndExtract(MKLPackage, tempPath, file =>
             {
-                progressWriter?.Message($"Failed to download MKL: {e.Message}");
-                return false;
-            }
-
-            complete = true;
-            progressWriter?.ItemComplete();
-
-            try
-            {
-                string dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "x64");
-                if (!Directory.Exists(dir))
+                var files = file.SelectEntries("*.*", @"build/x64");
+                foreach (var entry in files)
                 {
-                    Directory.CreateDirectory(dir);
-                }
-
-                using (var zip = ZipFile.Read(path))
-                {
-                    var files = zip.SelectEntries("*.*", @"build/x64");
-                    foreach (var file in files)
+                    using (var stream = new FileStream(Path.Combine(extractDir, Path.GetFileName(entry.FileName)), FileMode.Create, FileAccess.Write))
                     {
-                        using (var stream = new FileStream(Path.Combine(dir, Path.GetFileName(file.FileName)), FileMode.Create, FileAccess.Write))
-                        {
-                            file.Extract(stream);
-                        }
+                        entry.Extract(stream);
                     }
                 }
-
-                progressWriter?.Message($"Extracted MKL to {dir}");
-            }
-            catch (Exception e)
+            }))
             {
-                progressWriter?.Message($"Failed to extract MKL: {e.Message}");
                 return false;
-            }
-            finally
-            {
-                File.Delete(path);
             }
 
             if (!Control.TryUseNativeMKL())
