@@ -16,9 +16,9 @@ namespace Retia.Neural.Layers
         Tanh
     }
 
-    public class AffineLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class AffineLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
-        private readonly NeuroLayer<T> _activationLayer;
+        private readonly LayerBase<T> _activationLayer;
         private readonly AffineActivation _activationType;
         private readonly LinearLayer<T> _linearLayer;
 
@@ -74,7 +74,7 @@ namespace Retia.Neural.Layers
             _activationLayer.ClampGrads(limit);
         }
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new AffineLayer<T>(this);
         }
@@ -152,7 +152,7 @@ namespace Retia.Neural.Layers
             _activationLayer.Initialize(BatchSize, SeqLen);
         }
 
-        private NeuroLayer<T> GetAffineActivationLayer(AffineActivation activation, int ySize)
+        private LayerBase<T> GetAffineActivationLayer(AffineActivation activation, int ySize)
         {
             switch (activation)
             {
@@ -165,7 +165,7 @@ namespace Retia.Neural.Layers
             }
         }
 
-        private NeuroLayer<T> LoadAffineActivationLayer(AffineActivation activation, BinaryReader reader)
+        private LayerBase<T> LoadAffineActivationLayer(AffineActivation activation, BinaryReader reader)
         {
             switch (activation)
             {

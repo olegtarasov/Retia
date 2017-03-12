@@ -12,7 +12,7 @@ using Retia.RandomGenerator;
 
 namespace Retia.Neural.Layers
 {
-    public class SoftMaxLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class SoftMaxLayer<T> : DerivativeLayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly int _size;
 
@@ -47,7 +47,7 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new SoftMaxLayer<T>(this);
         }
@@ -67,24 +67,14 @@ namespace Retia.Neural.Layers
             return output;
         }
 
-
-        protected override T Derivative(Matrix<T> input, Matrix<T> output, int batch, int i, int o)
+        protected override double DerivativeD(Matrix<double> input, Matrix<double> output, int batch, int i, int o)
         {
-            // TODO: Support
-            throw new NotSupportedException();
-            //return i == o ? output[i, batch] * (1 - output[o, batch]) : -output[i, batch] * output[o, batch];
+            return i == o ? output[i, batch] * (1 - output[o, batch]) : -output[i, batch] * output[o, batch];
         }
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        protected override float DerivativeS(Matrix<float> input, Matrix<float> output, int batch, int i, int o)
         {
-            if (Outputs.Count != Inputs.Count)
-                throw new Exception("Backprop was not initialized (empty state sequence)");
-            if (Inputs.Count == 0)
-                throw new Exception("Empty inputs history, nothing to propagate!");
-            if (outSens.Count != Inputs.Count)
-                throw new Exception("Not enough sensitivies in list!");
-
-            return PropagateSensitivity(outSens);
+            return i == o ? output[i, batch] * (1 - output[o, batch]) : -output[i, batch] * output[o, batch];
         }
 
         public override void ResetMemory()

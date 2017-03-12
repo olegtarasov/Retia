@@ -37,7 +37,7 @@ namespace Retia.Gui.Models
 
         public OptimizationReportEventArgs Report { get; set; }
 
-        public int PlotRange { get; set; } = 500;
+        public int PlotRange { get; set; } = 10000;
 
         internal void AddTestError(double error)
         {

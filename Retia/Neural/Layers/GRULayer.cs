@@ -13,7 +13,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
-    public class GruLayer<T> : NeuroLayer<T> where T : struct, IEquatable<T>, IFormattable
+    public class GruLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
         private readonly List<Matrix<T>> _hNewVals = new List<Matrix<T>>();
         private readonly List<Matrix<T>> _hPropVals = new List<Matrix<T>>();
@@ -165,7 +165,7 @@ namespace Retia.Neural.Layers
         }
 
 
-        public override NeuroLayer<T> Clone()
+        public override LayerBase<T> Clone()
         {
             return new GruLayer<T>(this);
         }

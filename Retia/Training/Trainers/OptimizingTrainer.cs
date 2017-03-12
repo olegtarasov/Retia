@@ -63,7 +63,7 @@ namespace Retia.Training.Trainers
             set
             {
                 _optimizer.LearningRate = value;
-                Options.LearningRateScaler.Reset();
+                Options.LearningRateScaler?.Reset();
             }
         }
 

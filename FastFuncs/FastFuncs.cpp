@@ -6,6 +6,33 @@
 using namespace concurrency;
 
 template <class T>
+void AdamUpdate(T learningRate, T b1, T b2, int t, T *weights, T *cache1, T *cache2, T *grad, int n)
+{
+	const T e = 1e-8f;
+
+	parallel_for(0, n, [&](int i)
+	{
+		T g = grad[i];
+
+		cache1[i] = b1 * cache1[i] + (1 - b1) * g;
+		cache2[i] = b2 * cache2[i] + (1 - b2) * g * g;
+
+		T a = learningRate * sqrt(1 - pow(b2, t)) / (1 - pow(b1, t));
+		weights[i] = weights[i] - a * cache1[i] / (sqrt(cache2[i]) + e);
+	});
+}
+
+FASTFUNC AdamUpdateS(float learningRate, float b1, float b2, int t, float *weights, float *cache1, float *cache2, float *grad, int n)
+{
+	AdamUpdate(learningRate, b1, b2, t, weights, cache1, cache2, grad, n);
+}
+
+FASTFUNC AdamUpdateD(double learningRate, double b1, double b2, int t, double *weights, double *cache1, double *cache2, double *grad, int n)
+{
+	AdamUpdate(learningRate, b1, b2, t, weights, cache1, cache2, grad, n);
+}
+
+template <class T>
 void AdagradUpdate(T learningRate, T *weightMatrix, T *mem, T *gradient, int n)
 {
 	for (int i = 0; i < n; i++)

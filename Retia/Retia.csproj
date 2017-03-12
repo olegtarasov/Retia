@@ -54,6 +54,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNetZip">
+      <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MarkdownLog, Version=0.9.3.36, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MarkdownLog.0.9.3\lib\portable-net45+sl50+MonoAndroid10+MonoTouch10\MarkdownLog.dll</HintPath>
     </Reference>
@@ -72,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\FileDownloader.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\MinMax.cs" />
     <Compile Include="Helpers\MinMaxTracker.cs" />
@@ -94,6 +99,7 @@
     <Compile Include="Mathematics\MatrixFactory.cs" />
     <Compile Include="Mathematics\MathProviderImpl.cs" />
     <Compile Include="Mathematics\MAV.cs" />
+    <Compile Include="Mathematics\MklProvider.cs" />
     <Compile Include="Neural\BiGRU.cs" />
     <Compile Include="Neural\ErrorFunctions\CrossEntropyError.cs" />
     <Compile Include="Neural\ErrorFunctions\ErrorFunctionBase.cs" />
@@ -104,11 +110,12 @@
     <Compile Include="Neural\Initializers\RandomMatrixInitializer.cs" />
     <Compile Include="Neural\LayeredNet.cs" />
     <Compile Include="Neural\Layers\AffineLayer.cs" />
+    <Compile Include="Neural\Layers\DerivativeLayerBase.cs" />
     <Compile Include="Neural\Layers\DropoutLayer.cs" />
     <Compile Include="Neural\Layers\GRULayer.cs" />
     <Compile Include="Neural\Layers\LinearLayer.cs" />
     <Compile Include="Neural\Layers\ModulusLayer.cs" />
-    <Compile Include="Neural\Layers\NeuroLayer.cs" />
+    <Compile Include="Neural\Layers\LayerBase.cs" />
     <Compile Include="Neural\Layers\SigmoidLayer.cs" />
     <Compile Include="Neural\Layers\SoftMaxLayer.cs" />
     <Compile Include="Neural\Layers\TanhLayer.cs" />
@@ -116,6 +123,7 @@
     <Compile Include="Neural\NeuralNet.cs" />
     <Compile Include="Neural\NeuroWeight.cs" />
     <Compile Include="Optimizers\AdagradOptimizer.cs" />
+    <Compile Include="Optimizers\AdamOptimizer.cs" />
     <Compile Include="Optimizers\IOptimizer.cs" />
     <Compile Include="Optimizers\OptimizerBase.cs" />
     <Compile Include="Optimizers\RMSPropOptimizer.cs" />
@@ -197,13 +205,6 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets" Condition="Exists('$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)packages\MathNet.Numerics.MKL.Win-x64.2.2.0\build\MathNet.Numerics.MKL.Win-x64.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

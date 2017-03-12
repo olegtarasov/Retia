@@ -47,13 +47,15 @@
 			}
 		}
 
-        /// <summary>
-        /// Normalizes a value according to tracked minimum and maximum.
-        /// </summary>
-        /// <param name="value">Value to normalize.</param>
-        public double Normalize(double value)
+	    /// <summary>
+	    /// Normalizes a value according to tracked minimum and maximum.
+	    /// </summary>
+	    /// <param name="value">Value to normalize.</param>
+	    /// <param name="lo">Lower bound of normalization range.</param>
+	    /// <param name="hi">Upper bound of normalization range.</param>
+	    public double Normalize(double value, double lo = -1, double hi = 1)
 	    {
-	        return (value - Min) / Range;
+            return lo + ((value - Min) * (hi - lo)) / Range;
 	    }
 
         /// <summary>

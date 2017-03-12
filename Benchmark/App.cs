@@ -50,7 +50,7 @@ namespace Benchmark
             TestLayerForward(gruLayer, dataSet);
         }
 
-        private void TestLayerForward(NeuroLayer<float> layer, TestDataSet<float> dataSet, int? outSize = null)
+        private void TestLayerForward(LayerBase<float> layer, TestDataSet<float> dataSet, int? outSize = null)
         {
             layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
 

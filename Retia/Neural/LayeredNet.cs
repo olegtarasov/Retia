@@ -23,14 +23,14 @@ namespace Retia.Neural
         private static readonly byte[] _magic = {0xDE, 0xAD, 0xCA, 0xFE};
 
         protected readonly int BatchSize, SeqLen;
-        protected readonly List<NeuroLayer<T>> Layers = new List<NeuroLayer<T>>();
+        protected readonly List<LayerBase<T>> Layers = new List<LayerBase<T>>();
 
 #if !CPUONLY
         private GpuNetwork _gpuNetwork;
 #endif
         private OptimizerBase<T> _optimizer;
 
-        public LayeredNet(int batchSize, int seqLen, params NeuroLayer<T>[] layers)
+        public LayeredNet(int batchSize, int seqLen, params LayerBase<T>[] layers)
         {
             if (layers.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(layers));
 
@@ -100,8 +100,8 @@ namespace Retia.Neural
         }
 
 
-        protected NeuroLayer<T> OutLayer => Layers[Layers.Count - 1];
-        protected NeuroLayer<T> InLayer => Layers[0];
+        protected LayerBase<T> OutLayer => Layers[Layers.Count - 1];
+        protected LayerBase<T> InLayer => Layers[0];
 
         public static LayeredNet<T> Load(string path)
         {
@@ -131,7 +131,7 @@ namespace Retia.Neural
                 int batchSize = reader.ReadInt32();
                 int seqLen = reader.ReadInt32();
                 int layerCount = reader.ReadInt32();
-                var layers = new NeuroLayer<T>[layerCount];
+                var layers = new LayerBase<T>[layerCount];
                 for (int i = 0; i < layerCount; i++)
                 {
                     if (reader.ReadByte() != LayerMagic)
@@ -151,7 +151,7 @@ namespace Retia.Neural
                         throw new InvalidOperationException($"Can't find layer type {typeName}");
                     }
 
-                    var layer = (NeuroLayer<T>)Activator.CreateInstance(layerType, reader);
+                    var layer = (LayerBase<T>)Activator.CreateInstance(layerType, reader);
                     layers[i] = layer;
                 }
 

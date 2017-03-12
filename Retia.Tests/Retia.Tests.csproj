@@ -94,10 +94,10 @@
     <Compile Include="Mathematics\MathProviderTests.cs" />
     <Compile Include="Mathematics\MatrixTests.cs" />
     <Compile Include="Mathematics\MatrixTests.Data.cs" />
-    <Compile Include="Neural\ComplexTests.cs" />
     <Compile Include="Neural\GradientCheckTestsBase.cs" />
     <Compile Include="Neural\TestDataSet.cs" />
     <Compile Include="Optimizers\AdagradOptimizerTests.cs" />
+    <Compile Include="Optimizers\AdamOptimizerTests.cs" />
     <Compile Include="Optimizers\OptimizerTestBase.cs" />
     <Compile Include="Optimizers\RMSPropOptimizerTests.cs" />
     <Compile Include="Plumbing\AssertExtensions.cs" />

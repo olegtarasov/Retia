@@ -55,6 +55,9 @@
     <Reference Include="CLAP, Version=4.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\CLAP.4.6\lib\net35\CLAP.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
+    </Reference>
     <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -72,6 +75,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Examples.MLP_MNIST.cs" />
     <Compile Include="Examples.Xor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -88,10 +92,6 @@
     <ProjectReference Include="..\..\Retia.Gui\Retia.Gui.csproj">
       <Project>{eb0005db-e481-43ea-9802-352bae4b0526}</Project>
       <Name>Retia.Gui</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
-      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
-      <Name>Retia.NativeWrapper</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Retia\Retia.csproj">
       <Project>{80608848-f915-434c-a22c-62a2bb9de046}</Project>
