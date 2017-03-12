@@ -42,13 +42,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\Retia.Cuda;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\Reia.Cuda\bin\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\include;$(ProjectDir)..\Retia.Cuda;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\lib\x64;$(ProjectDir)..\Reia.Cuda\bin\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)..\Retia.Cuda;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\Retia.Cuda\bin\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\include;$(ProjectDir)..\Retia.Cuda;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\lib\x64;$(ProjectDir)..\Reia.Cuda\bin\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
