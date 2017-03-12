@@ -31,13 +31,13 @@ set CUDA_PATH_V8_0=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0
 
 nvcc -V
 
-rem cd ..
-rem git clone https://github.com/Microsoft/vcpkg.git vcpkg
-rem cd vcpkg
-rem mkdir downloads
-rem copy nul downloads\AlwaysAllowDownloads
-rem powershell -exec bypass scripts\bootstrap.ps1
-rem vcpkg integrate install
-rem vcpkg install gtest:x64-windows
+cd ..
+git clone https://github.com/Microsoft/vcpkg.git vcpkg
+cd vcpkg
+mkdir downloads
+copy nul downloads\AlwaysAllowDownloads
+powershell -exec bypass scripts\bootstrap.ps1
+vcpkg integrate install
+vcpkg install gtest:x64-windows
 
 cd "%APPVEYOR_BUILD_FOLDER%"
