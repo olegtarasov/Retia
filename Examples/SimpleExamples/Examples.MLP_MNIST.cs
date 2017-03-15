@@ -59,7 +59,7 @@ namespace SimpleExamples
                     ErrorFilterSize = 100,
                     MaxEpoch = 1,
                     ProgressWriter = ConsoleProgressWriter.Instance,
-                    ReportProgress = new EachIteration(100),
+                    ReportProgress = new EachIteration(1),
                     ReportMesages = true,
                     SequenceLength = 1,
                     SaveIntermediateStates = true
@@ -68,7 +68,6 @@ namespace SimpleExamples
             // Optimize the meta optimizer
             trainer.PeriodicActions.Add(new UserAction(new EachIteration(20), () =>
             {
-                var sens = network.Layers.Last().ErrorFunction.BackpropagateError(trainer.Outputs, trainer.Targets);
                 optimizer.MetaOptimize();
 
                 trainer.Outputs.Clear();

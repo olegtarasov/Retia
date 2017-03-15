@@ -103,8 +103,6 @@ namespace Retia.Optimizers
 
         public void MetaOptimize()
         {
-            if (_sens.Count != SeqLen) throw new InvalidOperationException("Wrong sensitivity count!");
-
             foreach (var layer in _network.Layers)
             {
                 layer.ClearGradients();
