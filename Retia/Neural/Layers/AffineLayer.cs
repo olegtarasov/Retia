@@ -58,14 +58,13 @@ namespace Retia.Neural.Layers
 
         public override int InputSize => _linearLayer.InputSize;
 
-        public override Matrix<T>[] InternalState => _linearLayer.InternalState;
         public override int OutputSize => _activationLayer.OutputSize;
         public override int TotalParamCount => _linearLayer.TotalParamCount + _activationLayer.TotalParamCount;
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
-            var activationSens = _activationLayer.BackPropagate(outSens);
-            return _linearLayer.BackPropagate(activationSens, needInputSens);
+            var activationSens = _activationLayer.BackPropagate(outSens, needInputSens, clearGrad);
+            return _linearLayer.BackPropagate(activationSens, needInputSens, clearGrad);
         }
 
         public override void ClampGrads(float limit)
@@ -176,6 +175,13 @@ namespace Retia.Neural.Layers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(activation), activation, null);
             }
+        }
+
+        public override IReadOnlyList<NeuroWeight<T>> Weights => _linearLayer.Weights;
+        public override void ClearGradients()
+        {
+            _linearLayer.ClearGradients();
+            _activationLayer.ClearGradients();
         }
     }
 }

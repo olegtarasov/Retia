@@ -47,7 +47,7 @@ namespace Retia.Neural.Layers
         /// <returns>Derivative value</returns>
         protected abstract double DerivativeD(Matrix<double> input, Matrix<double> output, int batch, int i, int o);
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
             if (Outputs.Count != Inputs.Count)
                 throw new Exception("Backprop was not initialized (empty state sequence)");

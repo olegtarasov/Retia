@@ -14,12 +14,14 @@ namespace Retia.Neural.Layers
 {
     public abstract class LayerBase<T> : ICloneable<LayerBase<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
+        private readonly List<NeuroWeight<T>> _weights = new List<NeuroWeight<T>>();
+
         protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         protected int BatchSize;
         protected int SeqLen;
 
-        protected List<Matrix<T>> Inputs = new List<Matrix<T>>();
-        protected List<Matrix<T>> Outputs = new List<Matrix<T>>();
+        public List<Matrix<T>> Inputs { get; set; } = new List<Matrix<T>>();
+        public List<Matrix<T>> Outputs { get; set; } = new List<Matrix<T>>();
 
         protected LayerBase()
         {
@@ -52,8 +54,9 @@ namespace Retia.Neural.Layers
         public abstract int InputSize { get; }
         public abstract int OutputSize { get; }
         public abstract int TotalParamCount { get; }
-        public virtual Matrix<T>[] InternalState { get;  set; }
+        public virtual IReadOnlyList<NeuroWeight<T>> Weights => _weights;
 
+        public abstract void ClearGradients();
         public abstract LayerBase<T> Clone();
 
         public virtual void Save(Stream s)
@@ -104,10 +107,21 @@ namespace Retia.Neural.Layers
         /// </summary>
         /// <param name="outSens">Sequence of sensitivity matrices of next layer</param>
         /// <param name="needInputSens">Calculate input sensitivity for further propagation</param>
+        /// <param name="clearGrad">Clear gradients before backpropagation.</param>
         /// <returns></returns>
-        public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public virtual List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
             return outSens;
+        }
+
+        /// <summary>
+        /// Registers layer weights to return from <see cref="Weights"/>.
+        /// </summary>
+        /// <param name="weights">Weight collection.</param>
+        protected void RegisterWeights(params NeuroWeight<T>[] weights)
+        {
+            _weights.Clear();
+            _weights.AddRange(weights);
         }
 
         /// <summary>

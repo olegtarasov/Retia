@@ -107,5 +107,9 @@ namespace Retia.Neural.Layers
         {
             return new SoftmaxLayerSpec(_size, BatchSize, SeqLen);
         }
+
+        public override void ClearGradients()
+        {
+        }
     }
 }

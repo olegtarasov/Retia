@@ -88,7 +88,7 @@ namespace SimpleExamples
                 Optimizer = optimizer
             };
 
-            var trainer = new OptimizingTrainer<float>(net, optimizer, null, new OptimizingTrainerOptions
+            var trainer = new OptimizingTrainer<float>(net, optimizer, new XorSet(true), new OptimizingTrainerOptions
             {
                 ErrorFilterSize = 0,
                 SequenceLength = 1,
@@ -96,10 +96,7 @@ namespace SimpleExamples
                 ReportMesages = true,
                 ProgressWriter = ConsoleProgressWriter.Instance,
                 LearningRateScaler = new ProportionalLearningRateScaler(new EachIteration(1), optimizer, 9e-5f)
-            })
-            {
-                TrainingSet = new XorSet(true)
-            };
+            });
 
             var runner = ConsoleRunner.Create(trainer, net);
 

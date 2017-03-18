@@ -85,7 +85,7 @@ namespace Retia.Neural.Layers
             return input.PointwiseMultiply(_scale);
         }
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
             if (_masks.Count == 0)
                 throw new Exception("Empty step history, nothing to propagate!");
@@ -142,6 +142,10 @@ namespace Retia.Neural.Layers
         protected override void Initialize()
         {
             _scale = Matrix<T>.Build.Dense(_size, BatchSize, MathProvider.Scalar(_dropout));
+        }
+
+        public override void ClearGradients()
+        {
         }
     }
 }

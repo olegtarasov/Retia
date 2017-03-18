@@ -26,6 +26,8 @@ namespace SimpleExamples
     {
         private const string MnistTrainingImages = "train-images-idx3-ubyte";
         private const string MnistTrainingLabels = "train-labels-idx1-ubyte";
+        private const string MnistTestImages = "t10k-images-idx3-ubyte";
+        private const string MnistTestLabels = "t10k-labels-idx1-ubyte";
         private const string MnistUrl = "https://github.com/total-world-domination/datasets/raw/master/mnist/mnist.zip";
 
         [Verb]
@@ -43,16 +45,14 @@ namespace SimpleExamples
             var trainSet = LoadTrainingSet(dataDir);
             trainSet.BatchSize = batchSize;
 
-            var optimizer = new AdamOptimizer<float>();
             var network = new LayeredNet<float>(batchSize, 1,
                 new AffineLayer<float>(trainSet.InputSize, hSize, AffineActivation.Sigmoid),
                 new LinearLayer<float>(hSize, trainSet.TargetSize),
-                new SoftMaxLayer<float>(trainSet.TargetSize))
-                          {
-                              Optimizer = optimizer
-                          };
+                new SoftMaxLayer<float>(trainSet.TargetSize));
+            var optimizer = new AdamOptimizer<float>();
+            network.Optimizer = optimizer;
 
-            var trainer = new OptimizingTrainer<float>(network, optimizer, null,
+            var trainer = new OptimizingTrainer<float>(network, optimizer, trainSet,
                 new OptimizingTrainerOptions
                 {
                     ErrorFilterSize = 100,
@@ -60,11 +60,9 @@ namespace SimpleExamples
                     ProgressWriter = ConsoleProgressWriter.Instance,
                     ReportProgress = new EachIteration(100),
                     ReportMesages = true,
-                    SequenceLength = 1
-                })
-                          {
-                              TrainingSet = trainSet
-                          };
+                    SequenceLength = 1,
+                    SaveIntermediateStates = true
+                });
 
             RetiaGui retiaGui;
             if (gui)
@@ -81,6 +79,14 @@ namespace SimpleExamples
         {
             string images = Path.Combine(path, MnistTrainingImages);
             string labels = Path.Combine(path, MnistTrainingLabels);
+
+            return MnistDataSet.Load(images, labels);
+        }
+
+        private MnistDataSet LoadTestSet(string path)
+        {
+            string images = Path.Combine(path, MnistTestImages);
+            string labels = Path.Combine(path, MnistTestLabels);
 
             return MnistDataSet.Load(images, labels);
         }

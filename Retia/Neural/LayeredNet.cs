@@ -23,7 +23,7 @@ namespace Retia.Neural
         private static readonly byte[] _magic = {0xDE, 0xAD, 0xCA, 0xFE};
 
         protected readonly int BatchSize, SeqLen;
-        protected readonly List<LayerBase<T>> Layers = new List<LayerBase<T>>();
+        protected readonly List<LayerBase<T>> LayersList = new List<LayerBase<T>>();
 
 #if !CPUONLY
         private GpuNetwork _gpuNetwork;
@@ -40,7 +40,7 @@ namespace Retia.Neural
             for (int i = 0; i < layers.Length; i++)
             {
                 var layer = layers[i];
-                Layers.Add(layer);
+                LayersList.Add(layer);
                 layer.Initialize(batchSize, seqLen);
                 if (i == 0)
                     continue;
@@ -54,16 +54,16 @@ namespace Retia.Neural
         {
             BatchSize = other.BatchSize;
             SeqLen = other.SeqLen;
-            Layers = other.Layers.Select(x => x.Clone()).ToList();
+            LayersList = other.LayersList.Select(x => x.Clone()).ToList();
         }
 
         protected LayeredNet(LayeredNet<T> other, int batchSize, int seqLength)
         {
             BatchSize = batchSize;
             SeqLen = seqLength;
-            Layers = other.Layers.Select(x => x.Clone()).ToList();
+            LayersList = other.LayersList.Select(x => x.Clone()).ToList();
 
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
             {
                 layer.Initialize(batchSize, seqLength);
             }
@@ -93,15 +93,16 @@ namespace Retia.Neural
             get
             {
                 var cnt = 0;
-                foreach (var layer in Layers)
+                foreach (var layer in LayersList)
                     cnt += layer.TotalParamCount;
                 return cnt;
             }
         }
 
-
-        protected LayerBase<T> OutLayer => Layers[Layers.Count - 1];
-        protected LayerBase<T> InLayer => Layers[0];
+        public IReadOnlyList<LayerBase<T>> Layers => LayersList;
+ 
+        protected LayerBase<T> OutLayer => LayersList[LayersList.Count - 1];
+        protected LayerBase<T> InLayer => LayersList[0];
 
         public static LayeredNet<T> Load(string path)
         {
@@ -208,7 +209,7 @@ namespace Retia.Neural
         //    Console.WriteLine(hasErr ? "Grad check complete with ERRORS!" : "Grad check OK!");
         //}
 
-        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
+        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<Matrix<T>> outputs)
         {
 #if !CPUONLY
             if (_gpuNetwork != null)
@@ -218,11 +219,14 @@ namespace Retia.Neural
                     throw new InvalidOperationException("GPU is only supported for float data type!");
                 }
 
+                // TODO: Support output from GPU
+                outputs = null;
+
                 return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
             }
 #endif
 
-            return base.TrainSequence(inputs, targets);
+            return base.TrainSequence(inputs, targets, out outputs);
         }
 
         public void TransferStateToHost()
@@ -271,9 +275,9 @@ namespace Retia.Neural
                 writer.Write(_magic);
                 writer.Write(BatchSize);
                 writer.Write(SeqLen);
-                writer.Write(Layers.Count);
+                writer.Write(LayersList.Count);
 
-                foreach (var layer in Layers)
+                foreach (var layer in LayersList)
                 {
                     writer.Write(LayerMagic);
                     writer.Write(layer.GetType().AssemblyQualifiedName);
@@ -308,7 +312,7 @@ namespace Retia.Neural
             }
 #endif
 
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
                 layer.Optimize(Optimizer);
         }
 
@@ -320,11 +324,11 @@ namespace Retia.Neural
         public override List<Matrix<T>> BackPropagate(List<Matrix<T>> targets, bool needInputSens = false)
         {  
             List<Matrix<T>> prop = OutLayer.ErrorPropagate(targets);
-            if (Layers.Count < 2)
+            if (LayersList.Count < 2)
                 return prop;
-            for (int i = Layers.Count - 2; i > 0; i--)
+            for (int i = LayersList.Count - 2; i > 0; i--)
             {
-                var layer = Layers[i];
+                var layer = LayersList[i];
                 prop = layer.BackPropagate(prop, true);
             }
             return InLayer.BackPropagate(prop, needInputSens);
@@ -333,7 +337,7 @@ namespace Retia.Neural
         public override Matrix<T> Step(Matrix<T> input, bool inTraining = false)
         {
             var prop = input;
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
                 prop = layer.Step(prop, inTraining);
             return prop;
         }
@@ -348,7 +352,7 @@ namespace Retia.Neural
             }
 #endif
 
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
                 layer.ResetMemory();
         }
 
@@ -362,13 +366,13 @@ namespace Retia.Neural
             }
 #endif
 
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
                 layer.ResetOptimizer();
         }
 
         public override void InitSequence()
         {
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
                 layer.InitSequence();
         }
 
@@ -378,7 +382,7 @@ namespace Retia.Neural
                 throw new ArgumentException($"Parameter index ({i}) should be less than {TotalParamCount}");
 
             var paramCnt = 0;
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
             {
                 if (i < paramCnt + layer.TotalParamCount)
                 {
@@ -396,7 +400,7 @@ namespace Retia.Neural
                 throw new ArgumentException($"Parameter index ({i}) should be less than {TotalParamCount}");
 
             var paramCnt = 0;
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
             {
                 if (i < paramCnt + layer.TotalParamCount)
                     return layer.GetParam(i - paramCnt, grad);
@@ -408,12 +412,12 @@ namespace Retia.Neural
         private LayeredNetSpec CreateSpec()
         {
             if (Optimizer == null) throw new InvalidOperationException("Set optimizer first!");
-            if (Layers.Count == 0) throw new InvalidOperationException("Add some layers!");
+            if (LayersList.Count == 0) throw new InvalidOperationException("Add some layers!");
 
-            var result = new LayeredNetSpec(Optimizer.CreateSpec(), Layers[0].InputSize, Layers[Layers.Count - 1].OutputSize, BatchSize, SeqLen);
+            var result = new LayeredNetSpec(Optimizer.CreateSpec(), LayersList[0].InputSize, LayersList[LayersList.Count - 1].OutputSize, BatchSize, SeqLen);
             LayerSpecBase lastSpec = null;
             
-            foreach (var layer in Layers)
+            foreach (var layer in LayersList)
             {
                 var lastGru = lastSpec as GruLayerSpec;
                 if (layer is GruLayer<T> && lastGru != null)
@@ -447,32 +451,10 @@ namespace Retia.Neural
 #endif
         }
 
-#region Candidates for removal
+        public override IReadOnlyList<NeuroWeight<T>> Weights => LayersList.SelectMany(x => x.Weights).ToList();
 
-        public override List<Matrix<T>[]> InternalState
-        {
-            get
-            {
-                var result = new List<Matrix<T>[]>(Layers.Count);
-                foreach (var layer in Layers)
-                {
-                    result.Add(layer.InternalState);
-                }
-                return result;
-            }
-            set
-            {
-                if (value.Count() != Layers.Count)
-                    throw new Exception($"Internal state of {GetType().AssemblyQualifiedName} should consist of {Layers.Count} Matrix[]");
-                for (int i = 0; i < Layers.Count; i++)
-                {
-                    var layer = Layers[i];
-                    var state = value[i];
-                    layer.InternalState = state;
-                }
-            }
-        }
+        #region Candidates for removal
 
-#endregion
+        #endregion
     }
 }

@@ -34,6 +34,8 @@ namespace Retia.Neural
         public abstract int OutputSize { get; }
 		public abstract int TotalParamCount { get; }
 
+        public abstract IReadOnlyList<NeuroWeight<T>> Weights { get; }
+
         protected NeuralNet()
         {
         }
@@ -76,21 +78,21 @@ namespace Retia.Neural
             return yList;
         }
 
-	    public virtual double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
+	    public virtual double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<Matrix<T>> outputs)
 	    {
             if (inputs.Count != targets.Count || targets.Count == 0)
                 throw new Exception("Not enough targets or inputs provided!");
 
             var sequenceLen = inputs.Count;
             InitSequence();
-            //var yList = new List<Matrix>(sequenceLen);
+            outputs = new List<Matrix<T>>(sequenceLen);
             var error = new List<double>(sequenceLen);
             for (int i = 0; i < inputs.Count; i++)
             {
                 var target = targets[i];
                 var input = inputs[i];
                 var y = Step(input, true);
-                //yList.Add(y);
+                outputs.Add(y);
                 error.Add(Error(y, target));
             }
             BackPropagate(targets);
@@ -99,8 +101,6 @@ namespace Retia.Neural
         }
 
         #region Candidates for removal
-
-        public virtual List<Matrix<T>[]> InternalState { get; set; }
 
         #endregion
     }

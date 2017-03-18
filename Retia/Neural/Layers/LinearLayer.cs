@@ -20,15 +20,12 @@ namespace Retia.Neural.Layers
         {
             _weights = other._weights.Clone();
             _bias = other._bias.Clone();
-        }
 
-        private LinearLayer()
-        {
+            RegisterWeights(_bias, _weights);
         }
 
         public LinearLayer(int xSize, int ySize) : this(xSize, ySize, new RandomMatrixInitializer<T>())
         {
-            
         }
 
         public LinearLayer(int xSize, int ySize, IMatrixInitializer<T> matrixInitializer)
@@ -37,12 +34,16 @@ namespace Retia.Neural.Layers
             _bias = matrixInitializer.CreateMatrix(ySize, 1);
 
             ErrorFunction = new MeanSquareError<T>();
+
+            RegisterWeights(_bias, _weights);
         }
 
         public LinearLayer(BinaryReader reader) : base(reader)
         {
             _bias = NeuroWeight<T>.Load(reader.BaseStream);
             _weights = NeuroWeight<T>.Load(reader.BaseStream);
+
+            RegisterWeights(_bias, _weights);
         }
 
         public override int InputSize => _weights.Weight.ColumnCount;
@@ -136,10 +137,12 @@ namespace Retia.Neural.Layers
             return BackPropagate(base.ErrorPropagate(targets));
         }
 
-        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true)
+        public override List<Matrix<T>> BackPropagate(List<Matrix<T>> outSens, bool needInputSens = true, bool clearGrad = true)
         {
-            _weights.ClearGrad();
-            _bias.ClearGrad();
+            if (clearGrad)
+            {
+                ClearGradients();
+            }
 
             if (Inputs.Count == 0)
                 throw new Exception("Empty inputs history, nothing to propagate!");
@@ -178,6 +181,12 @@ namespace Retia.Neural.Layers
             }
 
             return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight as Matrix<float>, _bias.Weight as Matrix<float>);
+        }
+
+        public override void ClearGradients()
+        {
+            _weights.ClearGrad();
+            _bias.ClearGrad();
         }
     }
 }
