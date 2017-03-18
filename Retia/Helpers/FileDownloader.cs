@@ -34,6 +34,8 @@ namespace Retia.Helpers
         /// <returns>True if suceeded, false otherwise.</returns>
         public bool DownloadAndExtract(string url, string downloadFileName, Action<ZipFile> extractor, bool keepDownloaded = false)
         {
+            string fileName = Path.GetFileName(downloadFileName);
+
             if (!File.Exists(downloadFileName))
             {
                 bool complete = false;
@@ -42,7 +44,7 @@ namespace Retia.Helpers
                 {
                     if (!complete)
                     {
-                        _progressWriter?.SetItemProgress(args.BytesReceived, args.TotalBytesToReceive, "Downloading MKL");
+                        _progressWriter?.SetItemProgress(args.BytesReceived, args.TotalBytesToReceive, $"Downloading {fileName}");
                     }
                 };
 
@@ -52,7 +54,7 @@ namespace Retia.Helpers
                 }
                 catch (Exception e)
                 {
-                    _progressWriter?.Message($"Failed to download MKL: {e.Message}");
+                    _progressWriter?.Message($"Failed to download {fileName}: {e.Message}");
                     return false;
                 }
 
@@ -67,11 +69,11 @@ namespace Retia.Helpers
                     extractor(zip);
                 }
 
-                _progressWriter?.Message($"Extracted MKL to {downloadFileName}");
+                _progressWriter?.Message($"Extracted {fileName}.");
             }
             catch (Exception e)
             {
-                _progressWriter?.Message($"Failed to extract MKL: {e.Message}");
+                _progressWriter?.Message($"Failed to extract {fileName}: {e.Message}");
                 return false;
             }
             finally

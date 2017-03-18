@@ -49,8 +49,7 @@ namespace SimpleExamples
                 new AffineLayer<float>(trainSet.InputSize, hSize, AffineActivation.Sigmoid),
                 new LinearLayer<float>(hSize, trainSet.TargetSize),
                 new SoftMaxLayer<float>(trainSet.TargetSize));
-            var optimizer = new MetaOptimizer(network.Weights);
-            //var optimizer = new AdamOptimizer<float>();
+            var optimizer = new AdamOptimizer<float>();
             network.Optimizer = optimizer;
 
             var trainer = new OptimizingTrainer<float>(network, optimizer, trainSet,
@@ -59,20 +58,11 @@ namespace SimpleExamples
                     ErrorFilterSize = 100,
                     MaxEpoch = 1,
                     ProgressWriter = ConsoleProgressWriter.Instance,
-                    ReportProgress = new EachIteration(1),
+                    ReportProgress = new EachIteration(100),
                     ReportMesages = true,
                     SequenceLength = 1,
                     SaveIntermediateStates = true
                 });
-
-            // Optimize the meta optimizer
-            trainer.PeriodicActions.Add(new UserAction(new EachIteration(20), () =>
-            {
-                optimizer.MetaOptimize();
-
-                trainer.Outputs.Clear();
-                trainer.Targets.Clear();
-            }));
 
             RetiaGui retiaGui;
             if (gui)
