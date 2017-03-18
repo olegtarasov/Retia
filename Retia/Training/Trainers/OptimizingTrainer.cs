@@ -13,7 +13,8 @@ using Retia.Training.Testers;
 
 namespace Retia.Training.Trainers
 {
-    public class OptimizingTrainer<T>: TrainerBase<T, OptimizingTrainerOptions, OptimizationReportEventArgs> where T : struct, IEquatable<T>, IFormattable
+    public class OptimizingTrainer<T>: TrainerBase<T, OptimizingTrainerOptions, OptimizationReportEventArgs> 
+        where T : struct, IEquatable<T>, IFormattable
     {
         protected readonly NeuralNet<T> _network;
         private readonly OptimizerBase<T> _optimizer;
@@ -43,6 +44,9 @@ namespace Retia.Training.Trainers
             }
             set
             {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
                 if (_trainingSet != null)
                     _trainingSet.DataSetReset -= TrainingSetOnDataSetReset;
 
