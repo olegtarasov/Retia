@@ -49,8 +49,7 @@ namespace SimpleExamples
                 new AffineLayer<float>(trainSet.InputSize, hSize, AffineActivation.Sigmoid),
                 new LinearLayer<float>(hSize, trainSet.TargetSize),
                 new SoftMaxLayer<float>(trainSet.TargetSize));
-            var optimizer = new MetaOptimizer(network.Weights);
-            //var optimizer = new AdamOptimizer<float>();
+            var optimizer = new AdamOptimizer<float>();
             network.Optimizer = optimizer;
 
             var trainer = new OptimizingTrainer<float>(network, optimizer, trainSet,
@@ -64,16 +63,6 @@ namespace SimpleExamples
                     SequenceLength = 1,
                     SaveIntermediateStates = true
                 });
-
-            // Optimize the meta optimizer
-            trainer.PeriodicActions.Add(new UserAction(new EachIteration(20), () =>
-            {
-                var sens = network.Layers.Last().ErrorFunction.BackpropagateError(trainer.Outputs, trainer.Targets);
-                optimizer.MetaOptimize();
-
-                trainer.Outputs.Clear();
-                trainer.Targets.Clear();
-            }));
 
             RetiaGui retiaGui;
             if (gui)
