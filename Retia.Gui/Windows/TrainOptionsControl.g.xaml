@@ -60,6 +60,11 @@
           <Binding Path="PauseCommand"/>
         </Button.Command>
       </Button>
+      <Button Margin="4" Padding="8 2" Content="Stop">
+        <Button.Command>
+          <Binding Path="StopCommand"/>
+        </Button.Command>
+      </Button>
     </StackPanel>
   </StackPanel>
 </UserControl>

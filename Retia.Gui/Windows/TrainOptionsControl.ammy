@@ -31,6 +31,9 @@
 			@PaddedButton("Pause") {
 				Command: bind PauseCommand
 			}
+			@PaddedButton("Stop") {
+				Command: bind StopCommand
+			}
 		}
 	}
 }

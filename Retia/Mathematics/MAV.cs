@@ -33,8 +33,11 @@ namespace Retia.Mathematics
         public double Filter(double value)
         {
             _buffer.AddLast(value);
-            if(_buffer.Count > Order)
+            while (_buffer.Count > Order)
+            {
                 _buffer.RemoveFirst();
+            }
+            
             return _buffer.Sum() / _buffer.Count;
         }
         

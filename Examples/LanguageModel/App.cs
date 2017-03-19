@@ -100,10 +100,9 @@ namespace LanguageModel
 		        network.UseGpu();
 		    }
 
-			var trainOptions = new OptimizingTrainerOptions
+			var trainOptions = new OptimizingTrainerOptions(SEQ_LEN)
 		                       {
 		                           ErrorFilterSize = 20,
-		                           SequenceLength = SEQ_LEN,
 		                           ReportMesages = true,
 		                           MaxEpoch = 1000,
                                    ProgressWriter = ConsoleProgressWriter.Instance,

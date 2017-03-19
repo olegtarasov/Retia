@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using MathNet.Numerics.LinearAlgebra;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural;
@@ -34,7 +33,7 @@ namespace Retia.Training.Trainers
             TrainingSet = trainingSet;
         }
 
-        public override NeuralNet<T> TestableNetwork => _network;
+        public virtual NeuralNet<T> Network => _network;
 
         public IDataSet<T> TrainingSet
         {
@@ -56,23 +55,6 @@ namespace Retia.Training.Trainers
         }
 
         public IDataSet<T> TestSet { get; set; }
-
-        // TODO: Find a better way to set learning rate manually
-        public float LearningRate
-        {
-            get
-            {
-                return _optimizer.LearningRate;
-            }
-            set
-            {
-                _optimizer.LearningRate = value;
-                Options.LearningRateScaler?.Reset();
-            }
-        }
-
-        public List<Matrix<T>> Outputs { get; set; }
-        public List<Matrix<T>> Targets { get; set; }
 
         protected virtual TrainingSequence<T> GetTrainSamples()
         {
@@ -159,12 +141,6 @@ namespace Retia.Training.Trainers
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
 
-            if (Options.SaveIntermediateStates)
-            {
-                Outputs = new List<Matrix<T>>();
-                Targets = new List<Matrix<T>>();
-            }
-
             Options.ProgressWriter?.Message($"Sequence length: {Options.SequenceLength}");
             Options.ProgressWriter?.Message($"Using network with total param count {_network.TotalParamCount}");
         }
@@ -190,14 +166,7 @@ namespace Retia.Training.Trainers
         protected override void TrainIteration()
         {
             var sequence = GetTrainSamples();
-            List<Matrix<T>> outputs;
-            double error = _network.TrainSequence(sequence.Inputs, sequence.Targets, out outputs);
-
-            if (Options.SaveIntermediateStates)
-            {
-                Targets.AddRange(sequence.Targets);
-                Outputs.AddRange(outputs);
-            }
+            double error = _network.TrainSequence(sequence.Inputs, sequence.Targets);
 
             _network.Optimize();
             ProcessError(error);
@@ -240,7 +209,7 @@ namespace Retia.Training.Trainers
             TestSet.Reset();
             var testWatch = new Stopwatch();
             testWatch.Start();
-            var result = _tester.Test(TestableNetwork.Clone(), TestSet);
+            var result = _tester.Test(Network.Clone(), TestSet);
             testWatch.Stop();
 
             if (Options.ReportMesages)

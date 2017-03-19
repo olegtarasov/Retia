@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Retia.Integration;
-using Retia.Neural;
 using Retia.Training.Data;
 using Retia.Training.Testers;
 using Retia.Training.Trainers.Actions;
@@ -21,6 +20,8 @@ namespace Retia.Training.Trainers
         public TOptions Options { get; }
 
         private readonly ManualResetEventSlim _pauseHandle = new ManualResetEventSlim(true);
+
+        private bool _stop = false;
         
         protected TrainerBase(TOptions options)
         {
@@ -28,8 +29,6 @@ namespace Retia.Training.Trainers
 
             ValidateOptions(options);
         }
-
-        public abstract NeuralNet<T> TestableNetwork { get; }
 
         public List<PeriodicActionBase> PeriodicActions { get; } = new List<PeriodicActionBase>();
         public bool IsTraining { get; private set; }
@@ -44,18 +43,26 @@ namespace Retia.Training.Trainers
 
         protected abstract void ResetMemory();
 
+        public event EventHandler TrainingStateChanged;
         public event EventHandler<TReport> TrainReport;
 
         public void Pause()
         {
             IsPaused = true;
             _pauseHandle.Reset();
+            OnTrainingStateChanged();
         }
 
         public void Resume()
         {
             IsPaused = false;
             _pauseHandle.Set();
+            OnTrainingStateChanged();
+        }
+
+        public void Stop()
+        {
+            _stop = true;
         }
 
         public async Task Train(CancellationToken token)
@@ -67,6 +74,9 @@ namespace Retia.Training.Trainers
 
             IsTraining = true;
             IsPaused = false;
+            _stop = false;
+
+            OnTrainingStateChanged();
 
             try
             {
@@ -75,6 +85,10 @@ namespace Retia.Training.Trainers
             catch (Exception e)
             {
                 Options.ProgressWriter?.Message(e.ToString());
+            }
+            finally
+            {
+                OnTrainingStateChanged();
             }
         }
 
@@ -112,12 +126,11 @@ namespace Retia.Training.Trainers
             SubscribeActions();
 
             var watch = new Stopwatch();
-            watch.Start();
             while (IsTraining)
             {
-                if (token.IsCancellationRequested)
+                if (token.IsCancellationRequested || _stop)
                 {
-                    Options.ProgressWriter?.Message("Stopped training manually");
+                    Options.ProgressWriter?.Message("Training stopped");
                     IsTraining = false;
                     return;
                 }
@@ -202,6 +215,11 @@ namespace Retia.Training.Trainers
         private void OnSequenceTrained()
         {
             SequenceTrained?.Invoke();
+        }
+
+        protected virtual void OnTrainingStateChanged()
+        {
+            TrainingStateChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

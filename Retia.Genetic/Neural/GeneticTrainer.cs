@@ -21,7 +21,7 @@ namespace Retia.Genetic.Neural
 	        _evolver = evolver;
         }
 
-        public override NeuralNet<float> TestableNetwork => _alpha;
+        public virtual NeuralNet<float> TestableNetwork => _alpha;
 
 	    protected override GeneticReportEventArgs GetTrainingReport()
         {

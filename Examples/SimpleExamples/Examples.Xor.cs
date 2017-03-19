@@ -88,10 +88,9 @@ namespace SimpleExamples
                 Optimizer = optimizer
             };
 
-            var trainer = new OptimizingTrainer<float>(net, optimizer, new XorSet(true), new OptimizingTrainerOptions
+            var trainer = new OptimizingTrainer<float>(net, optimizer, new XorSet(true), new OptimizingTrainerOptions(1)
             {
                 ErrorFilterSize = 0,
-                SequenceLength = 1,
                 ReportProgress = new EachIteration(1),
                 ReportMesages = true,
                 ProgressWriter = ConsoleProgressWriter.Instance,
