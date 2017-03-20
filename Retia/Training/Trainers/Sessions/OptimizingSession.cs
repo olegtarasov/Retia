@@ -12,8 +12,6 @@ namespace Retia.Training.Trainers.Sessions
     {
         private static readonly List<OptimizationError> FlushInProgress = new List<OptimizationError>();
 
-        private const int ErrorFlushInterval = 30000;
-
         private readonly object _flushLock = new object();
         private readonly StreamWriter _errorWriter;
         private readonly string _networksDir;
