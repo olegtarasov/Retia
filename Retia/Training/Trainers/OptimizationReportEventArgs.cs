@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers
 {
-	public class OptimizationReportEventArgs : TrainReportEventArgsBase
+	public class OptimizationReportEventArgs : TrainReportEventArgsBase<OptimizingSession>
 	{
-		public OptimizationReportEventArgs(List<double> errors, long epoch, long iteration, float learningRate) : base(epoch, iteration)
+		public OptimizationReportEventArgs(OptimizingSession session, List<OptimizationError> errors, float learningRate) : base(session)
 		{
 			Errors = errors;
 			LearningRate = learningRate;
 		}
 
-		public List<double> Errors { get; set; }
+		public List<OptimizationError> Errors { get; set; }
         public float LearningRate { get; set; }
 	}
 }

@@ -9,23 +9,23 @@ using Retia.Training.Trainers;
 
 namespace Retia.Genetic.Neural
 {
-    public class GeneticTrainer : TrainerBase<float, GeneticTrainerOptions, GeneticReportEventArgs>
+    public class GeneticTrainer : TrainerBase<float, GeneticTrainerOptions, GeneticReportEventArgs, GeneticSession>
     {
         private readonly Evolver<EvolvableNet> _evolver;
         private EvolvableNet _alpha;
 
         private TimeSpan _wtc, _ctw;
 
-        public GeneticTrainer(Evolver<EvolvableNet> evolver, GeneticTrainerOptions options) : base(options)
+        public GeneticTrainer(Evolver<EvolvableNet> evolver, GeneticTrainerOptions options) : base(options, new GeneticSession(null))
         {
 	        _evolver = evolver;
         }
 
-        public override NeuralNet<float> TestableNetwork => _alpha;
+        public virtual NeuralNet<float> TestableNetwork => _alpha;
 
-	    protected override GeneticReportEventArgs GetTrainingReport()
+	    protected override GeneticReportEventArgs GetAndFlushTrainingReport()
         {
-            return new GeneticReportEventArgs(Epoch, Iteration, _evolver.MaxFitness);
+            return new GeneticReportEventArgs(Session, _evolver.MaxFitness);
         }
 
         protected override string GetTrainingReportMessage()
@@ -41,7 +41,7 @@ namespace Retia.Genetic.Neural
 
         protected override void TrainIteration()
         {
-            Epoch = Iteration;
+            Session.Epoch = Session.Iteration;
 
             _evolver.CalculateFitness();
             _alpha = _evolver.Population[0];

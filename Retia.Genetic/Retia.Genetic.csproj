@@ -51,6 +51,7 @@
     <Compile Include="Neural\EvolvableNet.cs" />
     <Compile Include="Neural\EvolvableNetGenerator.cs" />
     <Compile Include="Neural\GeneticReportEventArgs.cs" />
+    <Compile Include="Neural\GeneticSession.cs" />
     <Compile Include="Neural\GeneticTrainer.cs" />
     <Compile Include="Neural\GeneticTrainerOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

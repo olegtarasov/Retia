@@ -42,13 +42,17 @@ namespace Retia.Gui
                 throw new InvalidOperationException("Set the window!");
             }
 
-            var window = _windowFunc();
-            if (window == null)
-            {
-                throw new InvalidOperationException("Window func returned null!");
-            }
-
             _application = new Application();
+            
+            Window window = null;
+            _application.Dispatcher.Invoke(() =>
+            {
+                window = _windowFunc();
+                if (window == null)
+                {
+                    throw new InvalidOperationException("Window func returned null!");
+                }
+            });
             _appStarted.Set();
             _application.Run(window);
         }

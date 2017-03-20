@@ -209,7 +209,7 @@ namespace Retia.Neural
         //    Console.WriteLine(hasErr ? "Grad check complete with ERRORS!" : "Grad check OK!");
         //}
 
-        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<Matrix<T>> outputs)
+        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
 #if !CPUONLY
             if (_gpuNetwork != null)
@@ -220,13 +220,12 @@ namespace Retia.Neural
                 }
 
                 // TODO: Support output from GPU
-                outputs = null;
 
                 return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
             }
 #endif
 
-            return base.TrainSequence(inputs, targets, out outputs);
+            return base.TrainSequence(inputs, targets);
         }
 
         public void TransferStateToHost()

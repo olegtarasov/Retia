@@ -21,6 +21,7 @@ using Retia.Optimizers;
 using Retia.RandomGenerator;
 using Retia.Training.Trainers;
 using Retia.Training.Trainers.Actions;
+using Retia.Training.Trainers.Sessions;
 using Window = System.Windows.Window;
 
 // Learn -b="D:\__RNN\ook.bin"
@@ -69,22 +70,18 @@ namespace LanguageModel
 			[Aliases("c")]				string configPath,
 			[Aliases("r"), DefaultValue(0.0002f)]  float learningRate,
             [DefaultValue(false)]       bool gpu,
-            [DefaultValue(false)]       bool gui)
+            [DefaultValue(true)]       bool gui)
 		{
             MklProvider.TryUseMkl(true, ConsoleProgressWriter.Instance);
 
-            string rnnPath = $"NETWORK_{DateTime.Now:dd_MM_yy-HH_mm_ss}.rnn";
-			var errFile = new FileStream($"ERR_{DateTime.Now:dd_MM_yy-HH_mm_ss}.txt", FileMode.Create);
-			var errWriter = new StreamWriter(errFile);
-
-			Console.WriteLine($"Loading test set from {batchesPath}");
+            Console.WriteLine($"Loading test set from {batchesPath}");
 			_dataProvider.Load(batchesPath);
 
 		    var optimizer = new RMSPropOptimizer<float>(learningRate, 0.95f, 0.0f, 0.9f);
 			LayeredNet<float> network;
 			if (string.IsNullOrEmpty(configPath))
 			{
-				network = CreateNetwork(_dataProvider.TrainingSet.InputSize, 256, _dataProvider.TrainingSet.TargetSize);
+				network = CreateNetwork(_dataProvider.TrainingSet.InputSize, 128, _dataProvider.TrainingSet.TargetSize);
                 network.Optimizer = optimizer;
 			}
 			else
@@ -100,32 +97,23 @@ namespace LanguageModel
 		        network.UseGpu();
 		    }
 
-			var trainOptions = new OptimizingTrainerOptions
+			var trainOptions = new OptimizingTrainerOptions(SEQ_LEN)
 		                       {
-		                           ErrorFilterSize = 20,
-		                           SequenceLength = SEQ_LEN,
+		                           ErrorFilterSize = 100,
 		                           ReportMesages = true,
 		                           MaxEpoch = 1000,
                                    ProgressWriter = ConsoleProgressWriter.Instance,
                                    ReportProgress = new EachIteration(10)
 		                       };
 
-            trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), optimizer, 9.9e-5f);
-            var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider.TrainingSet, trainOptions);
+            trainOptions.LearningRateScaler = new ProportionalLearningRateScaler(new ActionSchedule(1, PeriodType.Iteration), 9.9e-5f);
+
+            var session = new OptimizingSession(Path.GetFileNameWithoutExtension(batchesPath));
+            var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider.TrainingSet, trainOptions, session);
 
             var epochWatch = new Stopwatch();
            
-			trainer.TrainReport += (sender, args) =>
-			{
-				foreach (var err in args.Errors)
-				{
-					errWriter.WriteLine($"{DateTime.Now.TimeOfDay};{err.ToString(NumberFormatInfo.InvariantInfo)}");
-				}
-                errWriter.Flush();
-				errFile.Flush(true);
-				network.Save(rnnPath);
-			};
-			trainer.EpochReached += () =>
+			trainer.EpochReached += sess =>
 		    {
                 epochWatch.Stop();
 		        Console.WriteLine($"Trained epoch in {epochWatch.Elapsed.TotalSeconds} s.");

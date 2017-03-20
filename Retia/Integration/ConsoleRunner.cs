@@ -3,22 +3,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using Retia.Neural;
 using Retia.Training.Trainers;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Integration
 {
     /// <summary>
     /// Runs a trainer on a console supporting cancellation and other options.
     /// </summary>
-    public class ConsoleRunner<T, TOptions, TReport> 
+    public class ConsoleRunner<T, TOptions, TReport, TSession> 
             where T : struct, IEquatable<T>, IFormattable
             where TOptions : TrainerOptionsBase
-            where TReport : TrainReportEventArgsBase
+            where TReport : TrainReportEventArgsBase<TSession>
+            where TSession : TrainingSessionBase
     {
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private readonly TrainerBase<T, TOptions, TReport> _trainer;
+        private readonly TrainerBase<T, TOptions, TReport, TSession> _trainer;
         private readonly NeuralNet<T> _network;
 
-        public ConsoleRunner(TrainerBase<T, TOptions, TReport> trainer, NeuralNet<T> network)
+        public ConsoleRunner(TrainerBase<T, TOptions, TReport, TSession> trainer, NeuralNet<T> network)
         {
             _trainer = trainer;
             _network = network;
@@ -34,6 +36,7 @@ namespace Retia.Integration
                 switch (c)
                 {
                     case ConsoleKey.Q:
+                        Console.WriteLine("Stopping training manually");
                         running = false;
                         break;
 
@@ -58,12 +61,13 @@ namespace Retia.Integration
 
     public class ConsoleRunner
     {
-        public static ConsoleRunner<T, TOptions, TReport> Create<T, TOptions, TReport>(TrainerBase<T, TOptions, TReport> trainer, NeuralNet<T> network) 
+        public static ConsoleRunner<T, TOptions, TReport, TSession> Create<T, TOptions, TReport, TSession>(TrainerBase<T, TOptions, TReport, TSession> trainer, NeuralNet<T> network) 
             where T : struct, IEquatable<T>, IFormattable
             where TOptions : TrainerOptionsBase
-            where TReport : TrainReportEventArgsBase
+            where TReport : TrainReportEventArgsBase<TSession>
+            where TSession : TrainingSessionBase
         {
-            return new ConsoleRunner<T, TOptions, TReport>(trainer, network);
+            return new ConsoleRunner<T, TOptions, TReport, TSession>(trainer, network);
         }
     }
 }

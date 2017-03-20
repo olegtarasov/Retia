@@ -19,6 +19,7 @@ using Retia.RandomGenerator;
 using Retia.Training.Data;
 using Retia.Training.Trainers;
 using Retia.Training.Trainers.Actions;
+using Retia.Training.Trainers.Sessions;
 
 namespace SimpleExamples
 {
@@ -53,16 +54,14 @@ namespace SimpleExamples
             network.Optimizer = optimizer;
 
             var trainer = new OptimizingTrainer<float>(network, optimizer, trainSet,
-                new OptimizingTrainerOptions
+                new OptimizingTrainerOptions(1)
                 {
                     ErrorFilterSize = 100,
                     MaxEpoch = 1,
                     ProgressWriter = ConsoleProgressWriter.Instance,
                     ReportProgress = new EachIteration(100),
-                    ReportMesages = true,
-                    SequenceLength = 1,
-                    SaveIntermediateStates = true
-                });
+                    ReportMesages = true
+                }, new OptimizingSession("MNIST"));
 
             RetiaGui retiaGui;
             if (gui)

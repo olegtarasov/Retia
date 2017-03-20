@@ -15,6 +15,7 @@ namespace Retia.Gui.Models
 
         public RelayCommand StartResumeCommand { get; set; }
         public RelayCommand PauseCommand { get; set; }
+        public RelayCommand StopCommand { get; set; }
         public RelayCommand ApplyOptionsCommand { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural
 {
-    public abstract class NeuralNet<T> : ICloneable<NeuralNet<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
+    public abstract class NeuralNet<T> : ICloneable<NeuralNet<T>>, INeuralNet where T : struct, IEquatable<T>, IFormattable
     {
         protected MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         public virtual OptimizerBase<T> Optimizer { get; set; }
@@ -78,30 +78,24 @@ namespace Retia.Neural
             return yList;
         }
 
-	    public virtual double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets, out List<Matrix<T>> outputs)
+	    public virtual double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
 	    {
             if (inputs.Count != targets.Count || targets.Count == 0)
                 throw new Exception("Not enough targets or inputs provided!");
 
             var sequenceLen = inputs.Count;
             InitSequence();
-            outputs = new List<Matrix<T>>(sequenceLen);
             var error = new List<double>(sequenceLen);
             for (int i = 0; i < inputs.Count; i++)
             {
                 var target = targets[i];
                 var input = inputs[i];
                 var y = Step(input, true);
-                outputs.Add(y);
                 error.Add(Error(y, target));
             }
             BackPropagate(targets);
             var totalErr = error.Sum() / error.Count;
             return totalErr;
         }
-
-        #region Candidates for removal
-
-        #endregion
     }
 }

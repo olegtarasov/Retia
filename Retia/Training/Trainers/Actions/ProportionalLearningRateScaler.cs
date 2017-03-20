@@ -1,12 +1,15 @@
 ﻿using Retia.Optimizers;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers.Actions
 {
     public class ProportionalLearningRateScaler : LearningRateScalerBase
     {
+        private float _initialRate = float.NaN;
         private int _scalingTicks = 0;
 
-        public ProportionalLearningRateScaler(ActionSchedule schedule, IOptimizer optimizer, float scalingFactor) : base(schedule, optimizer)
+
+        public ProportionalLearningRateScaler(ActionSchedule schedule, float scalingFactor) : base(schedule)
         {
             ScalingFactor = scalingFactor;
         }
@@ -17,12 +20,18 @@ namespace Retia.Training.Trainers.Actions
         {
             base.Reset();
             _scalingTicks = 0;
+            _initialRate = float.NaN;
         }
 
-        protected override void DoAction()
+        protected override void DoAction(OptimizingSession session)
         {
+            if (float.IsNaN(_initialRate))
+            {
+                _initialRate = session.Optimizer.LearningRate;
+            }
+
             _scalingTicks++;
-            Optimizer.LearningRate = InitialRate / (1.0f + _scalingTicks * ScalingFactor);
+            session.Optimizer.LearningRate = _initialRate / (1.0f + _scalingTicks * ScalingFactor);
         }
     }
 }

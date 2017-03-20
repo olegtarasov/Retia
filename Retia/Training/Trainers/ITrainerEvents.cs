@@ -1,12 +1,11 @@
 using System;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers
 {
     public interface ITrainerEvents
     {
-        event Action SequenceTrained;
-        event Action EpochReached;
-        long Epoch { get; }
-        long Iteration { get; }
+        event Action<TrainingSessionBase> SequenceTrained;
+        event Action<TrainingSessionBase> EpochReached;
     }
 }

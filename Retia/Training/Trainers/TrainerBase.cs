@@ -6,56 +6,65 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Retia.Integration;
-using Retia.Neural;
 using Retia.Training.Data;
 using Retia.Training.Testers;
 using Retia.Training.Trainers.Actions;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers
 {
-    public abstract class TrainerBase<T, TOptions, TReport> : ITrainingReporter<TReport>, ITrainerEvents 
+    public abstract class TrainerBase<T, TOptions, TReport, TSession> : ITrainingReporter<TReport, TSession>, ITrainerEvents
         where T : struct, IEquatable<T>, IFormattable
         where TOptions : TrainerOptionsBase
-        where TReport : TrainReportEventArgsBase
+        where TReport : TrainReportEventArgsBase<TSession>
+        where TSession : TrainingSessionBase
     {
-        public TOptions Options { get; }
-
         private readonly ManualResetEventSlim _pauseHandle = new ManualResetEventSlim(true);
-        
-        protected TrainerBase(TOptions options)
+
+        private bool _stop = false;
+
+        protected TrainerBase(TOptions options, TSession session)
         {
             Options = options;
+            Session = session;
 
             ValidateOptions(options);
         }
 
-        public abstract NeuralNet<T> TestableNetwork { get; }
+        public bool IsPaused { get; private set; }
+        public bool IsTraining { get; private set; }
+
+        public TOptions Options { get; }
 
         public List<PeriodicActionBase> PeriodicActions { get; } = new List<PeriodicActionBase>();
-        public bool IsTraining { get; private set; }
-        public bool IsPaused { get; private set; }
-        public long Epoch { get; protected set; }
-        
-        public long Iteration { get; protected set; }
+        public TSession Session { get; private set; }
 
-        protected abstract TReport GetTrainingReport();
-
-        protected abstract void TrainIteration();
+        protected abstract TReport GetAndFlushTrainingReport();
 
         protected abstract void ResetMemory();
 
-        public event EventHandler<TReport> TrainReport;
+        protected abstract void TrainIteration();
+        public event Action<TrainingSessionBase> EpochReached;
 
         public void Pause()
         {
             IsPaused = true;
             _pauseHandle.Reset();
+            OnTrainingStateChanged();
         }
 
         public void Resume()
         {
             IsPaused = false;
             _pauseHandle.Set();
+            OnTrainingStateChanged();
+        }
+
+        public event Action<TrainingSessionBase> SequenceTrained;
+
+        public void Stop()
+        {
+            _stop = true;
         }
 
         public async Task Train(CancellationToken token)
@@ -67,6 +76,9 @@ namespace Retia.Training.Trainers
 
             IsTraining = true;
             IsPaused = false;
+            _stop = false;
+
+            OnTrainingStateChanged();
 
             try
             {
@@ -76,13 +88,19 @@ namespace Retia.Training.Trainers
             {
                 Options.ProgressWriter?.Message(e.ToString());
             }
+            finally
+            {
+                OnTrainingStateChanged();
+                Session.Dispose();
+            }
         }
 
-        public event Action SequenceTrained;
-        public event Action EpochReached;
+        public event EventHandler TrainingStateChanged;
+        public event EventHandler<TReport> TrainReport;
 
-        protected virtual void InitTraining()
+        protected virtual string GetIterationProgress(int otherLen)
         {
+            return $"I:{Session.Iteration}";
         }
 
         protected virtual string GetTrainingReportMessage()
@@ -90,97 +108,13 @@ namespace Retia.Training.Trainers
             return null;
         }
 
-        protected virtual void ValidateOptions(TOptions options)
+        protected virtual void InitTraining()
         {
         }
 
-        protected void OnTrainReport(TReport args)
+        protected virtual void OnTrainingStateChanged()
         {
-            TrainReport?.Invoke(this, args);
-        }
-
-        protected void OnEpochReached()
-        {
-            EpochReached?.Invoke();
-        }
-
-        private void TrainInternal(CancellationToken token)
-        {
-            Iteration = 0;
-
-            InitTraining();
-            SubscribeActions();
-
-            var watch = new Stopwatch();
-            watch.Start();
-            while (IsTraining)
-            {
-                if (token.IsCancellationRequested)
-                {
-                    Options.ProgressWriter?.Message("Stopped training manually");
-                    IsTraining = false;
-                    return;
-                }
-
-                if (!_pauseHandle.IsSet)
-                {
-                    Options.ProgressWriter?.Message("Training paused");
-                    try
-                    {
-                        _pauseHandle.Wait(token);
-                    }
-                    catch (TaskCanceledException)
-                    {
-                        return;
-                    }
-                    Options.ProgressWriter?.Message("Training resumed");
-                }
-
-                watch.Restart();
-                TrainIteration();
-                watch.Stop();
-
-                Iteration++;
-
-                // Check for memory reset on iteration.
-                if (Options.ResetMemory?.ShouldDoOnIteration(Iteration) == true)
-                {
-                    ResetMemory();
-                }
-
-                OnSequenceTrained();
-
-                if (Options.ReportProgress?.ShouldDoOnIteration(Iteration) == true)
-                {
-                    OnTrainReport(GetTrainingReport());
-
-                    if (Options.ReportMesages && Options.ProgressWriter != null)
-                    {
-                        var preIter = new StringBuilder();
-                        preIter.Append('#').Append(Epoch).Append('[');
-
-                        var postIter = new StringBuilder();
-                        postIter.Append(' ').AppendFormat("{0:0.0000}", watch.Elapsed.TotalSeconds).Append("s] ").Append(GetTrainingReportMessage());
-
-                        preIter.Append(GetIterationProgress(preIter.Length + postIter.Length)).Append(postIter);
-
-                        Options.ProgressWriter.SetItemProgress(preIter.ToString());
-                    }
-                }
-
-                if (Epoch > Options.MaxEpoch)
-                {
-                    Options.ProgressWriter?.Message($"{Options.MaxEpoch} reached, stopped training.");
-                    return;
-                }
-            }
-
-            UnsubscribeActions();
-        }
-
-        protected virtual string GetIterationProgress(int otherLen)
-        {
-            return $"I:{Iteration}";
+            TrainingStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected virtual void SubscribeActions()
@@ -199,9 +133,96 @@ namespace Retia.Training.Trainers
             }
         }
 
+        protected virtual void ValidateOptions(TOptions options)
+        {
+        }
+
+        protected void OnEpochReached()
+        {
+            EpochReached?.Invoke(Session);
+        }
+
+        protected void OnTrainReport(TReport args)
+        {
+            TrainReport?.Invoke(this, args);
+        }
+
         private void OnSequenceTrained()
         {
-            SequenceTrained?.Invoke();
+            SequenceTrained?.Invoke(Session);
+        }
+
+        private void TrainInternal(CancellationToken token)
+        {
+            Session.Iteration = 0;
+
+            InitTraining();
+            SubscribeActions();
+
+            var watch = new Stopwatch();
+            while (IsTraining)
+            {
+                if (token.IsCancellationRequested || _stop)
+                {
+                    Options.ProgressWriter?.Message("Training stopped");
+                    IsTraining = false;
+                    break;
+                }
+
+                if (!_pauseHandle.IsSet)
+                {
+                    Options.ProgressWriter?.Message("Training paused");
+                    try
+                    {
+                        _pauseHandle.Wait(token);
+                    }
+                    catch (TaskCanceledException)
+                    {
+                        break;
+                    }
+                    Options.ProgressWriter?.Message("Training resumed");
+                }
+
+                watch.Restart();
+                TrainIteration();
+                watch.Stop();
+
+                Session.Iteration++;
+
+                // Check for memory reset on iteration.
+                if (Options.ResetMemory?.ShouldDoOnIteration(Session.Iteration) == true)
+                {
+                    ResetMemory();
+                }
+
+                OnSequenceTrained();
+
+                if (Options.ReportProgress?.ShouldDoOnIteration(Session.Iteration) == true)
+                {
+                    OnTrainReport(GetAndFlushTrainingReport());
+
+                    if (Options.ReportMesages && Options.ProgressWriter != null)
+                    {
+                        var preIter = new StringBuilder();
+                        preIter.Append('#').Append(Session.Epoch).Append('[');
+
+                        var postIter = new StringBuilder();
+                        postIter.Append(' ').AppendFormat("{0:0.0000}", watch.Elapsed.TotalSeconds).Append("s] ").Append(GetTrainingReportMessage());
+
+                        preIter.Append(GetIterationProgress(preIter.Length + postIter.Length)).Append(postIter);
+
+                        Options.ProgressWriter.SetItemProgress(preIter.ToString());
+                    }
+                }
+
+                if (Session.Epoch > Options.MaxEpoch)
+                {
+                    Options.ProgressWriter?.Message($"{Options.MaxEpoch} reached, stopped training.");
+                    break;
+                }
+            }
+
+            UnsubscribeActions();
         }
     }
 }

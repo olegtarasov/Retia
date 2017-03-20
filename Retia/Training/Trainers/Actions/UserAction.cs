@@ -1,4 +1,5 @@
 ﻿using System;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers.Actions
 {
@@ -11,7 +12,7 @@ namespace Retia.Training.Trainers.Actions
             _action = action;
         }
 
-        protected override void DoAction()
+        protected override void DoAction(TrainingSessionBase session)
         {
             _action();
         }

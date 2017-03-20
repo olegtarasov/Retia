@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using PropertyChanged;
 using Retia.Integration;
 using Retia.Training.Trainers;
@@ -19,6 +21,15 @@ namespace Retia.Gui.Models
     [ImplementPropertyChanged]
     public class TypedTrainingModel<T> : TrainingModelBase where T : struct, IEquatable<T>, IFormattable
     {
+        #region Dispatch
+
+        protected void Dispatch(Action action)
+        {
+            Application.Current.Dispatcher.Invoke(action);
+        }
+
+        #endregion
+
         private readonly OptimizingTrainer<T> _trainer;
 
         private Task _trainingTask;
@@ -31,23 +42,38 @@ namespace Retia.Gui.Models
             OptionsModel = GetTrainOptionsModel();
             OptionsModel.StartResumeCommand = new RelayCommand(StartResume, CanStartResume);
             OptionsModel.PauseCommand = new RelayCommand(Pause, CanPause);
+            OptionsModel.StopCommand = new RelayCommand(Stop, CanStop);
             OptionsModel.ApplyOptionsCommand = new RelayCommand(ApplyOptions);
 
             ReportModel = new TrainingReportModel();
 
+            _trainer.TrainingStateChanged += TrainerOnTrainingStateChanged;
             _trainer.TrainReport += TrainerOnTrainReport;
+        }
+
+        private bool CanStop(object o)
+        {
+            return _trainer.IsTraining && !_trainer.IsPaused;
+        }
+
+        private void Stop(object o)
+        {
+            _trainer.Stop();
+        }
+
+        private void TrainerOnTrainingStateChanged(object sender, EventArgs eventArgs)
+        {
+            Dispatch(() =>
+            {
+                OptionsModel.StartResumeCommand.RaiseCanExecuteChanged();
+                OptionsModel.PauseCommand.RaiseCanExecuteChanged();
+                OptionsModel.StopCommand.RaiseCanExecuteChanged();
+            });
         }
 
         private void ApplyOptions(object o)
         {
-            _trainer.Options.ErrorFilterSize = OptionsModel.ErrorFilterSize;
-            if (Math.Abs(_trainer.LearningRate - OptionsModel.LearningRate) > 1e-5)
-            {
-                _trainer.LearningRate = OptionsModel.LearningRate;
-            }
-            _trainer.Options.LearningRateScaler.Schedule = new EachIteration(OptionsModel.LearningRateScalePeriod.GetValueOrDefault());
-            ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler).ScalingFactor = OptionsModel.LearningRateScaleFactor.GetValueOrDefault();
-            _trainer.Options.MaxEpoch = OptionsModel.MaxEpoch;
+            // TODO: Apply options
         }
 
         private bool CanPause(object o)
@@ -85,8 +111,11 @@ namespace Retia.Gui.Models
 
         private void TrainerOnTrainReport(object sender, OptimizationReportEventArgs e)
         {
-            ReportModel.UpdateReport(e);
-            OptionsModel.LearningRate = e.LearningRate;
+            Dispatch(() =>
+            {
+                ReportModel.UpdateReport(e);
+                OptionsModel.LearningRate = e.LearningRate;
+            });
         }
 
         private TrainOptionsModel GetTrainOptionsModel()
@@ -94,8 +123,8 @@ namespace Retia.Gui.Models
             return new TrainOptionsModel
                    {
                        ErrorFilterSize = _trainer.Options.ErrorFilterSize,
-                       LearningRate = _trainer.LearningRate,
-                       LearningRateScaleFactor = ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler)?.ScalingFactor,
+                       //LearningRate = _trainer.LearningRate,
+                       //LearningRateScaleFactor = ((ProportionalLearningRateScaler)_trainer.Options.LearningRateScaler)?.ScalingFactor,
                        LearningRateScalePeriod = _trainer.Options.LearningRateScaler?.Schedule.Period,
                        MaxEpoch = _trainer.Options.MaxEpoch
                    };
