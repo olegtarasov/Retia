@@ -116,7 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="AlgorithmTester.cu" />
-    <ClCompile Include="CApi.cpp" />
+    <CudaCompile Include="CApi.cu" />
     <ClCompile Include="CudaContext.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>

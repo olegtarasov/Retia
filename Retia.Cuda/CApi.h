@@ -1,13 +1,12 @@
 ﻿#pragma once
 
-#include <windows.h>
 #include "LayeredNet.h"
 #include "RMSPropOptimizer.h"
 #include "LinearLayer.h"
 #include "GruLayer.h"
 #include "SoftmaxLayer.h"
 
-#define GPUAPI EXTERN_C __declspec(dllexport)
+#define GPUAPI extern "C" __declspec(dllexport)
 #define _VOID void _cdecl
 
 /*
