@@ -8,8 +8,11 @@ using Retia.Neural;
 namespace Retia.Optimizers
 {
 	public class RMSPropOptimizer<T> : OptimizerBase<T> where T : struct, IEquatable<T>, IFormattable
-    {
-	    private readonly float _decayRate;
+	{
+	    [DllImport(Const.CudaDllName)]
+	    private static extern IntPtr CreateRMSPropOptimizer(float learningRate, float momentum, float decayRate, float weightDecay);
+
+        private readonly float _decayRate;
 	    private readonly float _momentum;
 	    private readonly float _weightDecay;
 
@@ -28,27 +31,8 @@ namespace Retia.Optimizers
 		    _momentum = other._momentum;
 		}
 
-        /// <summary>
-        /// Default RMSProp optimization without momentum
-        /// See http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf, slide 29
-        /// </summary>
-        /// <param name="weight">Weight matrix to optimize (incapsultes current gradient and all stored values needed for RMSProp)</param>
-	    //private unsafe void RMSPropOptimize(NeuroWeight weight)
-	    //{
-     //       var weightMatrix = weight.Weight;
-     //       var gradient = weight.Gradient;
-     //       var cache2 = weight.Cache2;
-
-     //       var size = weightMatrix.Rows * weightMatrix.Cols;
-     //       fixed (double* pGrad = (double[])gradient, pCache2 = (double[])cache2, pWeight = (double[])weightMatrix)
-     //       {
-     //           FastRMSPropUpdate(LearningRate, DecayRate, pWeight, pCache2, pGrad, size);
-     //       }
-     //   }
-
-	    public override void Optimize(NeuroWeight<T> weight)
+        public override void Optimize(NeuroWeight<T> weight)
         {
-            //RMSPropOptimize(weight);
             MathProvider.GravesRmsPropUpdate(_weightDecay, LearningRate, _decayRate, _momentum, weight);
         }
 
@@ -57,9 +41,11 @@ namespace Retia.Optimizers
 			return new RMSPropOptimizer<T>(this);
 		}
 
-	    public override OptimizerSpecBase CreateSpec()
-	    {
-	        return new RMSPropSpec(LearningRate, _momentum, _decayRate, _weightDecay);
-	    }
-	}
+        public override IntPtr CreateGpuOptimizer()
+        {
+            GpuOptimizerPtr = CreateRMSPropOptimizer(LearningRate, _momentum, _decayRate, _weightDecay);
+
+            return GpuOptimizerPtr;
+        }
+    }
 }

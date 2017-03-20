@@ -10,6 +10,11 @@ void DestroyOptimizer(OptimizerBase* optimizer)
 	delete optimizer;
 }
 
+void SetLearningRate(OptimizerBase* optimizer, float learningRate)
+{
+	optimizer->setLearningRate(learningRate);
+}
+
 LayeredNet* CreateLayeredNetwork(int inputSize, int outputSize, int batchSize, int seqLen)
 {
 	return new LayeredNet(inputSize, outputSize, batchSize, seqLen);

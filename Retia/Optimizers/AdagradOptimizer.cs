@@ -27,7 +27,7 @@ namespace Retia.Optimizers
             return new AdagradOptimizer<T>(this);
         }
 
-        public override OptimizerSpecBase CreateSpec()
+        public override IntPtr CreateGpuOptimizer()
         {
             throw new NotSupportedException();
         }

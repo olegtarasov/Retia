@@ -4,7 +4,7 @@
 
 void LayeredNet::UpdateLearningRate(float learningRate)
 {
-	_optimizer->set_learningRate(learningRate);
+	_optimizer->setLearningRate(learningRate);
 }
 
 void LayeredNet::TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states)

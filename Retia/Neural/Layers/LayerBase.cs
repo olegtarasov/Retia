@@ -20,6 +20,8 @@ namespace Retia.Neural.Layers
         protected int BatchSize;
         protected int SeqLen;
 
+        protected IntPtr GpuLayerPtr = IntPtr.Zero;
+
         public List<Matrix<T>> Inputs { get; set; } = new List<Matrix<T>>();
         public List<Matrix<T>> Outputs { get; set; } = new List<Matrix<T>>();
 
@@ -89,6 +91,8 @@ namespace Retia.Neural.Layers
         public abstract void InitSequence();
         public abstract void ClampGrads(float limit);
         public abstract LayerSpecBase CreateSpec();
+
+        public abstract IntPtr CreateGpuLayer();
 
         /// <summary>
         /// Converts layer state to a vector of doubles.

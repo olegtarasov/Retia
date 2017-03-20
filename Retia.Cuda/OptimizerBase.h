@@ -18,7 +18,7 @@ public:
 		return _learningRate;
 	}
 
-	void set_learningRate(float learningRate)
+	void setLearningRate(float learningRate)
 	{
 		_learningRate = learningRate;
 	}

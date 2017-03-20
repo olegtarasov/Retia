@@ -147,5 +147,10 @@ namespace Retia.Neural.Layers
         public override void ClearGradients()
         {
         }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            throw new NotSupportedException();
+        }
     }
 }

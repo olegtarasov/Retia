@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
 #if !CPUONLY
@@ -17,6 +17,18 @@ namespace Retia.Neural
 {
     public class LayeredNet<T> : NeuralNet<T>, IDisposable where T : struct, IEquatable<T>, IFormattable
     {
+        [DllImport(Const.CudaDllName)]
+        private static extern IntPtr CreateLayeredNetwork(int inputSize, int outputSize, int batchSize, int seqLen);
+
+        [DllImport(Const.CudaDllName)]
+        private static extern void DestroyLayeredNetwork(IntPtr network);
+
+        [DllImport(Const.CudaDllName)]
+        private static extern void AddNetworkLayer(IntPtr network, IntPtr layer);
+
+        [DllImport(Const.CudaDllName)]
+        private static extern void SetNetworkOptimizer(IntPtr network, IntPtr optimizer);
+
         private const byte LayerMagic = 0xBA;
         //public static uint cnt = 0;
         //public readonly uint id; 
@@ -25,9 +37,7 @@ namespace Retia.Neural
         protected readonly int BatchSize, SeqLen;
         protected readonly List<LayerBase<T>> LayersList = new List<LayerBase<T>>();
 
-#if !CPUONLY
-        private GpuNetwork _gpuNetwork;
-#endif
+        private IntPtr _gpuNetworkPtr = IntPtr.Zero;
         private OptimizerBase<T> _optimizer;
 
         public LayeredNet(int batchSize, int seqLen, params LayerBase<T>[] layers)
@@ -83,7 +93,7 @@ namespace Retia.Neural
             {
                 _optimizer = value;
 #if !CPUONLY
-                _optimizer.GpuOptimizer = _gpuNetwork;
+                
 #endif
             }
         }
@@ -212,17 +222,16 @@ namespace Retia.Neural
         public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
 #if !CPUONLY
-            if (_gpuNetwork != null)
-            {
-                if (typeof(T) != typeof(float))
-                {
-                    throw new InvalidOperationException("GPU is only supported for float data type!");
-                }
+            // TODO: _GPU
+            //if (_gpuNetwork != null)
+            //{
+            //    if (typeof(T) != typeof(float))
+            //    {
+            //        throw new InvalidOperationException("GPU is only supported for float data type!");
+            //    }
 
-                // TODO: Support output from GPU
-
-                return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
-            }
+            //    return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
+            //}
 #endif
 
             return base.TrainSequence(inputs, targets);
@@ -231,13 +240,14 @@ namespace Retia.Neural
         public void TransferStateToHost()
         {
 #if !CPUONLY
-            if (_gpuNetwork == null)
-            {
-                throw new InvalidOperationException("You are not using GPU!");
-            }
+            // TODO: _GPU
+            //if (_gpuNetwork == null)
+            //{
+            //    throw new InvalidOperationException("You are not using GPU!");
+            //}
 
-            var spec = CreateSpec();
-            _gpuNetwork.TransferStatesToHost(spec);
+            //var spec = CreateSpec();
+            //_gpuNetwork.TransferStatesToHost(spec);
 #else
             throw new InvalidOperationException("Library was compiled without GPU support!");
 #endif
@@ -246,13 +256,12 @@ namespace Retia.Neural
         public void UseGpu()
         {
 #if !CPUONLY
-            if (_gpuNetwork != null)
+            if (_gpuNetworkPtr != IntPtr.Zero)
             {
                 return;
             }
 
-            _gpuNetwork = new GpuNetwork(CreateSpec());
-            _optimizer.GpuOptimizer = _gpuNetwork;
+            CreateGpuNetwork();
 #else
             throw new InvalidOperationException("Library was compiled without GPU support!");
 #endif
@@ -261,9 +270,7 @@ namespace Retia.Neural
         public void UseCpu()
         {
 #if !CPUONLY
-            _gpuNetwork?.Dispose();
-            _gpuNetwork = null;
-            _optimizer.GpuOptimizer = null;
+            DestroyGpuNetwork();
 #endif
         }
 
@@ -304,11 +311,12 @@ namespace Retia.Neural
         public override void Optimize()
         {
 #if !CPUONLY
-            if (_gpuNetwork != null)
-            {
-                _gpuNetwork.Optimize();
-                return;
-            }
+            // TODO: _GPU
+            //if (_gpuNetwork != null)
+            //{
+            //    _gpuNetwork.Optimize();
+            //    return;
+            //}
 #endif
 
             foreach (var layer in LayersList)
@@ -344,11 +352,12 @@ namespace Retia.Neural
         public override void ResetMemory()
         {
 #if !CPUONLY
-            if (_gpuNetwork != null)
-            {
-                _gpuNetwork.ResetMemory();
-                return;
-            }
+            // TODO _GPU
+            //if (_gpuNetwork != null)
+            //{
+            //    _gpuNetwork.ResetMemory();
+            //    return;
+            //}
 #endif
 
             foreach (var layer in LayersList)
@@ -358,11 +367,12 @@ namespace Retia.Neural
         public override void ResetOptimizer()
         {
 #if !CPUONLY
-            if (_gpuNetwork != null)
-            {
-                _gpuNetwork.ResetOptimizerCache();
-                return;
-            }
+            // TODO: _GPU
+            //if (_gpuNetwork != null)
+            //{
+            //    _gpuNetwork.ResetOptimizerCache();
+            //    return;
+            //}
 #endif
 
             foreach (var layer in LayersList)
@@ -408,49 +418,38 @@ namespace Retia.Neural
             throw new Exception($"What the fuck is this? Your index={i} is somehow less then TotalParamCount={TotalParamCount} but more than sum of all layer param counts {paramCnt}!");
         }
 
-        private LayeredNetSpec CreateSpec()
-        {
-            if (Optimizer == null) throw new InvalidOperationException("Set optimizer first!");
-            if (LayersList.Count == 0) throw new InvalidOperationException("Add some layers!");
-
-            var result = new LayeredNetSpec(Optimizer.CreateSpec(), LayersList[0].InputSize, LayersList[LayersList.Count - 1].OutputSize, BatchSize, SeqLen);
-            LayerSpecBase lastSpec = null;
-            
-            foreach (var layer in LayersList)
-            {
-                var lastGru = lastSpec as GruLayerSpec;
-                if (layer is GruLayer<T> && lastGru != null)
-                {
-                    var spec = (GruLayerSpec)layer.CreateSpec();
-                    if (lastGru.HSize == spec.HSize)
-                    {
-                        lastGru.Layers++;
-                        lastGru.Weights.Add(spec.Weights[0]);
-                        continue;
-                    }
-                }
-
-                if (lastSpec != null)
-                {
-                    result.Layers.Add(lastSpec);
-                }
-
-                lastSpec = layer.CreateSpec();
-            }
-
-            result.Layers.Add(lastSpec);
-
-            return result;
-        }
-
         public void Dispose()
         {
 #if !CPUONLY
-            _gpuNetwork?.Dispose();
+            DestroyGpuNetwork();
 #endif
         }
 
+        private void DestroyGpuNetwork()
+        {
+            if (_gpuNetworkPtr != IntPtr.Zero)
+            {
+                DestroyLayeredNetwork(_gpuNetworkPtr);
+                _gpuNetworkPtr = IntPtr.Zero;
+            }
+        }
+
         public override IReadOnlyList<NeuroWeight<T>> Weights => LayersList.SelectMany(x => x.Weights).ToList();
+
+        private void CreateGpuNetwork()
+        {
+            DestroyGpuNetwork();
+
+            _gpuNetworkPtr = CreateLayeredNetwork(InputSize, OutputSize, BatchSize, SeqLen);
+            for (int i = 0; i < LayersList.Count; i++)
+            {
+                var layer = LayersList[i].CreateGpuLayer();
+                AddNetworkLayer(_gpuNetworkPtr, layer);
+            }
+
+            var optimizer = _optimizer.CreateGpuOptimizer();
+            SetNetworkOptimizer(_gpuNetworkPtr, optimizer);
+        }
 
         #region Candidates for removal
 

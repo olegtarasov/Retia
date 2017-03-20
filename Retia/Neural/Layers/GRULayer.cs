@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
@@ -15,6 +16,9 @@ namespace Retia.Neural.Layers
 {
     public class GruLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
+        [DllImport(Const.CudaDllName)]
+        private static extern IntPtr CreateGruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
+
         private readonly List<Matrix<T>> _hNewVals = new List<Matrix<T>>();
         private readonly List<Matrix<T>> _hPropVals = new List<Matrix<T>>();
 
@@ -496,6 +500,13 @@ namespace Retia.Neural.Layers
             _whr.ClearGrad();
             _whz.ClearGrad();
             _whh.ClearGrad();
+        }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            GpuLayerPtr = CreateGruLayer(InputSize, _hSize, 1, BatchSize, SeqLen);
+
+            return GpuLayerPtr;
         }
     }
 }
