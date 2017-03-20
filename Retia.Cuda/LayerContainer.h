@@ -3,13 +3,13 @@
 #include <memory>
 #include <vector>
 #include "LayerContainerBase.h"
-#include "NeuroLayer.h"
+#include "LayerBase.h"
 
 class LayerContainer : public LayerContainerBase
 {
 public:
 
-	explicit LayerContainer(NeuroLayer* neuroLayer)
+	explicit LayerContainer(LayerBase* neuroLayer)
 		: _layer(neuroLayer)
 	{
 	}
@@ -17,5 +17,5 @@ public:
 	void ForwardSequence(std::vector<RawMatrixPtr*>& input) override;
 	void TransferOutputToHost(std::vector<RawMatrixPtr*>& output) override;
 private:
-	std::unique_ptr<NeuroLayer> _layer;
+	std::unique_ptr<LayerBase> _layer;
 };

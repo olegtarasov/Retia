@@ -7,11 +7,11 @@
 #include "Exceptions.h"
 #include "RawMatrixPtr.h"
 
-class NeuroLayer
+class LayerBase
 {
 public:
 
-	NeuroLayer(int inSize, int outSize, int batchSize, int seqLen)
+	LayerBase(int inSize, int outSize, int batchSize, int seqLen)
 		: _inputSize(inSize),
 		  _outputSize(outSize),
 		  _batchSize(batchSize), 
@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	virtual ~NeuroLayer() = default;
+	virtual ~LayerBase() = default;
 
 
 	int inputSize() const

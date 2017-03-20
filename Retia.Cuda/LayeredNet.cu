@@ -34,13 +34,13 @@ double LayeredNet::TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector
 	return TrainSequence(devInput, devTarget);
 }
 
-void LayeredNet::AddLayer(NeuroLayer* layer)
+void LayeredNet::AddLayer(LayerBase* layer)
 {
 	auto inSize = _layers.size() > 0 ? _layers[_layers.size() - 1]->outputSize() : _inputSize;
 	if (layer->inputSize() != inSize)
 		throw RetiaException("Conflicting layer size!");
 	
-	_layers.push_back(std::unique_ptr<NeuroLayer>(layer));
+	_layers.push_back(std::unique_ptr<LayerBase>(layer));
 }
 
 double LayeredNet::TrainSequence(DeviceMatrix& input, DeviceMatrix& target)

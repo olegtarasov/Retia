@@ -6,7 +6,7 @@
 using std::cout;
 using std::endl;
 
-LinearLayer::LinearLayer(int inSize, int outSize, int batchSize, int seqLength): NeuroLayer(inSize, outSize, batchSize, seqLength)
+LinearLayer::LinearLayer(int inSize, int outSize, int batchSize, int seqLength): LayerBase(inSize, outSize, batchSize, seqLength)
 {
 	_w = std::make_unique<NeuroWeigth>(outSize, inSize);
 	_b = std::make_unique<NeuroWeigth>(outSize, 1, 1);

@@ -17,7 +17,7 @@ using std::endl;
 using thrust::get;
 
 SoftmaxLayer::SoftmaxLayer(int inSize, int batchSize, int seqLen)
-	: NeuroLayer(inSize, inSize, batchSize, seqLen)
+	: LayerBase(inSize, inSize, batchSize, seqLen)
 {
 	_xTensor = std::make_unique<CuDnnNdTensor>(_batchSize * _seqLen, _inputSize, 1, false);
 	_output = std::make_unique<DeviceMatrix>(_inputSize, _batchSize, _seqLen);

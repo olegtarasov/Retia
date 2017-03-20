@@ -2,14 +2,14 @@
 
 #include <memory>
 #include <vector>
-#include "NeuroLayer.h"
+#include "LayerBase.h"
 #include "LayeredNetBase.h"
 
 class LayeredNet : public LayeredNetBase
 {
 public:
-	LayeredNet(int input_size, int output_size, int batch_size, int seqLen)
-		: LayeredNetBase(input_size, output_size, batch_size, seqLen)
+	LayeredNet(int inputSize, int outputSize, int batchSize, int seqLen)
+		: LayeredNetBase(inputSize, outputSize, batchSize, seqLen)
 	{
 	}
 
@@ -17,7 +17,7 @@ public:
 	void UpdateLearningRate(float learningRate) override;
 	void TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states) override;
 	double TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector<RawMatrixPtr*>& targets) override;
-	void AddLayer(NeuroLayer* layer);
+	void AddLayer(LayerBase* layer);
 	double TrainSequence(DeviceMatrix& input, DeviceMatrix& target);
 	void Opimize() override;
 	void ResetMemory() override;
@@ -28,12 +28,12 @@ public:
 		return *_optimizer;
 	}
 
-	void set_optimizer(OptimizerBase* optimizer)
+	void setOptimizer(OptimizerBase* optimizer)
 	{
 		_optimizer = std::unique_ptr<OptimizerBase>(optimizer);
 	}
 
 private:
-	std::vector<std::unique_ptr<NeuroLayer>> _layers;
+	std::vector<std::unique_ptr<LayerBase>> _layers;
 	std::unique_ptr<OptimizerBase> _optimizer;
 };

@@ -90,6 +90,7 @@
   <ItemGroup>
     <ClInclude Include="Algorithms.h" />
     <ClInclude Include="AlgorithmTester.h" />
+    <ClInclude Include="CApi.h" />
     <ClInclude Include="CudaContext.h" />
     <ClInclude Include="CudaMemoryBlock.h" />
     <ClInclude Include="CudaHandle.h" />
@@ -107,7 +108,7 @@
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="MatrixBase.h" />
     <ClInclude Include="RawMatrixPtr.h" />
-    <ClInclude Include="NeuroLayer.h" />
+    <ClInclude Include="LayerBase.h" />
     <ClInclude Include="NeuroWeigth.h" />
     <ClInclude Include="OptimizerBase.h" />
     <ClInclude Include="RMSPropOptimizer.h" />
@@ -115,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="AlgorithmTester.cu" />
+    <ClCompile Include="CApi.cpp" />
     <ClCompile Include="CudaContext.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>

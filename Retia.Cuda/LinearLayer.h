@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include <memory>
-#include "NeuroLayer.h"
+#include "LayerBase.h"
 #include "NeuroWeigth.h"
 #include "RawMatrixPtr.h"
 
-class LinearLayer : public NeuroLayer
+class LinearLayer : public LayerBase
 {
 public:
 	LinearLayer(int inputSize, int outSize, int batchSize, int seqLen);

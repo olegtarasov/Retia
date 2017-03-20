@@ -11,7 +11,7 @@ using std::cout;
 using std::endl;
 
 GruLayer::GruLayer(int inSize, int hSize, int layers, int batchSize, int seqLength)
-	: NeuroLayer(inSize, hSize, batchSize, seqLength), 
+	: LayerBase(inSize, hSize, batchSize, seqLength), 
 	_hSize(hSize),
 	_layers(layers)
 {

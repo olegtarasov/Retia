@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include "NeuroLayer.h"
+#include "LayerBase.h"
 #include "CuDnnTensor.h"
 #include "CudaHandle.h"
 #include "RawMatrixPtr.h"
 
-class GruLayer : public NeuroLayer
+class GruLayer : public LayerBase
 {
 public:
 	GruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);

@@ -13,9 +13,6 @@
     <ClInclude Include="Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NeuroLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NeuroWeigth.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -72,6 +69,12 @@
     </ClInclude>
     <ClInclude Include="AlgorithmTester.h">
       <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="CApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerBase.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +139,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Exceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

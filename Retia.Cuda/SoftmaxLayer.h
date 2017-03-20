@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "NeuroLayer.h"
+#include "LayerBase.h"
 #include "CuDnnTensor.h"
 #include "RawMatrixPtr.h"
 
-class SoftmaxLayer : public NeuroLayer
+class SoftmaxLayer : public LayerBase
 {
 public:
 	SoftmaxLayer(int inSize, int batchSize, int seqLen);

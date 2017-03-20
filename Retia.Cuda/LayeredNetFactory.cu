@@ -12,7 +12,7 @@ LayeredNetFactory::LayeredNetFactory(int inputSize, int outputSize, int batchSiz
 
 void LayeredNetFactory::WithRMSPropOptimizer(float learningRate, float momentum, float decayRate, float weightDecay)
 {
-	_fullNet->set_optimizer(new RMSPropOptimizer(learningRate, momentum, decayRate, weightDecay));
+	_fullNet->setOptimizer(new RMSPropOptimizer(learningRate, momentum, decayRate, weightDecay));
 }
 
 void LayeredNetFactory::WithGruLayers(int layers, int inSize, int hSize, std::vector<RawMatrixPtr*>& states)
