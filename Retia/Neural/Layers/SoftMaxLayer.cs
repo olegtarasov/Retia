@@ -15,9 +15,6 @@ namespace Retia.Neural.Layers
 {
     public class SoftMaxLayer<T> : DerivativeLayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
-        [DllImport(Const.CudaDllName)]
-        private static extern IntPtr CreateSoftmaxLayer(int inSize, int batchSize, int seqLen);
-
         private readonly int _size;
 
         private SoftMaxLayer(SoftMaxLayer<T> other) : base(other)
@@ -118,7 +115,7 @@ namespace Retia.Neural.Layers
 
         public override IntPtr CreateGpuLayer()
         {
-            GpuLayerPtr = CreateSoftmaxLayer(_size, BatchSize, SeqLen);
+            GpuLayerPtr = GpuInterface.CreateSoftmaxLayer(_size, BatchSize, SeqLen);
 
             return GpuLayerPtr;
         }

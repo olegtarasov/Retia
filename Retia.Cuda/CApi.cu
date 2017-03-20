@@ -49,3 +49,44 @@ SoftmaxLayer* CreateSoftmaxLayer(int inSize, int batchSize, int seqLen)
 {
 	return new SoftmaxLayer(inSize, batchSize, seqLen);
 }
+
+void TransferLayerStatesFromHost(LayerBase* layer, MatrixDefinition* matrices, int matrixCount)
+{
+	auto states = GetMatrixPointers(matrices, matrixCount);
+
+	layer->TransferStatesFromHost(states);
+
+	DestroyMatrixPointers(states);
+}
+
+void TransferLayerStatesToHost(LayerBase* layer, MatrixDefinition* matrices, int matrixCount)
+{
+	auto states = GetMatrixPointers(matrices, matrixCount);
+
+	layer->TransferStatesToHost(states);
+
+	DestroyMatrixPointers(states);
+}
+
+std::vector<HostMatrixPtr*> GetMatrixPointers(MatrixDefinition* matrices, int matrixCount)
+{
+	std::vector<HostMatrixPtr*> result;
+
+	for (int i = 0; i < matrixCount; ++i)
+	{
+		auto cur = matrices[i];
+		result.push_back(new HostMatrixPtr(cur.Rows, cur.Columns, cur.SeqLength, cur.Pointer));
+	}
+
+	return result;
+}
+
+void DestroyMatrixPointers(std::vector<HostMatrixPtr*>& ptrs)
+{
+	for (int i = 0; i < ptrs.size(); ++i)
+	{
+		delete ptrs[i];
+	}
+}
+
+

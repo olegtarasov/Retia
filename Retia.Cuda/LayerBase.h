@@ -47,8 +47,8 @@ public:
 		_output->CopyTo(*output);
 	}
 
-	virtual void TransferStatesFromHost(std::vector<RawMatrixPtr*>& states) = 0;
-	virtual void TransferStatesToHost(std::vector<RawMatrixPtr*>& states) = 0;
+	virtual void TransferStatesFromHost(std::vector<HostMatrixPtr*>& states) = 0;
+	virtual void TransferStatesToHost(std::vector<HostMatrixPtr*>& states) = 0;
 	virtual void ForwardSequence(DeviceMatrix& input) = 0;
 	virtual void BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens) = 0;
 	virtual void Optimize(OptimizerBase& optimizer) = 0;

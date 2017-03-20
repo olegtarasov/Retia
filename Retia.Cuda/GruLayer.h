@@ -10,8 +10,8 @@ public:
 	GruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
 
 
-	void TransferStatesFromHost(std::vector<RawMatrixPtr*>& states) override;
-	void TransferStatesToHost(std::vector<RawMatrixPtr*>& states) override;
+	void TransferStatesFromHost(std::vector<HostMatrixPtr*>& states) override;
+	void TransferStatesToHost(std::vector<HostMatrixPtr*>& states) override;
 	void ForwardSequence(DeviceMatrix& input) override;
 	void BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens) override;
 	void Optimize(OptimizerBase& optimizer) override;
@@ -66,5 +66,5 @@ private:
 	* 10 - bhz
 	* 11 - bhh
 	*/
-	void TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevice);
+	void TransferState(std::vector<HostMatrixPtr*>& states, bool hostToDevice);
 };

@@ -9,8 +9,8 @@ public:
 	SoftmaxLayer(int inSize, int batchSize, int seqLen);
 
 
-	void TransferStatesFromHost(std::vector<RawMatrixPtr*>& states) override;
-	void TransferStatesToHost(std::vector<RawMatrixPtr*>& states) override;
+	void TransferStatesFromHost(std::vector<HostMatrixPtr*>& states) override;
+	void TransferStatesToHost(std::vector<HostMatrixPtr*>& states) override;
 	void ForwardSequence(DeviceMatrix& input) override;
 	void BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens) override;
 	void Optimize(OptimizerBase& optimizer) override;

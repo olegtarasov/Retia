@@ -196,6 +196,7 @@ namespace Retia.Neural.Layers
         public override IntPtr CreateGpuLayer()
         {
             GpuLayerPtr = CreateLinearLayer(_weights.Weight.ColumnCount, _weights.Weight.RowCount, BatchSize, SeqLen);
+            TransferStatesFromHost(_weights.Weight, _bias.Weight);
             return GpuLayerPtr;
         }
     }

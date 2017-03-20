@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Helpers;
@@ -12,6 +13,15 @@ using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct HostMatrixDefinition
+    {
+        public int Rows;
+        public int Columns;
+        public int SeqLength;
+        public IntPtr Pointer;
+    }
+
     public abstract class LayerBase<T> : ICloneable<LayerBase<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
         private readonly List<NeuroWeight<T>> _weights = new List<NeuroWeight<T>>();
@@ -183,6 +193,39 @@ namespace Retia.Neural.Layers
 
         protected virtual void Initialize()
         {
+        }
+
+        protected void TransferStatesFromHost(params Matrix<T>[] weights)
+        {
+            TransferStates(GpuInterface.TransferLayerStatesFromHost, weights);
+        }
+
+        protected void TransferStatesToHost(params Matrix<T>[] weights)
+        {
+            TransferStates(GpuInterface.TransferLayerStatesToHost, weights);
+        }
+
+        private unsafe void TransferStates(Action<IntPtr, IntPtr, int> action, params Matrix<T>[] weights)
+        {
+            using (var ptrs = new MatrixPointers<T>(weights))
+            {
+                var matrices = new HostMatrixDefinition[weights.Length];
+                for (int i = 0; i < weights.Length; i++)
+                {
+                    var weight = weights[i];
+                    var mat = matrices[i];
+
+                    mat.Rows = weight.RowCount;
+                    mat.Columns = weight.ColumnCount;
+                    mat.SeqLength = 1;
+                    mat.Pointer = ptrs[i];
+                }
+
+                fixed (HostMatrixDefinition* arr = &matrices[0])
+                {
+                    action(GpuLayerPtr, new IntPtr(arr), weights.Length);
+                }
+            }
         }
 
         internal void Initialize(int batchSize, int seqLen)

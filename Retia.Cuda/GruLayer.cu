@@ -18,12 +18,12 @@ GruLayer::GruLayer(int inSize, int hSize, int layers, int batchSize, int seqLeng
 	InitLayers();
 }
 
-void GruLayer::TransferStatesFromHost(std::vector<RawMatrixPtr*>& states)
+void GruLayer::TransferStatesFromHost(std::vector<HostMatrixPtr*>& states)
 {
 	TransferState(states, true);
 }
 
-void GruLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
+void GruLayer::TransferStatesToHost(std::vector<HostMatrixPtr*>& states)
 {
 	TransferState(states, false);
 }
@@ -46,7 +46,7 @@ void GruLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
 * 10 - bhz
 * 11 - bhh
 */
-void GruLayer::TransferState(std::vector<RawMatrixPtr*>& states, bool hostToDevice)
+void GruLayer::TransferState(std::vector<HostMatrixPtr*>& states, bool hostToDevice)
 {
 	if (states.size() / _layers != 12 || states.size() % 12 != 0) throw RetiaException("There should be exactly 12 state vectors for each layer");
 

@@ -6,6 +6,7 @@
 #include "GruLayer.h"
 #include "SoftmaxLayer.h"
 
+// TODO: _Crossplatform exports
 #define GPUAPI extern "C" __declspec(dllexport)
 #define _VOID void _cdecl
 
@@ -30,4 +31,23 @@ GPUAPI _VOID AddNetworkLayer(LayeredNet *network, LayerBase *layer);
 GPUAPI LinearLayer* _cdecl CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
 GPUAPI GruLayer* _cdecl CreateGruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
 GPUAPI SoftmaxLayer* _cdecl CreateSoftmaxLayer(int inSize, int batchSize, int seqLen);
-//GPUAPI
+
+/*
+ * State transfer
+ */
+struct MatrixDefinition
+{
+	int Rows;
+	int Columns;
+	int SeqLength;
+	float *Pointer;
+};
+
+GPUAPI _VOID TransferLayerStatesFromHost(LayerBase *layer, MatrixDefinition *matrices, int matrixCount);
+GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, MatrixDefinition *matrices, int matrixCount);
+
+/*
+ * Helpers
+ */
+std::vector<HostMatrixPtr*> GetMatrixPointers(MatrixDefinition *matrices, int matrixCount);
+void DestroyMatrixPointers(std::vector<HostMatrixPtr*>& ptrs);

@@ -9,10 +9,7 @@ namespace Retia.Optimizers
 {
 	public class RMSPropOptimizer<T> : OptimizerBase<T> where T : struct, IEquatable<T>, IFormattable
 	{
-	    [DllImport(Const.CudaDllName)]
-	    private static extern IntPtr CreateRMSPropOptimizer(float learningRate, float momentum, float decayRate, float weightDecay);
-
-        private readonly float _decayRate;
+	    private readonly float _decayRate;
 	    private readonly float _momentum;
 	    private readonly float _weightDecay;
 
@@ -43,7 +40,7 @@ namespace Retia.Optimizers
 
         public override IntPtr CreateGpuOptimizer()
         {
-            GpuOptimizerPtr = CreateRMSPropOptimizer(LearningRate, _momentum, _decayRate, _weightDecay);
+            GpuOptimizerPtr = GpuInterface.CreateRMSPropOptimizer(LearningRate, _momentum, _decayRate, _weightDecay);
 
             return GpuOptimizerPtr;
         }

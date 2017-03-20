@@ -9,13 +9,6 @@ namespace Retia.Optimizers
 {
 	public abstract class OptimizerBase<T> : ICloneable<OptimizerBase<T>>, IOptimizer where T : struct, IEquatable<T>, IFormattable
 	{
-	    [DllImport(Const.CudaDllName)]
-	    private static extern void SetLearningRate(IntPtr optimizer, float learningRate);
-
-	    [DllImport(Const.CudaDllName)]
-	    private static extern void DestroyOptimizer(IntPtr optimizer);
-
-
 	    protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
 
 	    protected IntPtr GpuOptimizerPtr = IntPtr.Zero;
@@ -40,7 +33,7 @@ namespace Retia.Optimizers
 	            _learningRate = value;
 	            if (GpuOptimizerPtr != IntPtr.Zero)
 	            {
-	                SetLearningRate(GpuOptimizerPtr, value);
+                    GpuInterface.SetLearningRate(GpuOptimizerPtr, value);
 	            }
 	        }
 	    }
@@ -49,7 +42,7 @@ namespace Retia.Optimizers
 	    {
 	        if (GpuOptimizerPtr != IntPtr.Zero)
 	        {
-	            DestroyOptimizer(GpuOptimizerPtr);
+                GpuInterface.DestroyOptimizer(GpuOptimizerPtr);
                 GpuOptimizerPtr = IntPtr.Zero;
 	        }
 	    }

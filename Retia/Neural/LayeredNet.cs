@@ -17,18 +17,6 @@ namespace Retia.Neural
 {
     public class LayeredNet<T> : NeuralNet<T>, IDisposable where T : struct, IEquatable<T>, IFormattable
     {
-        [DllImport(Const.CudaDllName)]
-        private static extern IntPtr CreateLayeredNetwork(int inputSize, int outputSize, int batchSize, int seqLen);
-
-        [DllImport(Const.CudaDllName)]
-        private static extern void DestroyLayeredNetwork(IntPtr network);
-
-        [DllImport(Const.CudaDllName)]
-        private static extern void AddNetworkLayer(IntPtr network, IntPtr layer);
-
-        [DllImport(Const.CudaDllName)]
-        private static extern void SetNetworkOptimizer(IntPtr network, IntPtr optimizer);
-
         private const byte LayerMagic = 0xBA;
         //public static uint cnt = 0;
         //public readonly uint id; 
@@ -429,7 +417,7 @@ namespace Retia.Neural
         {
             if (_gpuNetworkPtr != IntPtr.Zero)
             {
-                DestroyLayeredNetwork(_gpuNetworkPtr);
+                GpuInterface.DestroyLayeredNetwork(_gpuNetworkPtr);
                 _gpuNetworkPtr = IntPtr.Zero;
             }
         }
@@ -440,15 +428,15 @@ namespace Retia.Neural
         {
             DestroyGpuNetwork();
 
-            _gpuNetworkPtr = CreateLayeredNetwork(InputSize, OutputSize, BatchSize, SeqLen);
+            _gpuNetworkPtr = GpuInterface.CreateLayeredNetwork(InputSize, OutputSize, BatchSize, SeqLen);
             for (int i = 0; i < LayersList.Count; i++)
             {
                 var layer = LayersList[i].CreateGpuLayer();
-                AddNetworkLayer(_gpuNetworkPtr, layer);
+                GpuInterface.AddNetworkLayer(_gpuNetworkPtr, layer);
             }
 
             var optimizer = _optimizer.CreateGpuOptimizer();
-            SetNetworkOptimizer(_gpuNetworkPtr, optimizer);
+            GpuInterface.SetNetworkOptimizer(_gpuNetworkPtr, optimizer);
         }
 
         #region Candidates for removal

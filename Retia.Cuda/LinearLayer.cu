@@ -16,7 +16,7 @@ LinearLayer::LinearLayer(int inSize, int outSize, int batchSize, int seqLength):
 	_identity = std::make_unique<DeviceMatrix>(batchSize, 1, 1);
 }
 
-void LinearLayer::TransferStatesFromHost(std::vector<RawMatrixPtr*>& states)
+void LinearLayer::TransferStatesFromHost(std::vector<HostMatrixPtr*>& states)
 {
 	if (states.size() != 2) throw RetiaException("State vector should have the length of exactly 2");
 
@@ -24,7 +24,7 @@ void LinearLayer::TransferStatesFromHost(std::vector<RawMatrixPtr*>& states)
 	_b->weight().CopyFrom(*states[1]);
 }
 
-void LinearLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
+void LinearLayer::TransferStatesToHost(std::vector<HostMatrixPtr*>& states)
 {
 	if (states.size() != 2) throw RetiaException("State vector should have the length of exactly 2");
 

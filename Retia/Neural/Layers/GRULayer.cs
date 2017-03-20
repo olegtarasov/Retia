@@ -16,9 +16,6 @@ namespace Retia.Neural.Layers
 {
     public class GruLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
-        [DllImport(Const.CudaDllName)]
-        private static extern IntPtr CreateGruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
-
         private readonly List<Matrix<T>> _hNewVals = new List<Matrix<T>>();
         private readonly List<Matrix<T>> _hPropVals = new List<Matrix<T>>();
 
@@ -504,7 +501,23 @@ namespace Retia.Neural.Layers
 
         public override IntPtr CreateGpuLayer()
         {
-            GpuLayerPtr = CreateGruLayer(InputSize, _hSize, 1, BatchSize, SeqLen);
+            GpuLayerPtr = GpuInterface.CreateGruLayer(InputSize, _hSize, 1, BatchSize, SeqLen);
+            TransferStatesFromHost(
+                _wxr.Weight,
+                _wxz.Weight,
+                _wxh.Weight,
+
+                _whr.Weight,
+                _whz.Weight,
+                _whh.Weight,
+
+                _bxr.Weight,
+                _bxz.Weight,
+                _bxh.Weight,
+
+                _bhr.Weight,
+                _bhz.Weight,
+                _bhh.Weight);
 
             return GpuLayerPtr;
         }

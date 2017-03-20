@@ -24,12 +24,12 @@ SoftmaxLayer::SoftmaxLayer(int inSize, int batchSize, int seqLen)
 	_sensitivity = std::make_unique<DeviceMatrix>(_inputSize, _batchSize, _seqLen);
 }
 
-void SoftmaxLayer::TransferStatesFromHost(std::vector<RawMatrixPtr*>& states)
+void SoftmaxLayer::TransferStatesFromHost(std::vector<HostMatrixPtr*>& states)
 {
 	// Nothing to do here.
 }
 
-void SoftmaxLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
+void SoftmaxLayer::TransferStatesToHost(std::vector<HostMatrixPtr*>& states)
 {
 	// Nothing to do here.
 }
