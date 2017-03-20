@@ -1,8 +1,6 @@
 ﻿using System;
-using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Mathematics;
-using Retia.RandomGenerator;
 
 namespace Retia.Neural.Initializers
 {

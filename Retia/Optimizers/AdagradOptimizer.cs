@@ -1,7 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
-using Retia.Contracts;
-using Retia.Mathematics;
 using Retia.Neural;
 
 namespace Retia.Optimizers

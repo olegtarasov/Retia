@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Helpers;
 using Retia.Neural;
-using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {

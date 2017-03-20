@@ -1,8 +1,5 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Security;
-using Retia.Contracts;
-using Retia.Mathematics;
+using Retia.Gpu;
 using Retia.Neural;
 
 namespace Retia.Optimizers

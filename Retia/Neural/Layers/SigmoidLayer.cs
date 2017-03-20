@@ -4,7 +4,6 @@ using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
 using Retia.Mathematics;
-using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
 
 namespace Retia.Neural.Layers

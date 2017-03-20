@@ -115,8 +115,12 @@
     <ClInclude Include="SoftmaxLayer.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="AlgorithmTester.cu" />
-    <CudaCompile Include="CApi.cu" />
+    <CudaCompile Include="AlgorithmTester.cu">
+      <FileType>CppCode</FileType>
+    </CudaCompile>
+    <CudaCompile Include="CApi.cu">
+      <FileType>CppCode</FileType>
+    </CudaCompile>
     <ClCompile Include="CudaContext.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>

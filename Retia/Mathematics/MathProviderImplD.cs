@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Neural;
 using Retia.RandomGenerator;
-
 using Float = System.Double;
 
 namespace Retia.Mathematics

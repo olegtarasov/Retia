@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
-using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
+using Retia.Gpu;
 using Retia.Helpers;
-using Retia.Mathematics;
-#if !CPUONLY
-using Retia.NativeWrapper;
-#endif
 using Retia.Neural.Layers;
 using Retia.Optimizers;
+#if !CPUONLY
+#endif
 
 namespace Retia.Neural
 {
@@ -207,19 +204,25 @@ namespace Retia.Neural
         //    Console.WriteLine(hasErr ? "Grad check complete with ERRORS!" : "Grad check OK!");
         //}
 
-        public override double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
+        public override unsafe double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
 #if !CPUONLY
-            // TODO: _GPU
-            //if (_gpuNetwork != null)
-            //{
-            //    if (typeof(T) != typeof(float))
-            //    {
-            //        throw new InvalidOperationException("GPU is only supported for float data type!");
-            //    }
+            if (_gpuNetworkPtr != IntPtr.Zero)
+            {
+                if (typeof(T) != typeof(float))
+                {
+                    throw new InvalidOperationException("GPU is only supported for float data type!");
+                }
 
-            //    return _gpuNetwork.TrainSequence(inputs.Cast<Matrix<float>>().ToList(), targets.Cast<Matrix<float>>().ToList());
-            //}
+                using (var inPtrs = new HostMatrixPointers<T>(inputs.ToArray()))
+                using (var targPtrs = new HostMatrixPointers<T>(targets.ToArray()))
+                {
+                    fixed (HostMatrixDefinition* inPtr = &inPtrs.Definitions[0], targPtr = &targPtrs.Definitions[0])
+                    {
+                        return GpuInterface.TrainSequence(_gpuNetworkPtr, inPtr, targPtr, inputs.Count);
+                    }
+                }
+            }
 #endif
 
             return base.TrainSequence(inputs, targets);

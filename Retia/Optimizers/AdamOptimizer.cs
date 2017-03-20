@@ -1,5 +1,4 @@
 ﻿using System;
-using Retia.Contracts;
 using Retia.Neural;
 
 namespace Retia.Optimizers

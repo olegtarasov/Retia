@@ -1,6 +1,5 @@
 using System;
-using System.Runtime.InteropServices;
-using Retia.Contracts;
+using Retia.Gpu;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural;

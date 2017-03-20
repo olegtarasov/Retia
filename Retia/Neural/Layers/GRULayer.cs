@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
+using Retia.Gpu;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
@@ -502,7 +501,7 @@ namespace Retia.Neural.Layers
         public override IntPtr CreateGpuLayer()
         {
             GpuLayerPtr = GpuInterface.CreateGruLayer(InputSize, _hSize, 1, BatchSize, SeqLen);
-            TransferStatesFromHost(
+            TransferStatesFromHost(true, // CuDNN weight matrices are row-major
                 _wxr.Weight,
                 _wxz.Weight,
                 _wxh.Weight,

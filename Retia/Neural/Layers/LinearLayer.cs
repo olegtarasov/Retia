@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
 using Retia.Contracts;
+using Retia.Gpu;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
@@ -14,7 +15,7 @@ namespace Retia.Neural.Layers
 {
     public class LinearLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
-        [DllImport(Const.CudaDllName)]
+        [DllImport(GpuInterface.CudaDllName)]
         private static extern IntPtr CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
 
         private NeuroWeight<T> _bias;
@@ -196,7 +197,7 @@ namespace Retia.Neural.Layers
         public override IntPtr CreateGpuLayer()
         {
             GpuLayerPtr = CreateLinearLayer(_weights.Weight.ColumnCount, _weights.Weight.RowCount, BatchSize, SeqLen);
-            TransferStatesFromHost(_weights.Weight, _bias.Weight);
+            TransferStatesFromHost(false, _weights.Weight, _bias.Weight);
             return GpuLayerPtr;
         }
     }

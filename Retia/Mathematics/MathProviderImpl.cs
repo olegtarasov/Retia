@@ -7,7 +7,6 @@ using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Neural;
 using Retia.RandomGenerator;
-
 using Float = System.Single;
 
 namespace Retia.Mathematics

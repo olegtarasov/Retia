@@ -7,7 +7,7 @@ void LayeredNet::UpdateLearningRate(float learningRate)
 	_optimizer->setLearningRate(learningRate);
 }
 
-void LayeredNet::TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states)
+void LayeredNet::TransferStatesToHost(int layer, std::vector<HostMatrixPtr*>& states)
 {
 	if (layer >= _layers.size())
 		throw RetiaException("Index out of range");
@@ -15,7 +15,7 @@ void LayeredNet::TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& sta
 	_layers[layer]->TransferStatesToHost(states);
 }
 
-double LayeredNet::TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector<RawMatrixPtr*>& targets)
+double LayeredNet::TrainSequence(std::vector<HostMatrixPtr*>& inputs, std::vector<HostMatrixPtr*>& targets)
 {
 	if (inputs.size() != _seqLen || targets.size() != _seqLen) throw RetiaException("Wrong number of matrices!");
 

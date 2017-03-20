@@ -127,6 +127,9 @@
     <CudaCompile Include="AlgorithmTester.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="CApi.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CudaContext.cpp">
@@ -139,9 +142,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Exceptions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -68,6 +68,19 @@ void TransferLayerStatesToHost(LayerBase* layer, MatrixDefinition* matrices, int
 	DestroyMatrixPointers(states);
 }
 
+double TrainSequence(LayeredNet* net, MatrixDefinition* inputs, MatrixDefinition* targets, int count)
+{
+	auto in = GetMatrixPointers(inputs, count);
+	auto targ = GetMatrixPointers(targets, count);
+
+	double result = net->TrainSequence(in, targ);
+
+	DestroyMatrixPointers(in);
+	DestroyMatrixPointers(targ);
+
+	return result;
+}
+
 std::vector<HostMatrixPtr*> GetMatrixPointers(MatrixDefinition* matrices, int matrixCount)
 {
 	std::vector<HostMatrixPtr*> result;

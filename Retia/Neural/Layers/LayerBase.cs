@@ -1,27 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Contracts;
+using Retia.Gpu;
 using Retia.Helpers;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
+using MatrixExtensions = Retia.Mathematics.MatrixExtensions;
 
 namespace Retia.Neural.Layers
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct HostMatrixDefinition
-    {
-        public int Rows;
-        public int Columns;
-        public int SeqLength;
-        public IntPtr Pointer;
-    }
-
     public abstract class LayerBase<T> : ICloneable<LayerBase<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
         private readonly List<NeuroWeight<T>> _weights = new List<NeuroWeight<T>>();
@@ -43,7 +35,7 @@ namespace Retia.Neural.Layers
         {
             BatchSize = other.BatchSize;
             SeqLen = other.SeqLen;
-            Inputs = other.Inputs.Select(x => x.CloneMatrix()).ToList();
+            Inputs = other.Inputs.Select(x => MatrixExtensions.CloneMatrix<T>(x)).ToList();
             Outputs = other.Outputs.Select(x => x.CloneMatrix()).ToList();
             ErrorFunction = other.ErrorFunction?.Clone();
         }
@@ -195,35 +187,24 @@ namespace Retia.Neural.Layers
         {
         }
 
-        protected void TransferStatesFromHost(params Matrix<T>[] weights)
+        protected unsafe void TransferStatesFromHost(bool rowMajor, params Matrix<T>[] weights)
         {
-            TransferStates(GpuInterface.TransferLayerStatesFromHost, weights);
-        }
-
-        protected void TransferStatesToHost(params Matrix<T>[] weights)
-        {
-            TransferStates(GpuInterface.TransferLayerStatesToHost, weights);
-        }
-
-        private unsafe void TransferStates(Action<IntPtr, IntPtr, int> action, params Matrix<T>[] weights)
-        {
-            using (var ptrs = new MatrixPointers<T>(weights))
+            using (var defs = new HostMatrixPointers<T>(rowMajor, weights))
             {
-                var matrices = new HostMatrixDefinition[weights.Length];
-                for (int i = 0; i < weights.Length; i++)
+                fixed (HostMatrixDefinition* ptr = &defs.Definitions[0])
                 {
-                    var weight = weights[i];
-                    var mat = matrices[i];
-
-                    mat.Rows = weight.RowCount;
-                    mat.Columns = weight.ColumnCount;
-                    mat.SeqLength = 1;
-                    mat.Pointer = ptrs[i];
+                    GpuInterface.TransferLayerStatesFromHost(GpuLayerPtr, ptr, weights.Length);
                 }
+            }
+        }
 
-                fixed (HostMatrixDefinition* arr = &matrices[0])
+        protected unsafe void TransferStatesToHost(bool rowMajor, params Matrix<T>[] weights)
+        {
+            using (var defs = new HostMatrixPointers<T>(rowMajor, weights))
+            {
+                fixed (HostMatrixDefinition* ptr = &defs.Definitions[0])
                 {
-                    action(GpuLayerPtr, new IntPtr(arr), weights.Length);
+                    GpuInterface.TransferLayerStatesToHost(GpuLayerPtr, ptr, weights.Length);
                 }
             }
         }

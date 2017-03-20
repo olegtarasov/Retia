@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Single;
 using Retia.Contracts;
+using Retia.Gpu;
 using Retia.Helpers;
-using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
-using Retia.RandomGenerator;
 
 namespace Retia.Neural.Layers
 {

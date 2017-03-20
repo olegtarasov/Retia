@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
-using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {

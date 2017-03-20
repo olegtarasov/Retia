@@ -47,6 +47,11 @@ GPUAPI _VOID TransferLayerStatesFromHost(LayerBase *layer, MatrixDefinition *mat
 GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, MatrixDefinition *matrices, int matrixCount);
 
 /*
+ * Training
+ */
+GPUAPI double _cdecl TrainSequence(LayeredNet *net, MatrixDefinition *inputs, MatrixDefinition *targets, int count);
+
+/*
  * Helpers
  */
 std::vector<HostMatrixPtr*> GetMatrixPointers(MatrixDefinition *matrices, int matrixCount);
