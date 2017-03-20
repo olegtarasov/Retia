@@ -1,16 +1,15 @@
 using System;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers
 {
-    public abstract class TrainReportEventArgsBase : EventArgs
+    public abstract class TrainReportEventArgsBase<T> : EventArgs where T : TrainingSessionBase
     {
-        protected TrainReportEventArgsBase(long epoch, long iteration)
+        protected TrainReportEventArgsBase(T session)
         {
-            Epoch = epoch;
-            Iteration = iteration;
+            Session = session;
         }
 
-        public long Epoch { get; set; }
-        public long Iteration { get; set; }
+        public T Session { get; set; }
     }
 }

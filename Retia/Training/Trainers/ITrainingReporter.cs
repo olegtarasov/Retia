@@ -1,9 +1,12 @@
 ﻿using System;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers
 {
-	public interface ITrainingReporter<T> where T : TrainReportEventArgsBase
+	public interface ITrainingReporter<TReport, TSession> 
+        where TReport : TrainReportEventArgsBase<TSession>
+        where TSession : TrainingSessionBase
     {
-		event EventHandler<T> TrainReport;
+		event EventHandler<TReport> TrainReport;
 	}
 }

@@ -19,6 +19,7 @@ using Retia.RandomGenerator;
 using Retia.Training.Data;
 using Retia.Training.Trainers;
 using Retia.Training.Trainers.Actions;
+using Retia.Training.Trainers.Sessions;
 
 namespace SimpleExamples
 {
@@ -60,7 +61,7 @@ namespace SimpleExamples
                     ProgressWriter = ConsoleProgressWriter.Instance,
                     ReportProgress = new EachIteration(100),
                     ReportMesages = true
-                });
+                }, new OptimizingSession("MNIST"));
 
             RetiaGui retiaGui;
             if (gui)

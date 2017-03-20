@@ -16,8 +16,6 @@ namespace LanguageModel
     {
 		private static void Main(string[] args)
 		{
-            Control.UseNativeMKL();
-		    Console.OutputEncoding = Encoding.UTF8;
             try
 		    {
 		        new Parser<App>().Run(args, new App());

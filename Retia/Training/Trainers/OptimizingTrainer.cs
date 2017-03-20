@@ -9,28 +9,32 @@ using Retia.Neural;
 using Retia.Optimizers;
 using Retia.Training.Data;
 using Retia.Training.Testers;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers
 {
-    public class OptimizingTrainer<T>: TrainerBase<T, OptimizingTrainerOptions, OptimizationReportEventArgs> 
+    public class OptimizingTrainer<T>: TrainerBase<T, OptimizingTrainerOptions, OptimizationReportEventArgs, OptimizingSession> 
         where T : struct, IEquatable<T>, IFormattable
     {
         protected readonly NeuralNet<T> _network;
         private readonly OptimizerBase<T> _optimizer;
         private readonly ITester<T> _tester;
 
-        private List<double> _errors;
         private MAV _mav;
         private double _lastError;
 
         private double _dErr = 0;
         private IDataSet<T> _trainingSet;
 
-        public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataSet<T> trainingSet, OptimizingTrainerOptions options) : base(options)
+        public OptimizingTrainer(NeuralNet<T> network, OptimizerBase<T> optimizer, IDataSet<T> trainingSet, OptimizingTrainerOptions options, OptimizingSession session) : base(options, session)
         {
             _network = network;
             _optimizer = optimizer;
             TrainingSet = trainingSet;
+
+            // TODO: This is not very good.
+            session.Optimizer = optimizer;
+            session.Network = network;
         }
 
         public virtual NeuralNet<T> Network => _network;
@@ -105,7 +109,8 @@ namespace Retia.Training.Trainers
                 filteredError = error;
             }
 
-            _errors.Add(filteredError);
+            Session.AddError(filteredError, error);
+
             _dErr = filteredError - _lastError;
             _lastError = filteredError;
         }
@@ -118,8 +123,8 @@ namespace Retia.Training.Trainers
 
                 int total = TrainingSet.SampleCount / Options.SequenceLength;
 
-                sb.Append(Iteration).Append('/').Append(total);
-                sb.Append(ConsoleProgressWriter.GetProgressbar(Iteration, total, otherLen + sb.Length));
+                sb.Append(Session.Iteration).Append('/').Append(total);
+                sb.Append(ConsoleProgressWriter.GetProgressbar(Session.Iteration, total, otherLen + sb.Length));
 
                 return sb.ToString();
             }
@@ -137,7 +142,6 @@ namespace Retia.Training.Trainers
             if (Options.RunTests?.IsEnabled == true && TestSet == null)
                 throw new InvalidOperationException("Tests are enabled, but test set is not set!");
 
-            _errors = new List<double>();
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
 
@@ -145,11 +149,11 @@ namespace Retia.Training.Trainers
             Options.ProgressWriter?.Message($"Using network with total param count {_network.TotalParamCount}");
         }
 
-        protected override OptimizationReportEventArgs GetTrainingReport()
+        protected override OptimizationReportEventArgs GetAndFlushTrainingReport()
         {
-            var result = new OptimizationReportEventArgs(_errors.ToList(), Epoch, Iteration, _optimizer.LearningRate);
-            _errors.Clear();
-
+            var errors = Session.GetAndFlushErrors();
+            var result = new OptimizationReportEventArgs(Session, errors, _optimizer.LearningRate);
+            
             return result;
         }
 
@@ -171,7 +175,7 @@ namespace Retia.Training.Trainers
             _network.Optimize();
             ProcessError(error);
 
-            if (_tester != null && Options.RunTests?.ShouldDoOnIteration(Iteration) == true)
+            if (_tester != null && Options.RunTests?.ShouldDoOnIteration(Session.Iteration) == true)
             {
                 RunTest();
             }
@@ -191,12 +195,14 @@ namespace Retia.Training.Trainers
         {
             base.SubscribeActions();
             Options.LearningRateScaler?.Subscribe(this);
+            Options.SaveNetwork?.Subscribe(this);
         }
 
         protected override void UnsubscribeActions()
         {
             base.UnsubscribeActions();
             Options.LearningRateScaler?.Unsubscribe();
+            Options.SaveNetwork?.Unsubscribe();
         }
 
         private void RunTest()
@@ -222,23 +228,23 @@ namespace Retia.Training.Trainers
         {
             // An epoch was reached and data set rolled over.
             //OnMessage($"Epoch reached on iteration {Iteration}");
-            Epoch++;
+            Session.Epoch++;
             Options.ProgressWriter?.ItemComplete();
             
-            if (_tester != null && Options.RunTests?.ShouldDoOnEpoch(Epoch) == true)
+            if (_tester != null && Options.RunTests?.ShouldDoOnEpoch(Session.Epoch) == true)
             {
                 RunTest();
             }
 
             // Check for epoch memory reset
-            if (Options.ResetMemory?.ShouldDoOnEpoch(Epoch) == true)
+            if (Options.ResetMemory?.ShouldDoOnEpoch(Session.Epoch) == true)
             {
                 ResetMemory();
             }
 
             OnEpochReached();
 
-            Iteration = 0;
+            Session.Iteration = 0;
         }
     }
 }

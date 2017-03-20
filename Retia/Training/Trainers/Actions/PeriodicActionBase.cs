@@ -1,4 +1,5 @@
 ﻿using System;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers.Actions
 {
@@ -30,22 +31,36 @@ namespace Retia.Training.Trainers.Actions
             _trainerEvents.SequenceTrained -= TrainerEventsOnSequenceTrained;
         }
 
-        protected abstract void DoAction();
+        protected abstract void DoAction(TrainingSessionBase session);
 
-        private void TrainerEventsOnSequenceTrained()
+        private void TrainerEventsOnSequenceTrained(TrainingSessionBase session)
         {
-            if (Schedule.ShouldDoOnIteration(_trainerEvents.Iteration))
+            if (Schedule.ShouldDoOnIteration(session.Iteration))
             {
-                DoAction();
+                DoAction(session);
             }
         }
 
-        private void TrainerEventsOnEpochReached()
+        private void TrainerEventsOnEpochReached(TrainingSessionBase session)
         {
-            if (Schedule.ShouldDoOnEpoch(_trainerEvents.Epoch))
+            if (Schedule.ShouldDoOnEpoch(session.Epoch))
             {
-                DoAction();
+                DoAction(session);
             }
         }
+    }
+
+    public abstract class TypedPeriodicActionBase<T> : PeriodicActionBase where T : TrainingSessionBase
+    {
+        public TypedPeriodicActionBase(ActionSchedule schedule) : base(schedule)
+        {
+        }
+
+        protected override void DoAction(TrainingSessionBase session)
+        {
+            DoAction((T)session);
+        }
+
+        protected abstract void DoAction(T session);
     }
 }

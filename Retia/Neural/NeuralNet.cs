@@ -10,7 +10,7 @@ using Retia.Optimizers;
 
 namespace Retia.Neural
 {
-    public abstract class NeuralNet<T> : ICloneable<NeuralNet<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
+    public abstract class NeuralNet<T> : ICloneable<NeuralNet<T>>, INeuralNet where T : struct, IEquatable<T>, IFormattable
     {
         protected MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         public virtual OptimizerBase<T> Optimizer { get; set; }
@@ -97,9 +97,5 @@ namespace Retia.Neural
             var totalErr = error.Sum() / error.Count;
             return totalErr;
         }
-
-        #region Candidates for removal
-
-        #endregion
     }
 }

@@ -15,6 +15,7 @@ using Retia.RandomGenerator;
 using Retia.Training.Data;
 using Retia.Training.Trainers;
 using Retia.Training.Trainers.Actions;
+using Retia.Training.Trainers.Sessions;
 
 namespace SimpleExamples
 {
@@ -94,14 +95,14 @@ namespace SimpleExamples
                 ReportProgress = new EachIteration(1),
                 ReportMesages = true,
                 ProgressWriter = ConsoleProgressWriter.Instance,
-                LearningRateScaler = new ProportionalLearningRateScaler(new EachIteration(1), optimizer, 9e-5f)
-            });
+                LearningRateScaler = new ProportionalLearningRateScaler(new EachIteration(1), 9e-5f)
+            }, new OptimizingSession("XOR"));
 
             var runner = ConsoleRunner.Create(trainer, net);
 
             trainer.TrainReport += (sender, args) =>
             {
-                if (args.Errors.Last() < 1e-7f)
+                if (args.Errors.Last().RawError < 1e-7f)
                 {
                     runner.Stop();
                     Console.WriteLine("Finished training.");
