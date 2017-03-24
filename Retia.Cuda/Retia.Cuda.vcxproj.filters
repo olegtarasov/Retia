@@ -13,9 +13,6 @@
     <ClInclude Include="Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NeuroWeigth.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LinearLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -46,9 +43,6 @@
     <ClInclude Include="LayeredNetFactoryBase.h">
       <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
-    <ClInclude Include="MatrixBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="LayeredNetFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -58,22 +52,25 @@
     <ClInclude Include="Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RawMatrixPtr.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="LayerContainerBase.h">
       <Filter>Header Files\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="LayerContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AlgorithmTester.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="CApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LayerBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlgorithmTester.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroWeight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightSyncContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,9 +89,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="LinearLayer.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="NeuroWeigth.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="RMSPropOptimizer.cu">
@@ -128,6 +122,9 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="CApi.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="NeuroWeight.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

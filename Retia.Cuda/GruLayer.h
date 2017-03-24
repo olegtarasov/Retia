@@ -34,7 +34,7 @@ private:
 
 	// RNN Weigths
 	std::unique_ptr<CuDnnFilter>		_wFilter, _dwFilter;
-	std::unique_ptr<NeuroWeigth>		_w;
+	std::unique_ptr<NeuroWeight>		_w;
 
 	// Dropout
 	std::unique_ptr<CudaMemoryBlock>	_dropoutStates;

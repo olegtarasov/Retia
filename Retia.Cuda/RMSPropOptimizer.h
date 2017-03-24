@@ -13,7 +13,7 @@ public:
 	{
 	}
 
-	void Optimize(NeuroWeigth& weigth) override;
+	void Optimize(NeuroWeight& weigth) override;
 private:
 	float _momentum, _decayRate, _weightDecay;
 };

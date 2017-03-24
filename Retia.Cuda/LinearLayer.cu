@@ -8,8 +8,8 @@ using std::endl;
 
 LinearLayer::LinearLayer(int inSize, int outSize, int batchSize, int seqLength): LayerBase(inSize, outSize, batchSize, seqLength)
 {
-	_w = std::make_unique<NeuroWeigth>(outSize, inSize);
-	_b = std::make_unique<NeuroWeigth>(outSize, 1, 1);
+	_w = std::make_unique<NeuroWeight>(outSize, inSize);
+	_b = std::make_unique<NeuroWeight>(outSize, 1, 1);
 
 	_output = std::make_unique<DeviceMatrix>(outSize, batchSize, seqLength);
 	_sensitivity = std::make_unique<DeviceMatrix>(inSize, batchSize, seqLength);

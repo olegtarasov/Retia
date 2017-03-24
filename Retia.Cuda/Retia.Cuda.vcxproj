@@ -106,13 +106,12 @@
     <ClInclude Include="LayeredNetFactoryBase.h" />
     <ClInclude Include="LinearLayer.h" />
     <ClInclude Include="Matrix.h" />
-    <ClInclude Include="MatrixBase.h" />
-    <ClInclude Include="RawMatrixPtr.h" />
     <ClInclude Include="LayerBase.h" />
-    <ClInclude Include="NeuroWeigth.h" />
+    <ClInclude Include="NeuroWeight.h" />
     <ClInclude Include="OptimizerBase.h" />
     <ClInclude Include="RMSPropOptimizer.h" />
     <ClInclude Include="SoftmaxLayer.h" />
+    <ClInclude Include="WeightSyncContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="AlgorithmTester.cu">
@@ -163,7 +162,7 @@
     <CudaCompile Include="LinearLayer.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>
-    <CudaCompile Include="NeuroWeigth.cu">
+    <CudaCompile Include="NeuroWeight.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>
   </ItemGroup>

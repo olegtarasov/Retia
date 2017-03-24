@@ -2,7 +2,7 @@
 
 #include <memory>
 #include "LayerBase.h"
-#include "NeuroWeigth.h"
+#include "NeuroWeight.h"
 #include "RawMatrixPtr.h"
 
 class LinearLayer : public LayerBase
@@ -19,6 +19,6 @@ public:
 	void ResetMemory() override;
 	void ResetOptimizerCache() override;
 private:
-	std::unique_ptr<NeuroWeigth> _w, _b;
+	std::unique_ptr<NeuroWeight> _w, _b;
 	std::unique_ptr<DeviceMatrix> _identity;
 };

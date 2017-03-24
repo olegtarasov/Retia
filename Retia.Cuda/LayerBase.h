@@ -5,7 +5,6 @@
 #include "Matrix.h"
 #include "OptimizerBase.h"
 #include "Exceptions.h"
-#include "RawMatrixPtr.h"
 
 class LayerBase
 {
@@ -46,6 +45,8 @@ public:
 	{
 		_output->CopyTo(*output);
 	}
+
+
 
 	virtual void TransferStatesFromHost(std::vector<HostMatrixPtr*>& states) = 0;
 	virtual void TransferStatesToHost(std::vector<HostMatrixPtr*>& states) = 0;

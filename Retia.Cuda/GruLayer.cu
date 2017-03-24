@@ -260,7 +260,7 @@ void GruLayer::InitLayers()
 	int wLen = (int)(weightsSize / sizeof(float));
 	_wFilter = make_unique<CuDnnFilter>(wLen, 1, 1, false);
 	_dwFilter = make_unique<CuDnnFilter>(wLen, 1, 1, false);
-	_w = make_unique<NeuroWeigth>(1, wLen, 1);
+	_w = make_unique<NeuroWeight>(1, wLen, 1);
 
 	// Allocate workspace and reserve
 	size_t wsSize, reserveSize;
