@@ -2,7 +2,6 @@
 #include "LayerBase.h"
 #include "CuDnnTensor.h"
 #include "CudaHandle.h"
-#include "RawMatrixPtr.h"
 
 class GruLayer : public LayerBase
 {
@@ -10,8 +9,8 @@ public:
 	GruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
 
 
-	void TransferStatesFromHost(std::vector<HostMatrixPtr*>& states) override;
-	void TransferStatesToHost(std::vector<HostMatrixPtr*>& states) override;
+	void TransferStatesToDevice(std::vector<WeightSyncContainer*>& states) override;
+	void TransferStatesToHost(std::vector<WeightSyncContainer*>& states) override;
 	void ForwardSequence(DeviceMatrix& input) override;
 	void BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens) override;
 	void Optimize(OptimizerBase& optimizer) override;
@@ -33,8 +32,11 @@ private:
 		_dhyTensor, _dcyTensor;
 
 	// RNN Weigths
-	std::unique_ptr<CuDnnFilter>		_wFilter, _dwFilter;
-	std::unique_ptr<NeuroWeight>		_w;
+	std::unique_ptr<CuDnnFilter>		_wFilter, _dwFilter; // Weight tensors (no memory allocation).
+	std::unique_ptr<NeuroWeight>		_w; // Contigous block of memory for weights, gradients and caches
+	
+	std::vector<std::unique_ptr<NeuroWeightPtr>> _weights; // Sigle weight pointers	
+
 
 	// Dropout
 	std::unique_ptr<CudaMemoryBlock>	_dropoutStates;
@@ -47,6 +49,9 @@ private:
 	std::unique_ptr<CudaMemoryBlock>	_workspace, _reserve;
 
 	void InitLayers();
+	void InitWeights();
+	std::tuple<int, int, int> GetTensorDims(cudnnFilterDescriptor_t desc);
+	NeuroWeightPtr* GetWeightPtr(cudnnFilterDescriptor_t tensor, float* weightPtr);
 
 	/*
 	* States indexes:

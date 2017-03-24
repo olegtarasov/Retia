@@ -179,27 +179,6 @@ inline DeviceMatrixPtr::DeviceMatrixPtr(int rows, int columns, int seqLength, fl
 	_ptr = thrust::device_pointer_cast(rawPtr);
 }
 
-inline DeviceMatrixPtr::DeviceMatrixPtr(cudnnFilterDescriptor_t desc, float* rawPtr): DeviceMatrixBase<thrust::device_ptr<float>>(0, 0, 0)
-{
-	cudnnDataType_t dataType;
-	cudnnTensorFormat_t format;
-	int nbDims;
-	int dims[3];
-
-	auto result = cudnnGetFilterNdDescriptor(desc, 3, &dataType, &format, &nbDims, dims);
-	if (result != CUDNN_STATUS_SUCCESS)
-	{
-		throw CuDnnException(result);
-	}
-
-	_rows = dims[1];
-	_columns = dims[0];
-	_seqLength = dims[2];
-
-	_length = _rows * _columns * _seqLength;
-	_ptr = thrust::device_pointer_cast(rawPtr);
-}
-
 inline DeviceMatrix::DeviceMatrix(int rows, int columns, int seqLength): DeviceMatrixBase<thrust::device_vector<float>::iterator>(rows, columns, seqLength)
 {
 	_storage = thrust::device_vector<float>(_length);

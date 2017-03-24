@@ -119,8 +119,6 @@ public:
 	DeviceMatrixPtr(int rows, int columns, int seqLength, float* rawPtr);
 
 
-	DeviceMatrixPtr(cudnnFilterDescriptor_t desc, float* rawPtr);
-
 	thrust::device_ptr<float> begin() override { return _ptr; }
 	thrust::device_ptr<float> end() override { return _ptr + this->_length; }
 	float* raw_ptr() override { return thrust::raw_pointer_cast(_ptr); }

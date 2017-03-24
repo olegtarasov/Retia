@@ -37,25 +37,10 @@
     <ClInclude Include="Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LayeredNetBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayeredNetFactoryBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayeredNetFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Algorithms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Helpers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LayerContainerBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayerContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CApi.h">
@@ -83,9 +68,6 @@
       <UniqueIdentifier>{93e1b579-c7c1-4962-930b-46415cfe7d04}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files\Interfaces">
-      <UniqueIdentifier>{50f8c309-f017-4915-9469-49f7502c2a62}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="LinearLayer.cu">
@@ -103,19 +85,7 @@
     <CudaCompile Include="LayeredNet.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="LayeredNetFactory.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="LayeredNetFactoryBase.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
     <CudaCompile Include="CuDnnTensor.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="LayerContainer.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="LayerContainerBase.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="AlgorithmTester.cu">
@@ -139,6 +109,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Exceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,46 +6,47 @@
 class WeightSyncContainer
 {
 public:
-	WeightSyncContainer(HostMatrixPtr* weight, HostMatrixPtr* gradient, HostMatrixPtr* cache1, HostMatrixPtr* cache2, HostMatrixPtr* cacheM)
-		: _weight(weight),
-		_gradient(gradient),
-		_cache1(cache1),
-		_cache2(cache2),
-		_cacheM(cacheM)
+	WeightSyncContainer(int rows, int columns, int seqLen, float* weightPtr, float* gradPtr, float* cache1Ptr, float* cache2Ptr, float* cacheMPtr)
 	{
-		if (_weight == nullptr
-			|| _gradient == nullptr
-			|| _cache1 == nullptr
-			|| _cache2 == nullptr
-			|| _cacheM == nullptr)
+		if (weightPtr == nullptr
+			|| gradPtr == nullptr
+			|| cache1Ptr == nullptr
+			|| cache2Ptr == nullptr
+			|| cacheMPtr == nullptr)
 		{
 			throw RetiaException("All matrices must exist on host!");
 		}
+
+		_weight = std::make_unique<HostMatrixPtr>(rows, columns, seqLen, weightPtr);
+		_gradient = std::make_unique<HostMatrixPtr>(rows, columns, seqLen, gradPtr);
+		_cache1 = std::make_unique<HostMatrixPtr>(rows, columns, seqLen, cache1Ptr);
+		_cache2 = std::make_unique<HostMatrixPtr>(rows, columns, seqLen, cache2Ptr);
+		_cacheM = std::make_unique<HostMatrixPtr>(rows, columns, seqLen, cacheMPtr);
 	}
 
-	std::unique_ptr<HostMatrixPtr> weight() const
+	HostMatrixPtr* weight() const
 	{
-		return _weight;
+		return _weight.get();
 	}
 
-	std::unique_ptr<HostMatrixPtr> gradient() const
+	HostMatrixPtr* gradient() const
 	{
-		return _gradient;
+		return _gradient.get();
 	}
 
-	std::unique_ptr<HostMatrixPtr> cache1() const
+	HostMatrixPtr* cache1() const
 	{
-		return _cache1;
+		return _cache1.get();
 	}
 
-	std::unique_ptr<HostMatrixPtr> cache2() const
+	HostMatrixPtr* cache2() const
 	{
-		return _cache2;
+		return _cache2.get();
 	}
 
-	std::unique_ptr<HostMatrixPtr> cacheM() const
+	HostMatrixPtr* cacheM() const
 	{
-		return _cacheM;
+		return _cacheM.get();
 	}
 
 private:

@@ -8,40 +8,27 @@ template <class T>
 class NeuroWeightBase
 {
 public:
-	NeuroWeightBase(int rows, int columns = 1, int seqLength = 1)
-	{
-		_cache1 = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
-		_cache2 = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
-		_cacheM = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
-
-		_weight->ZeroMemory();
-		_gradient->ZeroMemory();
-		_cache1->ZeroMemory();
-		_cache2->ZeroMemory();
-		_cacheM->ZeroMemory();
-	}
-
-	DeviceMatrix& weight() const
+	T& weight() const
 	{
 		return *_weight;
 	}
 
-	DeviceMatrix& gradient() const
+	T& gradient() const
 	{
 		return *_gradient;
 	}
 
-	DeviceMatrix& cache1() const
+	T& cache1() const
 	{
 		return *_cache1;
 	}
 
-	DeviceMatrix& cache2() const
+	T& cache2() const
 	{
 		return *_cache2;
 	}
 
-	DeviceMatrix& cache_m() const
+	T& cache_m() const
 	{
 		return *_cacheM;
 	}
@@ -79,29 +66,39 @@ public:
 protected:
 	std::unique_ptr<T>	_weight;
 	std::unique_ptr<T>	_gradient;
-	std::unique_ptr<DeviceMatrix>	_cache1;
-	std::unique_ptr<DeviceMatrix>	_cache2;
-	std::unique_ptr<DeviceMatrix>	_cacheM;
+	std::unique_ptr<T>	_cache1;
+	std::unique_ptr<T>	_cache2;
+	std::unique_ptr<T>	_cacheM;
 };
 
 class NeuroWeight : public NeuroWeightBase<DeviceMatrix>
 {
 public:
 	NeuroWeight(int rows, int columns = 1, int seqLength = 1)
-		: NeuroWeightBase<DeviceMatrix>(rows, columns, seqLength)
 	{
 		_weight = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
 		_gradient = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
+		_cache1 = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
+		_cache2 = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
+		_cacheM = std::make_unique<DeviceMatrix>(rows, columns, seqLength);
+
+		_weight->ZeroMemory();
+		_gradient->ZeroMemory();
+		_cache1->ZeroMemory();
+		_cache2->ZeroMemory();
+		_cacheM->ZeroMemory();
 	}	
 };
 
 class NeuroWeightPtr : public NeuroWeightBase<DeviceMatrixPtr>
 {
 public:
-	NeuroWeightPtr(int rows, int columns = 1, int seqLength = 1, float* weightPtr, float* gradPtr)
-		: NeuroWeightBase<DeviceMatrixPtr>(rows, columns, seqLength)
+	NeuroWeightPtr(int rows, int columns, int seqLength, float* weightPtr, float* gradPtr, float* cache1Ptr, float* cache2Ptr, float* cacheMPtr)
 	{
 		_weight = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, weightPtr);
 		_gradient = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, gradPtr);
+		_cache1 = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, cache1Ptr);
+		_cache2 = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, cache2Ptr);
+		_cacheM = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, cacheMPtr);
 	}
 };

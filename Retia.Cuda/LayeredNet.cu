@@ -7,14 +7,6 @@ void LayeredNet::UpdateLearningRate(float learningRate)
 	_optimizer->setLearningRate(learningRate);
 }
 
-void LayeredNet::TransferStatesToHost(int layer, std::vector<HostMatrixPtr*>& states)
-{
-	if (layer >= _layers.size())
-		throw RetiaException("Index out of range");
-
-	_layers[layer]->TransferStatesToHost(states);
-}
-
 double LayeredNet::TrainSequence(std::vector<HostMatrixPtr*>& inputs, std::vector<HostMatrixPtr*>& targets)
 {
 	if (inputs.size() != _seqLen || targets.size() != _seqLen) throw RetiaException("Wrong number of matrices!");

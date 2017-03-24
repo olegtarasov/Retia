@@ -43,8 +43,16 @@ struct MatrixDefinition
 	float *Pointer;
 };
 
-GPUAPI _VOID TransferLayerStatesFromHost(LayerBase *layer, MatrixDefinition *matrices, int matrixCount);
-GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, MatrixDefinition *matrices, int matrixCount);
+struct WeightDefinition
+{
+	int Rows;
+	int Columns;
+	int SeqLength;
+	float *WeightPtr, *GradPtr, *Cache1Ptr, *Cache2Ptr, *CacheMPtr;
+};
+
+GPUAPI _VOID TransferLayerStatesToDevice(LayerBase *layer, WeightDefinition *weights, int count);
+GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, WeightDefinition *weights, int count);
 
 /*
  * Training
@@ -54,5 +62,7 @@ GPUAPI double _cdecl TrainSequence(LayeredNet *net, MatrixDefinition *inputs, Ma
 /*
  * Helpers
  */
+std::vector<WeightSyncContainer*> GetWeightSyncContainers(WeightDefinition* weights, int count);
+void DestroyWeightSyncContainers(std::vector<WeightSyncContainer*>& containers);
 std::vector<HostMatrixPtr*> GetMatrixPointers(MatrixDefinition *matrices, int matrixCount);
 void DestroyMatrixPointers(std::vector<HostMatrixPtr*>& ptrs);

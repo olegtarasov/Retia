@@ -17,13 +17,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -42,11 +42,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetExt>.lib</TargetExt>
+    <TargetExt>.dll</TargetExt>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetExt>.lib</TargetExt>
+    <TargetExt>.dll</TargetExt>
     <OutDir>$(ProjectDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -98,12 +98,7 @@
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="GruLayer.h" />
     <ClInclude Include="Helpers.h" />
-    <ClInclude Include="LayerContainer.h" />
-    <ClInclude Include="LayerContainerBase.h" />
-    <ClInclude Include="LayeredNetBase.h" />
     <ClInclude Include="LayeredNet.h" />
-    <ClInclude Include="LayeredNetFactory.h" />
-    <ClInclude Include="LayeredNetFactoryBase.h" />
     <ClInclude Include="LinearLayer.h" />
     <ClInclude Include="Matrix.h" />
     <ClInclude Include="LayerBase.h" />
@@ -129,18 +124,6 @@
     <ClCompile Include="CudaHandle.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>
-    <CudaCompile Include="LayerContainerBase.cu">
-      <FileType>CppCode</FileType>
-    </CudaCompile>
-    <CudaCompile Include="LayerContainer.cu">
-      <FileType>CppCode</FileType>
-    </CudaCompile>
-    <CudaCompile Include="LayeredNetFactoryBase.cu">
-      <FileType>CppCode</FileType>
-    </CudaCompile>
-    <CudaCompile Include="LayeredNetFactory.cu">
-      <FileType>CppCode</FileType>
-    </CudaCompile>
     <CudaCompile Include="LayeredNet.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>
@@ -156,6 +139,7 @@
     <CudaCompile Include="CuDnnTensor.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>
+    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Exceptions.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>

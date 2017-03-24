@@ -18,16 +18,6 @@ GruLayer::GruLayer(int inSize, int hSize, int layers, int batchSize, int seqLeng
 	InitLayers();
 }
 
-void GruLayer::TransferStatesFromHost(std::vector<HostMatrixPtr*>& states)
-{
-	TransferState(states, true);
-}
-
-void GruLayer::TransferStatesToHost(std::vector<HostMatrixPtr*>& states)
-{
-	TransferState(states, false);
-}
-
 /*
 * States indexes for each layer:
 * 0  - Wxr
@@ -46,78 +36,23 @@ void GruLayer::TransferStatesToHost(std::vector<HostMatrixPtr*>& states)
 * 10 - bhz
 * 11 - bhh
 */
-void GruLayer::TransferState(std::vector<HostMatrixPtr*>& states, bool hostToDevice)
+void GruLayer::TransferStatesToDevice(std::vector<WeightSyncContainer*>& states)
 {
-	if (states.size() / _layers != 12 || states.size() % 12 != 0) throw RetiaException("There should be exactly 12 state vectors for each layer");
+	if (states.size() != _weights.size()) throw RetiaException("There should be exactly 12 state vectors for each layer");
 
-	cudnnStatus_t result;
-	for (int layer = 0; layer < _layers; layer++)
+	for (int i = 0; i < states.size(); ++i)
 	{
-		for (int linLayerID = 0; linLayerID < 6; linLayerID++) { // 6 matrices for GRU
-			int matIdx = layer * 12 + linLayerID;
-			int bIdx = matIdx + 6;
+		_weights[i]->TransferStateToDevice(*states[i]);
+	}
+}
 
-			cudnnFilterDescriptor_t filterDesc;
-			result = cudnnCreateFilterDescriptor(&filterDesc);
-			if (result != CUDNN_STATUS_SUCCESS)
-			{
-				throw CuDnnException(result);
-			}
+void GruLayer::TransferStatesToHost(std::vector<WeightSyncContainer*>& states)
+{
+	if (states.size() != _weights.size()) throw RetiaException("There should be exactly 12 state vectors for each layer");
 
-			float *filterMemPtr;
-
-			// Weight matrix
-			result = cudnnGetRNNLinLayerMatrixParams(CudaContext::cudnnHandle(), _rnnDesc, layer, (*_xTensor)[0], *_wFilter, _w->weight().raw_ptr(), linLayerID, filterDesc, (void**)&filterMemPtr);
-			if (result != CUDNN_STATUS_SUCCESS)
-			{
-				throw CuDnnException(result);
-			}
-
-			auto matPtr = DeviceMatrixPtr(filterDesc, filterMemPtr);
-			if (hostToDevice)
-			{
-				matPtr.CopyFromLoose(*states[matIdx]);
-			}
-			else
-			{
-				matPtr.CopyToLoose(*states[matIdx]);
-			}
-
-			result = cudnnDestroyFilterDescriptor(filterDesc);
-			if (result != CUDNN_STATUS_SUCCESS)
-			{
-				throw CuDnnException(result);
-			}
-
-			// Bias vector
-			result = cudnnCreateFilterDescriptor(&filterDesc);
-			if (result != CUDNN_STATUS_SUCCESS)
-			{
-				throw CuDnnException(result);
-			}
-
-			result = cudnnGetRNNLinLayerBiasParams(CudaContext::cudnnHandle(), _rnnDesc, layer, (*_xTensor)[0], *_wFilter, _w->weight().raw_ptr(), linLayerID, filterDesc, (void**)&filterMemPtr);
-			if (result != CUDNN_STATUS_SUCCESS)
-			{
-				throw CuDnnException(result);
-			}
-
-			matPtr = DeviceMatrixPtr(filterDesc, filterMemPtr);
-			if (hostToDevice)
-			{
-				matPtr.CopyFromLoose(*states[bIdx]);
-			}
-			else
-			{
-				matPtr.CopyToLoose(*states[bIdx]);
-			}
-
-			result = cudnnDestroyFilterDescriptor(filterDesc);
-			if (result != CUDNN_STATUS_SUCCESS)
-			{
-				throw CuDnnException(result);
-			}
-		}
+	for (int i = 0; i < states.size(); ++i)
+	{
+		_weights[i]->TransferStateToHost(*states[i]);
 	}
 }
 
@@ -260,7 +195,8 @@ void GruLayer::InitLayers()
 	int wLen = (int)(weightsSize / sizeof(float));
 	_wFilter = make_unique<CuDnnFilter>(wLen, 1, 1, false);
 	_dwFilter = make_unique<CuDnnFilter>(wLen, 1, 1, false);
-	_w = make_unique<NeuroWeight>(1, wLen, 1);
+	_w = make_unique<NeuroWeight>(wLen, 1, 1);
+	InitWeights();
 
 	// Allocate workspace and reserve
 	size_t wsSize, reserveSize;
@@ -278,4 +214,95 @@ void GruLayer::InitLayers()
 
 	_workspace = make_unique<CudaMemoryBlock>(wsSize);
 	_reserve = make_unique<CudaMemoryBlock>(reserveSize);
+}
+
+void GruLayer::InitWeights()
+{
+	int weightCnt = _layers * 12;
+	_weights = std::vector<std::unique_ptr<NeuroWeightPtr>>(weightCnt);
+	for (int i = 0; i < weightCnt; ++i)
+	{
+		_weights.push_back(std::unique_ptr<NeuroWeightPtr>());
+	}
+
+	cudnnStatus_t result;
+	for (int layer = 0; layer < _layers; layer++)
+	{
+		for (int linLayerID = 0; linLayerID < 6; linLayerID++) { // 6 matrices for GRU
+			int matIdx = layer * 12 + linLayerID;
+			int bIdx = matIdx + 6;
+
+			cudnnFilterDescriptor_t filterDesc;
+			result = cudnnCreateFilterDescriptor(&filterDesc);
+			if (result != CUDNN_STATUS_SUCCESS)
+			{
+				throw CuDnnException(result);
+			}
+
+			float *filterMemPtr;
+
+			// Weight matrix
+			result = cudnnGetRNNLinLayerMatrixParams(CudaContext::cudnnHandle(), _rnnDesc, layer, (*_xTensor)[0], *_wFilter, _w->weight().raw_ptr(), linLayerID, filterDesc, (void**)&filterMemPtr);
+			if (result != CUDNN_STATUS_SUCCESS)
+			{
+				throw CuDnnException(result);
+			}
+
+			_weights[matIdx].reset(GetWeightPtr(filterDesc, filterMemPtr));
+
+			result = cudnnDestroyFilterDescriptor(filterDesc);
+			if (result != CUDNN_STATUS_SUCCESS)
+			{
+				throw CuDnnException(result);
+			}
+
+			// Bias vector
+			result = cudnnCreateFilterDescriptor(&filterDesc);
+			if (result != CUDNN_STATUS_SUCCESS)
+			{
+				throw CuDnnException(result);
+			}
+
+			result = cudnnGetRNNLinLayerBiasParams(CudaContext::cudnnHandle(), _rnnDesc, layer, (*_xTensor)[0], *_wFilter, _w->weight().raw_ptr(), linLayerID, filterDesc, (void**)&filterMemPtr);
+			if (result != CUDNN_STATUS_SUCCESS)
+			{
+				throw CuDnnException(result);
+			}
+
+			_weights[bIdx].reset(GetWeightPtr(filterDesc, filterMemPtr));
+
+			result = cudnnDestroyFilterDescriptor(filterDesc);
+			if (result != CUDNN_STATUS_SUCCESS)
+			{
+				throw CuDnnException(result);
+			}
+		}
+	}
+}
+
+std::tuple<int, int, int> GruLayer::GetTensorDims(cudnnFilterDescriptor_t desc)
+{
+	cudnnDataType_t dataType;
+	cudnnTensorFormat_t format;
+	int nbDims;
+	int dims[3];
+
+	auto result = cudnnGetFilterNdDescriptor(desc, 3, &dataType, &format, &nbDims, dims);
+	if (result != CUDNN_STATUS_SUCCESS)
+	{
+		throw CuDnnException(result);
+	}
+
+	return std::make_tuple(dims[1], dims[0], dims[2]);
+}
+
+NeuroWeightPtr* GruLayer::GetWeightPtr(cudnnFilterDescriptor_t tensor, float* weightPtr)
+{
+	auto dims = GetTensorDims(tensor);
+	auto delta = weightPtr - _w->weight().raw_ptr(); // We assume that gradients have the same offset as weights
+	float* gradPtr = _w->gradient().raw_ptr() + delta;
+	float* cache1Ptr = _w->cache1().raw_ptr() + delta;
+	float* cache2Ptr = _w->cache2().raw_ptr() + delta;
+	float* cacheMPtr = _w->cache_m().raw_ptr() + delta;
+	return new NeuroWeightPtr(std::get<0>(dims), std::get<1>(dims), std::get<2>(dims), weightPtr, gradPtr, cache1Ptr, cache2Ptr, cacheMPtr);
 }

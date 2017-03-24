@@ -50,22 +50,22 @@ SoftmaxLayer* CreateSoftmaxLayer(int inSize, int batchSize, int seqLen)
 	return new SoftmaxLayer(inSize, batchSize, seqLen);
 }
 
-void TransferLayerStatesFromHost(LayerBase* layer, MatrixDefinition* matrices, int matrixCount)
+void TransferLayerStatesToDevice(LayerBase* layer, WeightDefinition *weights, int count)
 {
-	auto states = GetMatrixPointers(matrices, matrixCount);
+	auto states = GetWeightSyncContainers(weights, count);
 
-	layer->TransferStatesFromHost(states);
+	layer->TransferStatesToDevice(states);
 
-	DestroyMatrixPointers(states);
+	DestroyWeightSyncContainers(states);
 }
 
-void TransferLayerStatesToHost(LayerBase* layer, MatrixDefinition* matrices, int matrixCount)
+void TransferLayerStatesToHost(LayerBase* layer, WeightDefinition *weights, int count)
 {
-	auto states = GetMatrixPointers(matrices, matrixCount);
+	auto states = GetWeightSyncContainers(weights, count);
 
 	layer->TransferStatesToHost(states);
 
-	DestroyMatrixPointers(states);
+	DestroyWeightSyncContainers(states);
 }
 
 double TrainSequence(LayeredNet* net, MatrixDefinition* inputs, MatrixDefinition* targets, int count)
@@ -79,6 +79,27 @@ double TrainSequence(LayeredNet* net, MatrixDefinition* inputs, MatrixDefinition
 	DestroyMatrixPointers(targ);
 
 	return result;
+}
+
+std::vector<WeightSyncContainer*> GetWeightSyncContainers(WeightDefinition* weights, int count)
+{
+	std::vector<WeightSyncContainer*> result;
+
+	for (int i = 0; i < count; ++i)
+	{
+		auto cur = weights[i];
+		result.push_back(new WeightSyncContainer(cur.Rows, cur.Columns, cur.SeqLength, cur.WeightPtr, cur.GradPtr, cur.Cache1Ptr, cur.Cache2Ptr, cur.CacheMPtr));
+	}
+
+	return result;
+}
+
+void DestroyWeightSyncContainers(std::vector<WeightSyncContainer*>& containers)
+{
+	for (int i = 0; i < containers.size(); ++i)
+	{
+		delete containers[i];
+	}
 }
 
 std::vector<HostMatrixPtr*> GetMatrixPointers(MatrixDefinition* matrices, int matrixCount)

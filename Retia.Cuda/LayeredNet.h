@@ -3,7 +3,6 @@
 #include <memory>
 #include <vector>
 #include "LayerBase.h"
-#include "LayeredNetBase.h"
 
 class LayeredNet
 {
@@ -18,7 +17,6 @@ public:
 
 
 	void UpdateLearningRate(float learningRate);
-	void TransferStatesToHost(int layer, std::vector<HostMatrixPtr*>& states);
 	double TrainSequence(std::vector<HostMatrixPtr*>& inputs, std::vector<HostMatrixPtr*>& targets);
 	void AddLayer(LayerBase* layer);
 	double TrainSequence(DeviceMatrix& input, DeviceMatrix& target);
