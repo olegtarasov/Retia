@@ -42,7 +42,7 @@ void GruLayer::TransferStatesToDevice(std::vector<WeightSyncContainer*>& states)
 
 	for (int i = 0; i < states.size(); ++i)
 	{
-		_weights[i]->TransferStateToDevice(*states[i]);
+		_weights[i]->TransferStateToDeviceLoose(*states[i]);
 	}
 }
 
@@ -52,7 +52,7 @@ void GruLayer::TransferStatesToHost(std::vector<WeightSyncContainer*>& states)
 
 	for (int i = 0; i < states.size(); ++i)
 	{
-		_weights[i]->TransferStateToHost(*states[i]);
+		_weights[i]->TransferStateToHostLoose(*states[i]);
 	}
 }
 
@@ -218,9 +218,7 @@ void GruLayer::InitLayers()
 
 void GruLayer::InitWeights()
 {
-	int weightCnt = _layers * 12;
-	_weights = std::vector<std::unique_ptr<NeuroWeightPtr>>(weightCnt);
-	for (int i = 0; i < weightCnt; ++i)
+	for (int i = 0; i < _layers * 12; ++i)
 	{
 		_weights.push_back(std::unique_ptr<NeuroWeightPtr>());
 	}

@@ -101,4 +101,22 @@ public:
 		_cache2 = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, cache2Ptr);
 		_cacheM = std::make_unique<DeviceMatrixPtr>(rows, columns, seqLength, cacheMPtr);
 	}
+
+	void TransferStateToDeviceLoose(WeightSyncContainer& container)
+	{
+		_weight->CopyFromLoose(*container.weight());
+		_gradient->CopyFromLoose(*container.gradient());
+		_cache1->CopyFromLoose(*container.cache1());
+		_cache2->CopyFromLoose(*container.cache2());
+		_cacheM->CopyFromLoose(*container.cacheM());
+	}
+
+	void TransferStateToHostLoose(WeightSyncContainer& container)
+	{
+		_weight->CopyToLoose(*container.weight());
+		_gradient->CopyToLoose(*container.gradient());
+		_cache1->CopyToLoose(*container.cache1());
+		_cache2->CopyToLoose(*container.cache2());
+		_cacheM->CopyToLoose(*container.cacheM());
+	}
 };
