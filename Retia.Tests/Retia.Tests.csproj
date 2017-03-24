@@ -109,12 +109,6 @@
     <Compile Include="Training\ConfusionTableTests.cs" />
     <Compile Include="Training\LinearDataSetTests.cs" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
-      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
-      <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Retia.Genetic\Retia.Genetic.csproj">
       <Project>{6b721697-aaae-465c-916f-17f7f06e78d3}</Project>

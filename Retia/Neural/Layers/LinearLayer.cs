@@ -4,7 +4,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Gpu;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
@@ -15,9 +14,6 @@ namespace Retia.Neural.Layers
 {
     public class LinearLayer<T> : LayerBase<T> where T : struct, IEquatable<T>, IFormattable
     {
-        [DllImport(GpuInterface.CudaDllName)]
-        private static extern IntPtr CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
-
         private NeuroWeight<T> _bias;
         private NeuroWeight<T> _weights;
 
@@ -178,16 +174,6 @@ namespace Retia.Neural.Layers
             return inputSensList;
         }
 
-        public override LayerSpecBase CreateSpec()
-        {
-            if (typeof(T) != typeof(float))
-            {
-                throw new InvalidOperationException("Only float for GPU!");
-            }
-
-            return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight as Matrix<float>, _bias.Weight as Matrix<float>);
-        }
-
         public override void ClearGradients()
         {
             _weights.ClearGrad();
@@ -196,8 +182,8 @@ namespace Retia.Neural.Layers
 
         public override IntPtr CreateGpuLayer()
         {
-            GpuLayerPtr = CreateLinearLayer(_weights.Weight.ColumnCount, _weights.Weight.RowCount, BatchSize, SeqLen);
-            TransferStatesFromHost(false, _weights.Weight, _bias.Weight);
+            GpuLayerPtr = GpuInterface.CreateLinearLayer(_weights.Weight.ColumnCount, _weights.Weight.RowCount, BatchSize, SeqLen);
+            TransferStatesToDevice(false, _weights.Weight, _bias.Weight);
             return GpuLayerPtr;
         }
     }

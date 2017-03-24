@@ -79,6 +79,7 @@
     <Compile Include="Gpu\GpuInterface.cs" />
     <Compile Include="Gpu\HostMatrixDefinition.cs" />
     <Compile Include="Gpu\HostMatrixPointers.cs" />
+    <Compile Include="Gpu\HostWeightPointers.cs" />
     <Compile Include="Helpers\FileDownloader.cs" />
     <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\MinMax.cs" />
@@ -181,10 +182,18 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Retia.Cuda\bin\$(Platform)\Debug\Retia.Cuda.dll">
+      <Link>Retia.Cuda.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release [CPUOnly]' Or '$(Configuration)' == 'Release'">
     <Content Include="..\FastFuncs\bin\$(Platform)\Release\FastFuncs.dll">
       <Link>FastFuncs.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Retia.Cuda\bin\$(Platform)\Release\Retia.Cuda.dll">
+      <Link>Retia.Cuda.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -196,18 +205,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MathProviderImplD.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Retia.Contracts\Retia.Contracts.csproj">
-      <Project>{d9562091-9caa-4b3e-92a1-746642339f1f}</Project>
-      <Name>Retia.Contracts</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
-      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
-      <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

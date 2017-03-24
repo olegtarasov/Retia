@@ -87,17 +87,7 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
-      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
-      <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Retia.Contracts\Retia.Contracts.csproj">
-      <Project>{d9562091-9caa-4b3e-92a1-746642339f1f}</Project>
-      <Name>Retia.Contracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Retia.Gui\Retia.Gui.csproj">
       <Project>{eb0005db-e481-43ea-9802-352bae4b0526}</Project>
       <Name>Retia.Gui</Name>

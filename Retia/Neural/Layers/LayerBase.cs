@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Gpu;
 using Retia.Helpers;
 using Retia.Integration;
@@ -92,7 +91,6 @@ namespace Retia.Neural.Layers
         public abstract void ResetOptimizer();
         public abstract void InitSequence();
         public abstract void ClampGrads(float limit);
-        public abstract LayerSpecBase CreateSpec();
 
         public abstract IntPtr CreateGpuLayer();
 
@@ -187,22 +185,22 @@ namespace Retia.Neural.Layers
         {
         }
 
-        protected unsafe void TransferStatesFromHost(bool rowMajor, params Matrix<T>[] weights)
+        protected unsafe void TransferStatesToDevice(bool rowMajor, params NeuroWeight<T>[] weights)
         {
-            using (var defs = new HostMatrixPointers<T>(rowMajor, weights))
+            using (var defs = new HostWeightPointers<T>(rowMajor, weights))
             {
-                fixed (HostMatrixDefinition* ptr = &defs.Definitions[0])
+                fixed (HostWeightDefinition* ptr = &defs.Definitions[0])
                 {
-                    GpuInterface.TransferLayerStatesFromHost(GpuLayerPtr, ptr, weights.Length);
+                    GpuInterface.TransferLayerStatesToDevice(GpuLayerPtr, ptr, weights.Length);
                 }
             }
         }
 
-        protected unsafe void TransferStatesToHost(bool rowMajor, params Matrix<T>[] weights)
+        protected unsafe void TransferStatesToHost(bool rowMajor, params NeuroWeight<T>[] weights)
         {
-            using (var defs = new HostMatrixPointers<T>(rowMajor, weights))
+            using (var defs = new HostWeightPointers<T>(rowMajor, weights))
             {
-                fixed (HostMatrixDefinition* ptr = &defs.Definitions[0])
+                fixed (HostWeightDefinition* ptr = &defs.Definitions[0])
                 {
                     GpuInterface.TransferLayerStatesToHost(GpuLayerPtr, ptr, weights.Length);
                 }

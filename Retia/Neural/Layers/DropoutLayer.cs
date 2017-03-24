@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
 using Retia.Optimizers;
@@ -132,11 +131,6 @@ namespace Retia.Neural.Layers
 
         public override void FromVectorState(T[] vector, ref int idx)
         {
-        }
-
-        public override LayerSpecBase CreateSpec()
-        {
-            throw new NotSupportedException();
         }
 
         protected override void Initialize()

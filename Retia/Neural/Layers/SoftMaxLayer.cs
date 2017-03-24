@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Gpu;
 using Retia.Helpers;
 using Retia.Neural.ErrorFunctions;
@@ -98,11 +97,6 @@ namespace Retia.Neural.Layers
 
         public override void FromVectorState(T[] vector, ref int idx)
         {
-        }
-
-        public override LayerSpecBase CreateSpec()
-        {
-            return new SoftmaxLayerSpec(_size, BatchSize, SeqLen);
         }
 
         public override void ClearGradients()

@@ -26,10 +26,10 @@ namespace Retia.Gpu
         public static extern IntPtr CreateSoftmaxLayer(int inSize, int batchSize, int seqLen);
 
         [DllImport(CudaDllName)]
-        public static extern unsafe void TransferLayerStatesFromHost(IntPtr layer, HostMatrixDefinition *matrices, int matrixCount);
+        public static extern unsafe void TransferLayerStatesToDevice(IntPtr layer, HostWeightDefinition *weigths, int count);
 
         [DllImport(CudaDllName)]
-        public static extern unsafe void TransferLayerStatesToHost(IntPtr layer, HostMatrixDefinition *matrices, int matrixCount);
+        public static extern unsafe void TransferLayerStatesToHost(IntPtr layer, HostWeightDefinition *weights, int count);
 
         [DllImport(CudaDllName)]
         public static extern void SetLearningRate(IntPtr optimizer, float learningRate);
@@ -42,5 +42,8 @@ namespace Retia.Gpu
 
         [DllImport(CudaDllName)]
         public static extern unsafe double TrainSequence(IntPtr net, HostMatrixDefinition *inputs, HostMatrixDefinition *targets, int count);
+
+        [DllImport(GpuInterface.CudaDllName)]
+        public static extern IntPtr CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
     }
 }
