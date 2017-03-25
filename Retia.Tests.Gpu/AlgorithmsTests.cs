@@ -1,4 +1,5 @@
-﻿using Retia.Gpu;
+﻿#if !CPUONLY
+using Retia.Gpu;
 using Retia.Mathematics;
 using Retia.Tests.Mathematics;
 using Retia.Tests.Plumbing;
@@ -12,3 +13,4 @@ namespace Retia.Tests.Gpu
         protected override GpuInterface.TestingBase Interface => GpuInterface.GpuTesting.Instance;
     }
 }
+#endif

@@ -96,20 +96,22 @@ namespace Retia.Tests.Mathematics
             }
         }
 
-        //[Fact]
-        //public void CanClampMatrix()
-        //{
-        //    var hostMatrix = MatrixFactory.ParseString<float>(@"2 5
-        //                                           -6 1");
-        //    var gpuMatrix = hostMatrix.Clone();
+        [Fact]
+        public void CanClampMatrix()
+        {
+            var local = MatrixFactory.ParseString<float>(@"2 5
+                                                   -6 1");
+            var remote = local.Clone();
 
+            local.Clamp(-4.0f, 4.0f);
+            local.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
 
-        //    hostMatrix.Clamp(-4.0f, 4.0f);
-        //    hostMatrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
-
-        //    MathTester.TestClampMatrix(gpuMatrix, 4.0f);
-        //    gpuMatrix.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
-        //}
+            using (var ptrs = new HostMatrixPointers<float>(remote))
+            {
+                Interface.TestClampMatrix(ptrs.Definitions[0], 4.0f);
+                remote.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
+            }
+        }
     }
 
     public class CpuAlgorithmsTests : AlgorithmsTestsBase

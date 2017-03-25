@@ -4,7 +4,7 @@ using Retia.Mathematics;
 using Xunit;
 using XunitShould;
 
-namespace Retia.Tests.Helers
+namespace Retia.Tests.Helpers
 {
     public class MatrixPointersTests
     {

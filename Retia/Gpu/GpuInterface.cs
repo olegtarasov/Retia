@@ -13,6 +13,8 @@ namespace Retia.Gpu
             public abstract void TestCrossEntropyBackprop(HostMatrixDefinition m1, HostMatrixDefinition m2, HostMatrixDefinition result);
             public abstract void TestRMSPropUpdate(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1,
                                                    HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
+
+            public abstract void TestClampMatrix(HostMatrixDefinition matrix, float threshold);
         }
 
         public class CpuTesting : TestingBase
@@ -33,6 +35,11 @@ namespace Retia.Gpu
             {
                 Testing.TestRMSPropUpdateCpu(weight, grad, cache1, cache2, cacheM, learningRate, decayRate, momentum, weightDecay);
             }
+
+            public override void TestClampMatrix(HostMatrixDefinition matrix, float threshold)
+            {
+                Testing.TestClampMatrixCpu(matrix, threshold);
+            }
         }
 
         public class GpuTesting : TestingBase
@@ -52,6 +59,11 @@ namespace Retia.Gpu
             public override void TestRMSPropUpdate(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1, HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay)
             {
                 Testing.TestRMSPropUpdateGpu(weight, grad, cache1, cache2, cacheM, learningRate, decayRate, momentum, weightDecay);
+            }
+
+            public override void TestClampMatrix(HostMatrixDefinition matrix, float threshold)
+            {
+                Testing.TestClampMatrixGpu(matrix, threshold);
             }
         }
 
@@ -76,6 +88,12 @@ namespace Retia.Gpu
             [DllImport(CudaDllName)]
             public static extern void TestRMSPropUpdateGpu(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1,
                                                             HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestClampMatrixCpu(HostMatrixDefinition matrix, float threshold);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestClampMatrixGpu(HostMatrixDefinition matrix, float threshold);
         }
 
         [DllImport(CudaDllName)]

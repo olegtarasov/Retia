@@ -213,4 +213,23 @@ void TestRMSPropUpdateGpu(MatrixDefinition weight, MatrixDefinition grad, Matrix
 	mCacheM->CopyFrom(*gmCacheM);
 }
 
+void TestClampMatrixCpu(MatrixDefinition matrix, float threshold)
+{
+	auto mat = std::make_unique<HostMatrixPtr>(matrix.Rows, matrix.Columns, matrix.SeqLength, matrix.Pointer);
+
+	Algorithms::Clamp(*mat, threshold);
+}
+
+void TestClampMatrixGpu(MatrixDefinition matrix, float threshold)
+{
+	auto mat = std::make_unique<HostMatrixPtr>(matrix.Rows, matrix.Columns, matrix.SeqLength, matrix.Pointer);
+	auto gMat = std::make_unique<DeviceMatrix>(matrix.Rows, matrix.Columns, matrix.SeqLength);
+
+	mat->CopyTo(*gMat);
+
+	Algorithms::Clamp(*gMat, threshold);
+
+	mat->CopyFrom(*gMat);
+}
+
 

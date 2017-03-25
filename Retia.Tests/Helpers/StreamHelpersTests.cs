@@ -1,10 +1,9 @@
 ﻿using System.IO;
 using Retia.Helpers;
-using Retia.Tests.Plumbing;
 using Xunit;
 using XunitShould;
 
-namespace Retia.Tests.Helers
+namespace Retia.Tests.Helpers
 {
     public class StreamHelpersTests
     {
