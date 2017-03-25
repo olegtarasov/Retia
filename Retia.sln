@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Gui", "Retia.Gui\Reti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleExamples", "Examples\SimpleExamples\SimpleExamples.csproj", "{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Tests.Gpu", "Retia.Tests.Gpu\Retia.Tests.Gpu.csproj", "{EA12182E-33C3-4F57-A905-70015121953F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug [CPUOnly]|x64 = Debug [CPUOnly]|x64
@@ -141,6 +143,12 @@ Global
 		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release  [CPUOnly]|x64.Build.0 = Release|x64
 		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release|x64.ActiveCfg = Release|x64
 		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6}.Release|x64.Build.0 = Release|x64
+		{EA12182E-33C3-4F57-A905-70015121953F}.Debug [CPUOnly]|x64.ActiveCfg = Debug|x64
+		{EA12182E-33C3-4F57-A905-70015121953F}.Debug|x64.ActiveCfg = Debug|x64
+		{EA12182E-33C3-4F57-A905-70015121953F}.Debug|x64.Build.0 = Debug|x64
+		{EA12182E-33C3-4F57-A905-70015121953F}.Release  [CPUOnly]|x64.ActiveCfg = Release|x64
+		{EA12182E-33C3-4F57-A905-70015121953F}.Release|x64.ActiveCfg = Release|x64
+		{EA12182E-33C3-4F57-A905-70015121953F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

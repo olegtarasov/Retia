@@ -1,6 +1,7 @@
 ﻿using System;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using Retia.Mathematics;
 using Xunit;
 using XunitShould;
 
@@ -31,12 +32,7 @@ namespace Retia.Tests.Plumbing
 
         public static void ShouldEqualWithinError<T>(this T val, T expected, float error = 1e-5f) where T : struct, IEquatable<T>, IFormattable
         {
-            if (typeof(T) == typeof(float))
-                Math.Abs(Convert.ToSingle(val) - Convert.ToSingle(expected)).ShouldBeLessThan(error);
-            else if (typeof(T) == typeof(double))
-                Math.Abs(Convert.ToDouble(val) - Convert.ToDouble(expected)).ShouldBeLessThan(error);
-            else
-                throw new InvalidOperationException();
+            MathProvider<T>.Instance.AlmostEqual(val, expected, error).ShouldBeTrue();
         }
 
         public static void ShouldHaveSize<T>(this Matrix<T> matrix, int rows, int cols) where T : struct, IEquatable<T>, IFormattable

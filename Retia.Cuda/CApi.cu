@@ -1,4 +1,5 @@
 ﻿#include "CApi.h"
+#include "Algorithms.h"
 
 RMSPropOptimizer* CreateRMSPropOptimizer(float learningRate, float momentum, float decayRate, float weightDecay)
 {
@@ -121,6 +122,14 @@ void DestroyMatrixPointers(std::vector<HostMatrixPtr*>& ptrs)
 	{
 		delete ptrs[i];
 	}
+}
+
+double TestCrossEntropyError(MatrixDefinition m1, MatrixDefinition m2)
+{
+	auto mat1 = std::make_unique<HostMatrixPtr>(m1.Rows, m1.Columns, m1.SeqLength, m1.Pointer);
+	auto mat2 = std::make_unique<HostMatrixPtr>(m2.Rows, m2.Columns, m2.SeqLength, m2.Pointer);
+
+	return Algorithms::CrossEntropyError(*mat1, *mat2);
 }
 
 

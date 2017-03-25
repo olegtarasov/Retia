@@ -60,6 +60,11 @@ GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, WeightDefinition *weigh
 GPUAPI double _cdecl TrainSequence(LayeredNet *net, MatrixDefinition *inputs, MatrixDefinition *targets, int count);
 
 /*
+* Tests
+*/
+GPUAPI double TestCrossEntropyError(MatrixDefinition m1, MatrixDefinition m2);
+
+/*
  * Helpers
  */
 std::vector<WeightSyncContainer*> GetWeightSyncContainers(WeightDefinition* weights, int count);

@@ -7,6 +7,12 @@ namespace Retia.Gpu
     {
         public const string CudaDllName = "Retia.Cuda.dll";
 
+        public static class Testing
+        {
+            [DllImport(CudaDllName)]
+            public static extern double TestCrossEntropyError(HostMatrixDefinition m1, HostMatrixDefinition m2);
+        }
+
         [DllImport(CudaDllName)]
         public static extern IntPtr CreateLayeredNetwork(int inputSize, int outputSize, int batchSize, int seqLen);
 

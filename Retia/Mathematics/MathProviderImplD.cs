@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -294,9 +295,9 @@ namespace Retia.Mathematics
             return p;
         }
 
-        protected override bool AlmostEqual(Float a, Float b)
+        public override bool AlmostEqual(Float a, Float b, float margin = 1e-7f)
         {
-            return Math.Abs(a - b) < 10e-7f;
+            return Math.Abs(a - b) < margin;
         }
 
         public override void SaveMatrix(Matrix<Float> matrix, Stream stream)

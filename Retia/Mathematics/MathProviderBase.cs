@@ -42,9 +42,9 @@ namespace Retia.Mathematics
         public abstract T[] Array(params float[] input);
 
         /// <summary>
-        /// Tests two values of T for equality with error margin of 10e-7.
+        /// Tests two values of T for equality with error margin of 1e-7.
         /// </summary>
-        protected abstract bool AlmostEqual(T a, T b);
+        public abstract bool AlmostEqual(T a, T b, float margin = 1e-7f);
 
         #endregion
 
