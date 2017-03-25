@@ -1,5 +1,8 @@
 ﻿#include "CApi.h"
 #include "Algorithms.h"
+#include <thrust/device_vector.h>
+#include <thrust/for_each.h>
+#include <thrust/iterator/zip_iterator.h>
 
 RMSPropOptimizer* CreateRMSPropOptimizer(float learningRate, float momentum, float decayRate, float weightDecay)
 {
@@ -228,6 +231,57 @@ void TestClampMatrixGpu(MatrixDefinition matrix, float threshold)
 	mat->CopyTo(*gMat);
 
 	Algorithms::Clamp(*gMat, threshold);
+
+	mat->CopyFrom(*gMat);
+}
+
+struct test_mutator
+{
+	template <typename Tuple>
+	__host__ __device__
+		void operator()(Tuple t)
+	{
+		thrust::get<0>(t) = thrust::get<0>(t) + thrust::get<1>(t);
+	}
+};
+
+void TestMatrixTransferCpu(MatrixDefinition matrix)
+{
+	auto mat = std::make_unique<HostMatrixPtr>(matrix.Rows, matrix.Columns, matrix.SeqLength, matrix.Pointer);
+	auto coeff = thrust::host_vector<float>(mat->length());
+
+	for (int col = 0; col < matrix.Columns; ++col)
+	{
+		for (int row = 0; row < matrix.Rows; ++row)
+		{
+			coeff[matrix.Rows * col + row] += row - col;
+		}
+	}
+
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(mat->begin(), coeff.begin())),
+					thrust::make_zip_iterator(thrust::make_tuple(mat->end(), coeff.end())),
+					test_mutator());	
+}
+
+void TestMatrixTransferGpu(MatrixDefinition matrix)
+{
+	auto mat = std::make_unique<HostMatrixPtr>(matrix.Rows, matrix.Columns, matrix.SeqLength, matrix.Pointer);
+	auto gMat = std::make_unique<DeviceMatrix>(matrix.Rows, matrix.Columns, matrix.SeqLength);
+	auto coeff = thrust::device_vector<float>(mat->length());
+
+	for (int col = 0; col < matrix.Columns; ++col)
+	{
+		for (int row = 0; row < matrix.Rows; ++row)
+		{
+			coeff[matrix.Rows * col + row] += row - col;
+		}
+	}
+
+	mat->CopyTo(*gMat);
+
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gMat->begin(), coeff.begin())),
+					 thrust::make_zip_iterator(thrust::make_tuple(gMat->end(), coeff.end())),
+					 test_mutator());
 
 	mat->CopyFrom(*gMat);
 }

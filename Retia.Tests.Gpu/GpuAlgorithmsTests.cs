@@ -1,10 +1,6 @@
 ﻿#if !CPUONLY
 using Retia.Gpu;
-using Retia.Mathematics;
 using Retia.Tests.Mathematics;
-using Retia.Tests.Plumbing;
-using Xunit;
-using XunitShould;
 
 namespace Retia.Tests.Gpu
 {

@@ -72,6 +72,8 @@ GPUAPI _VOID TestRMSPropUpdateGpu(MatrixDefinition weight, MatrixDefinition grad
 	MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
 GPUAPI _VOID TestClampMatrixCpu(MatrixDefinition matrix, float threshold);
 GPUAPI _VOID TestClampMatrixGpu(MatrixDefinition matrix, float threshold);
+GPUAPI _VOID TestMatrixTransferCpu(MatrixDefinition matrix);
+GPUAPI _VOID TestMatrixTransferGpu(MatrixDefinition matrix);
 
 /*
  * Helpers

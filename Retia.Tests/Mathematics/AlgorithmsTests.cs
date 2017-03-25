@@ -14,12 +14,8 @@ namespace Retia.Tests.Mathematics
     /// This suite tests .NET and GPU algorithms on same data to make sure they give
     /// identical results.
     /// </summary>
-    public abstract class AlgorithmsTestsBase
+    public abstract class AlgorithmsTestsBase : GpuTestsBase
     {
-        private readonly MathProviderBase<float> MathProvider = MathProvider<float>.Instance;
-
-        protected abstract GpuInterface.TestingBase Interface { get; }
-
         [Fact]
         public void CrossEntropyErrorsAreEqual()
         {

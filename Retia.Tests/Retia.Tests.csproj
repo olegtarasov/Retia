@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="Genetic\GeneticTestsBase.cs" />
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
+    <Compile Include="Gpu\TransferTests.cs" />
     <Compile Include="Helpers\MatrixPointersTests.cs" />
     <Compile Include="Helpers\StreamHelpersTests.cs" />
     <Compile Include="Mathematics\AlgorithmsTests.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Plumbing\AssertExtensions.cs" />
     <Compile Include="Plumbing\DisposableFile.cs" />
     <Compile Include="Plumbing\FakeRandom.cs" />
+    <Compile Include="Plumbing\GpuTestsBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Training\Batching\LinearBatcherTests.cs" />
     <Compile Include="Training\Batching\SequenceBatcherTests.cs" />

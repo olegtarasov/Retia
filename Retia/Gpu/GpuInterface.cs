@@ -15,6 +15,7 @@ namespace Retia.Gpu
                                                    HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
 
             public abstract void TestClampMatrix(HostMatrixDefinition matrix, float threshold);
+            public abstract void TestMatrixTransfer(HostMatrixDefinition matrix);
         }
 
         public class CpuTesting : TestingBase
@@ -40,6 +41,11 @@ namespace Retia.Gpu
             {
                 Testing.TestClampMatrixCpu(matrix, threshold);
             }
+
+            public override void TestMatrixTransfer(HostMatrixDefinition matrix)
+            {
+                Testing.TestMatrixTransferCpu(matrix);
+            }
         }
 
         public class GpuTesting : TestingBase
@@ -64,6 +70,11 @@ namespace Retia.Gpu
             public override void TestClampMatrix(HostMatrixDefinition matrix, float threshold)
             {
                 Testing.TestClampMatrixGpu(matrix, threshold);
+            }
+
+            public override void TestMatrixTransfer(HostMatrixDefinition matrix)
+            {
+                Testing.TestMatrixTransferGpu(matrix);
             }
         }
 
@@ -94,6 +105,12 @@ namespace Retia.Gpu
 
             [DllImport(CudaDllName)]
             public static extern void TestClampMatrixGpu(HostMatrixDefinition matrix, float threshold);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestMatrixTransferCpu(HostMatrixDefinition matrix);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestMatrixTransferGpu(HostMatrixDefinition matrix);
         }
 
         [DllImport(CudaDllName)]

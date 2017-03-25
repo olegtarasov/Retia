@@ -77,9 +77,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AlgorithmsTests.cs" />
+    <Compile Include="GpuAlgorithmsTests.cs" />
     <Compile Include="Dummy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="GpuTransferTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Retia.Tests\Retia.Tests.csproj">
