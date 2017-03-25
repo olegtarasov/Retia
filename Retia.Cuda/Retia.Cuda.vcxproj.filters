@@ -49,9 +49,6 @@
     <ClInclude Include="LayerBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AlgorithmTester.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NeuroWeight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,9 +83,6 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="CuDnnTensor.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="AlgorithmTester.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="CApi.cu">

@@ -177,7 +177,7 @@ namespace Retia.Mathematics
                     continue;
 
                 notNan++;
-                
+
                 err += ta[i] * Math.Log(pa[i]);
             }
 
@@ -186,7 +186,7 @@ namespace Retia.Mathematics
                 throw new InvalidOperationException("All of your targets are NaN! This is pointless.");
             }
 
-            return -err / cols;
+            return -err / p.ColumnCount;
         }
 
         public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<Float> weight)

@@ -7,10 +7,75 @@ namespace Retia.Gpu
     {
         public const string CudaDllName = "Retia.Cuda.dll";
 
+        public abstract class TestingBase
+        {
+            public abstract double TestCrossEntropyError(HostMatrixDefinition m1, HostMatrixDefinition m2);
+            public abstract void TestCrossEntropyBackprop(HostMatrixDefinition m1, HostMatrixDefinition m2, HostMatrixDefinition result);
+            public abstract void TestRMSPropUpdate(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1,
+                                                   HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
+        }
+
+        public class CpuTesting : TestingBase
+        {
+            public static TestingBase Instance { get; } = new CpuTesting();
+
+            public override double TestCrossEntropyError(HostMatrixDefinition m1, HostMatrixDefinition m2)
+            {
+                return Testing.TestCrossEntropyErrorCpu(m1, m2);
+            }
+
+            public override void TestCrossEntropyBackprop(HostMatrixDefinition m1, HostMatrixDefinition m2, HostMatrixDefinition result)
+            {
+                Testing.TestCrossEntropyBackpropCpu(m1, m2, result);
+            }
+
+            public override void TestRMSPropUpdate(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1, HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay)
+            {
+                Testing.TestRMSPropUpdateCpu(weight, grad, cache1, cache2, cacheM, learningRate, decayRate, momentum, weightDecay);
+            }
+        }
+
+        public class GpuTesting : TestingBase
+        {
+            public static TestingBase Instance { get; } = new GpuTesting();
+
+            public override double TestCrossEntropyError(HostMatrixDefinition m1, HostMatrixDefinition m2)
+            {
+                return Testing.TestCrossEntropyErrorGpu(m1, m2);
+            }
+
+            public override void TestCrossEntropyBackprop(HostMatrixDefinition m1, HostMatrixDefinition m2, HostMatrixDefinition result)
+            {
+                Testing.TestCrossEntropyBackpropGpu(m1, m2, result);
+            }
+
+            public override void TestRMSPropUpdate(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1, HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay)
+            {
+                Testing.TestRMSPropUpdateGpu(weight, grad, cache1, cache2, cacheM, learningRate, decayRate, momentum, weightDecay);
+            }
+        }
+
         public static class Testing
         {
             [DllImport(CudaDllName)]
-            public static extern double TestCrossEntropyError(HostMatrixDefinition m1, HostMatrixDefinition m2);
+            public static extern double TestCrossEntropyErrorCpu(HostMatrixDefinition m1, HostMatrixDefinition m2);
+
+            [DllImport(CudaDllName)]
+            public static extern double TestCrossEntropyErrorGpu(HostMatrixDefinition m1, HostMatrixDefinition m2);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestCrossEntropyBackpropCpu(HostMatrixDefinition m1, HostMatrixDefinition m2, HostMatrixDefinition result);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestCrossEntropyBackpropGpu(HostMatrixDefinition m1, HostMatrixDefinition m2, HostMatrixDefinition result);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestRMSPropUpdateCpu(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1,
+                                                            HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestRMSPropUpdateGpu(HostMatrixDefinition weight, HostMatrixDefinition grad, HostMatrixDefinition cache1,
+                                                            HostMatrixDefinition cache2, HostMatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
         }
 
         [DllImport(CudaDllName)]
@@ -49,7 +114,7 @@ namespace Retia.Gpu
         [DllImport(CudaDllName)]
         public static extern unsafe double TrainSequence(IntPtr net, HostMatrixDefinition *inputs, HostMatrixDefinition *targets, int count);
 
-        [DllImport(GpuInterface.CudaDllName)]
+        [DllImport(CudaDllName)]
         public static extern IntPtr CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
     }
 }

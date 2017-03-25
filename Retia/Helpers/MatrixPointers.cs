@@ -75,7 +75,16 @@ namespace Retia.Helpers
         /// </summary>
         /// <param name="idx">Matrix index.</param>
         /// <returns>Pointer to an underlying matrix array.</returns>
-        public IntPtr this[int idx] => _pointers[idx];
+        public IntPtr this[int idx]
+        {
+            get
+            {
+                if (_disposed)
+                    throw new ObjectDisposedException(nameof(MatrixPointers<T>));
+
+                return _pointers[idx];
+            }
+        }
 
         public IntPtr[] Pointers => _pointers;
 

@@ -89,7 +89,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Algorithms.h" />
-    <ClInclude Include="AlgorithmTester.h" />
     <ClInclude Include="CApi.h" />
     <ClInclude Include="CudaContext.h" />
     <ClInclude Include="CudaMemoryBlock.h" />
@@ -109,9 +108,6 @@
     <ClInclude Include="WeightSyncContainer.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="AlgorithmTester.cu">
-      <FileType>CppCode</FileType>
-    </CudaCompile>
     <CudaCompile Include="CApi.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>

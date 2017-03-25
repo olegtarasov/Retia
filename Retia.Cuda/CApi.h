@@ -62,7 +62,14 @@ GPUAPI double _cdecl TrainSequence(LayeredNet *net, MatrixDefinition *inputs, Ma
 /*
 * Tests
 */
-GPUAPI double TestCrossEntropyError(MatrixDefinition m1, MatrixDefinition m2);
+GPUAPI double _cdecl TestCrossEntropyErrorCpu(MatrixDefinition m1, MatrixDefinition m2);
+GPUAPI double _cdecl TestCrossEntropyErrorGpu(MatrixDefinition m1, MatrixDefinition m2);
+GPUAPI _VOID TestCrossEntropyBackpropCpu(MatrixDefinition m1, MatrixDefinition m2, MatrixDefinition result);
+GPUAPI _VOID TestCrossEntropyBackpropGpu(MatrixDefinition m1, MatrixDefinition m2, MatrixDefinition result);
+GPUAPI _VOID TestRMSPropUpdateCpu(MatrixDefinition weight, MatrixDefinition grad, MatrixDefinition cache1,
+	MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
+GPUAPI _VOID TestRMSPropUpdateGpu(MatrixDefinition weight, MatrixDefinition grad, MatrixDefinition cache1,
+	MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
 
 /*
  * Helpers

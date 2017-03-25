@@ -62,7 +62,7 @@ void SoftmaxLayer::Optimize(OptimizerBase& optimizer)
 
 void SoftmaxLayer::ErrorPropagate(DeviceMatrix& target)
 {
-	Algorithms::PropagateError(*_output, target, *_sensitivity);
+	Algorithms::BackpropagateCrossEntropyError(*_output, target, *_sensitivity);
 }
 
 double SoftmaxLayer::LayerError(DeviceMatrix& target)

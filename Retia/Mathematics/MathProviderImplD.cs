@@ -162,32 +162,32 @@ namespace Retia.Mathematics
 
             //E(y0, ... ,yn) = -y0*log(p0)-...-yn*log(pn)
             double err = 0.0d;
-            int notNan = 0;
-            int cols = p.ColumnCount;
+            //int notNan = 0;
+            //int cols = p.ColumnCount;
             for (int i = 0; i < pa.Length; i++)
             {
-                if (i > 0 && i % p.RowCount == 0)
-                {
-                    if (notNan == 0)
-                        cols--;
+                //if (i > 0 && i % p.RowCount == 0)
+                //{
+                //    if (notNan == 0)
+                //        cols--;
 
-                    notNan = 0;
-                }
+                //    notNan = 0;
+                //}
 
-                if (Float.IsNaN(ta[i]))
-                    continue;
+                //if (Float.IsNaN(ta[i]))
+                //    continue;
 
-                notNan++;
+                //notNan++;
                 
                 err += ta[i] * Math.Log(pa[i]);
             }
 
-            if (cols == 0)
-            {
-                throw new InvalidOperationException("All of your targets are NaN! This is pointless.");
-            }
+            //if (cols == 0)
+            //{
+            //    throw new InvalidOperationException("All of your targets are NaN! This is pointless.");
+            //}
 
-            return -err / cols;
+            return -err / p.ColumnCount;
         }
 
         public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<Float> weight)

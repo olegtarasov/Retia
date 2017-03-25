@@ -124,12 +124,90 @@ void DestroyMatrixPointers(std::vector<HostMatrixPtr*>& ptrs)
 	}
 }
 
-double TestCrossEntropyError(MatrixDefinition m1, MatrixDefinition m2)
+double TestCrossEntropyErrorCpu(MatrixDefinition m1, MatrixDefinition m2)
 {
 	auto mat1 = std::make_unique<HostMatrixPtr>(m1.Rows, m1.Columns, m1.SeqLength, m1.Pointer);
 	auto mat2 = std::make_unique<HostMatrixPtr>(m2.Rows, m2.Columns, m2.SeqLength, m2.Pointer);
 
 	return Algorithms::CrossEntropyError(*mat1, *mat2);
+}
+
+double TestCrossEntropyErrorGpu(MatrixDefinition m1, MatrixDefinition m2)
+{
+	auto mat1 = std::make_unique<HostMatrixPtr>(m1.Rows, m1.Columns, m1.SeqLength, m1.Pointer);
+	auto mat2 = std::make_unique<HostMatrixPtr>(m2.Rows, m2.Columns, m2.SeqLength, m2.Pointer);
+
+	auto gpum1 = std::make_unique<DeviceMatrix>(m1.Rows, m1.Columns, m1.SeqLength);
+	auto gpum2 = std::make_unique<DeviceMatrix>(m2.Rows, m2.Columns, m2.SeqLength);
+
+	mat1->CopyTo(*gpum1);
+	mat2->CopyTo(*gpum2);
+
+	return Algorithms::CrossEntropyError(*gpum1, *gpum2);
+}
+
+void TestCrossEntropyBackpropCpu(MatrixDefinition m1, MatrixDefinition m2, MatrixDefinition result)
+{
+	auto mat1 = std::make_unique<HostMatrixPtr>(m1.Rows, m1.Columns, m1.SeqLength, m1.Pointer);
+	auto mat2 = std::make_unique<HostMatrixPtr>(m2.Rows, m2.Columns, m2.SeqLength, m2.Pointer);
+	auto mResult = std::make_unique<HostMatrixPtr>(result.Rows, result.Columns, result.SeqLength, result.Pointer);
+
+	Algorithms::BackpropagateCrossEntropyError(*mat1, *mat2, *mResult);
+}
+
+void TestCrossEntropyBackpropGpu(MatrixDefinition m1, MatrixDefinition m2, MatrixDefinition result)
+{
+	auto mat1 = std::make_unique<HostMatrixPtr>(m1.Rows, m1.Columns, m1.SeqLength, m1.Pointer);
+	auto mat2 = std::make_unique<HostMatrixPtr>(m2.Rows, m2.Columns, m2.SeqLength, m2.Pointer);
+	auto mResult = std::make_unique<HostMatrixPtr>(result.Rows, result.Columns, result.SeqLength, result.Pointer);
+
+	auto gpum1 = std::make_unique<DeviceMatrix>(m1.Rows, m1.Columns, m1.SeqLength);
+	auto gpum2 = std::make_unique<DeviceMatrix>(m2.Rows, m2.Columns, m2.SeqLength);
+	auto gpumRes = std::make_unique<DeviceMatrix>(result.Rows, result.Columns, result.SeqLength);
+
+	mat1->CopyTo(*gpum1);
+	mat2->CopyTo(*gpum2);
+	mResult->CopyTo(*gpumRes);
+
+	Algorithms::BackpropagateCrossEntropyError(*gpum1, *gpum2, *gpumRes);
+
+	mResult->CopyFrom(*gpumRes);
+}
+
+void TestRMSPropUpdateCpu(MatrixDefinition weight, MatrixDefinition grad, MatrixDefinition cache1, MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay)
+{
+	auto mWeight = std::make_unique<HostMatrixPtr>(weight.Rows, weight.Columns, weight.SeqLength, weight.Pointer);
+	auto mGrad = std::make_unique<HostMatrixPtr>(grad.Rows, grad.Columns, grad.SeqLength, grad.Pointer);
+	auto mCache1 = std::make_unique<HostMatrixPtr>(cache1.Rows, cache1.Columns, cache1.SeqLength, cache1.Pointer);
+	auto mCache2 = std::make_unique<HostMatrixPtr>(cache2.Rows, cache2.Columns, cache2.SeqLength, cache2.Pointer);
+	auto mCacheM = std::make_unique<HostMatrixPtr>(cacheM.Rows, cacheM.Columns, cacheM.SeqLength, cacheM.Pointer);
+
+	Algorithms::RMSPropOptimize(*mWeight, *mGrad, *mCache1, *mCache2, *mCacheM, learningRate, decayRate, momentum, weightDecay);
+}
+
+void TestRMSPropUpdateGpu(MatrixDefinition weight, MatrixDefinition grad, MatrixDefinition cache1, MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay)
+{
+	auto mWeight = std::make_unique<HostMatrixPtr>(weight.Rows, weight.Columns, weight.SeqLength, weight.Pointer);
+	auto mGrad = std::make_unique<HostMatrixPtr>(grad.Rows, grad.Columns, grad.SeqLength, grad.Pointer);
+	auto mCache1 = std::make_unique<HostMatrixPtr>(cache1.Rows, cache1.Columns, cache1.SeqLength, cache1.Pointer);
+	auto mCache2 = std::make_unique<HostMatrixPtr>(cache2.Rows, cache2.Columns, cache2.SeqLength, cache2.Pointer);
+	auto mCacheM = std::make_unique<HostMatrixPtr>(cacheM.Rows, cacheM.Columns, cacheM.SeqLength, cacheM.Pointer);
+
+	auto gmWeight = std::make_unique<DeviceMatrix>(weight.Rows, weight.Columns, weight.SeqLength);
+	auto gmGrad = std::make_unique<DeviceMatrix>(grad.Rows, grad.Columns, grad.SeqLength);
+	auto gmCache1 = std::make_unique<DeviceMatrix>(cache1.Rows, cache1.Columns, cache1.SeqLength);
+	auto gmCache2 = std::make_unique<DeviceMatrix>(cache2.Rows, cache2.Columns, cache2.SeqLength);
+	auto gmCacheM = std::make_unique<DeviceMatrix>(cacheM.Rows, cacheM.Columns, cacheM.SeqLength);
+
+	mWeight->CopyTo(*gmWeight);
+	mGrad->CopyTo(*gmGrad);
+	mCache1->CopyTo(*gmCache1);
+	mCache2->CopyTo(*gmCache2);
+	mCacheM->CopyTo(*gmCacheM);
+
+	Algorithms::RMSPropOptimize(*gmWeight, *gmGrad, *gmCache1, *gmCache2, *gmCacheM, learningRate, decayRate, momentum, weightDecay);
+
+	mWeight->CopyFrom(*gmWeight);
 }
 
 
