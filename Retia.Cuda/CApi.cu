@@ -208,6 +208,9 @@ void TestRMSPropUpdateGpu(MatrixDefinition weight, MatrixDefinition grad, Matrix
 	Algorithms::RMSPropOptimize(*gmWeight, *gmGrad, *gmCache1, *gmCache2, *gmCacheM, learningRate, decayRate, momentum, weightDecay);
 
 	mWeight->CopyFrom(*gmWeight);
+	mCache1->CopyFrom(*gmCache1);
+	mCache2->CopyFrom(*gmCache2);
+	mCacheM->CopyFrom(*gmCacheM);
 }
 
 
