@@ -434,6 +434,7 @@ namespace Retia.Neural.Layers
             _zVals.Clear();
             _rVals.Clear();
             Inputs.Clear();
+            ResetMemory();
         }
 
         protected override void Initialize()

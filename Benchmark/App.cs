@@ -33,7 +33,7 @@ namespace Benchmark
         [Verb]
         public void TestGpuLayers()
         {
-            var dataSet = new TestDataSet<float>(3, 4, 2, 5);
+            var dataSet = new TestDataSet<float>(3, 4, 5, 10);
 
             Console.WriteLine("Testing softmax forward");
             var softmaxLayer = new SoftMaxLayer<float>(dataSet.InputSize);
@@ -59,14 +59,15 @@ namespace Benchmark
             {
                 var seq = dataSet.GetNextSamples(dataSet.SampleCount);
                 var cpuOut = new List<Matrix<float>>();
+                layer.InitSequence();
                 foreach (var input in seq.Inputs)
                 {
                     cpuOut.Add(layer.Step(input));
                 }
 
                 var gpuOut = Enumerable.Range(0, dataSet.SampleCount).Select(x => Matrix<float>.Build.Dense(finalOutSize, dataSet.BatchSize)).ToArray();
-                using (var inPtrs = new MatrixPointersBag<float>(seq.Inputs.ToArray()))
-                using (var outPtrs = new MatrixPointersBag<float>(gpuOut))
+                using (var inPtrs = new MatrixPointersBag<float>(true, seq.Inputs.ToArray()))
+                using (var outPtrs = new MatrixPointersBag<float>(true, gpuOut))
                 {
                     fixed (MatrixDefinition* inDef = &inPtrs.Definitions[0], outDef = &outPtrs.Definitions[0])
                     {
@@ -89,6 +90,8 @@ namespace Benchmark
                 //    Console.WriteLine("---------------");
                 //}
 
+                //Console.WriteLine("================================");
+
                 for (int j = 0; j < dataSet.SampleCount; j++)
                 {
                     var cpuArr = cpuOut[j].AsColumnMajorArray();
@@ -102,8 +105,6 @@ namespace Benchmark
                         }
                     }
                 }
-
-                //layer.ResetMemory();
             }
         }
 #endif
