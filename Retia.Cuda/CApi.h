@@ -16,6 +16,9 @@ GPUAPI LayeredNet* _cdecl CreateLayeredNetwork(int inputSize, int outputSize, in
 GPUAPI _VOID DestroyLayeredNetwork(LayeredNet *network);
 GPUAPI _VOID SetNetworkOptimizer(LayeredNet *network, OptimizerBase* optimizer);
 GPUAPI _VOID AddNetworkLayer(LayeredNet *network, LayerBase *layer);
+GPUAPI _VOID OptimizeNetwork(LayeredNet *network);
+GPUAPI _VOID ResetNetworkMemory(LayeredNet *network);
+GPUAPI _VOID ResetOptimizerCaches(LayeredNet *network);
 
 /*
  * Layers

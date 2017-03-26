@@ -178,6 +178,9 @@ namespace Retia.Interop
         public static extern void SetNetworkOptimizer(IntPtr network, IntPtr optimizer);
 
         [DllImport(CudaDllName)]
+        public static extern void OptimizeNetwork(IntPtr network);
+
+        [DllImport(CudaDllName)]
         public static extern IntPtr CreateGruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
 
         [DllImport(CudaDllName)]
@@ -188,6 +191,12 @@ namespace Retia.Interop
 
         [DllImport(CudaDllName)]
         public static extern unsafe void TransferLayerStatesToHost(IntPtr layer, WeightDefinition *weights, int count);
+
+        [DllImport(CudaDllName)]
+        public static extern void ResetNetworkMemory(IntPtr network);
+
+        [DllImport(CudaDllName)]
+        public static extern void ResetOptimizerCaches(IntPtr network);
 
         [DllImport(CudaDllName)]
         public static extern void SetLearningRate(IntPtr optimizer, float learningRate);

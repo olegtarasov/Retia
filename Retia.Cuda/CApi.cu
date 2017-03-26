@@ -36,6 +36,21 @@ void AddNetworkLayer(LayeredNet* network, LayerBase* layer)
 	network->AddLayer(layer);
 }
 
+void OptimizeNetwork(LayeredNet* network)
+{
+	network->Opimize();
+}
+
+void ResetNetworkMemory(LayeredNet* network)
+{
+	network->ResetMemory();
+}
+
+void ResetOptimizerCaches(LayeredNet* network)
+{
+	network->ResetOptimizerCache();
+}
+
 LinearLayer* CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen)
 {
 	return new LinearLayer(inputSize, outSize, batchSize, seqLen);

@@ -146,5 +146,15 @@ namespace Retia.Neural.Layers
         {
             throw new NotSupportedException();
         }
+
+        public override void TransferWeightsToDevice()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            throw new NotSupportedException();
+        }
     }
 }

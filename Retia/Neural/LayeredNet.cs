@@ -155,55 +155,6 @@ namespace Retia.Neural
             }
         }
 
-        //public static void CheckGrad(LayeredNet<T> net, int seqLen)
-        //{
-        //    Console.WriteLine("Starting grad check");
-        //    float delta = 1e-3f;
-
-        //    net.ResetMemory();
-
-        //    var inputs = new List<Matrix<T>>(seqLen);
-        //    var targets = new List<Matrix<T>>(seqLen);
-        //    for (int i = 0; i < seqLen; i++)
-        //    {
-        //        var randomInput = MatrixFactory.RandomMatrix<T>(net.InputSize, 1, 2.0f);
-        //        var randomTarget = MatrixFactory.RandomMatrix<T>(net.OutputSize, 1, 2.0f); 
-        //        randomTarget = MathProvider<T>.Instance.SoftMaxNorm(randomTarget);
-        //        inputs.Add(randomInput);
-        //        targets.Add(randomTarget);
-        //    }
-
-        //    var controlNet = new LayeredNet<T>(net);
-        //    controlNet.TrainSequence(inputs, targets);
-        //    var hasErr = false;
-        //    for (int i = 0; i < net.TotalParamCount; i++)
-        //    {
-        //        var netP = new LayeredNet<T>(net);
-        //        var netN = new LayeredNet<T>(net);
-        //        netP.SetParam(i, netP.GetParam(i) + delta);
-        //        netN.SetParam(i, netN.GetParam(i) - delta);
-
-        //        double errP=0.0, errN=0.0;
-        //        for (int s = 0; s < seqLen; s++)
-        //        {
-        //            var pY=netP.Step(inputs[s]);
-        //            errP += netP.Error(pY, targets[s]);
-
-        //            var nY = netN.Step(inputs[s]);
-        //            errN += netN.Error(nY, targets[s]);
-        //        }
-        //        var numGrad = (errP - errN)/(2*delta);
-        //        var grad = controlNet.GetParam(i, true);
-        //        var d = grad - numGrad;
-        //        if (Math.Abs(d) > 1e-7)
-        //        {
-        //            Console.WriteLine($"Grad err={d} in param {i}");
-        //            hasErr = true;
-        //        }
-        //    }
-        //    Console.WriteLine(hasErr ? "Grad check complete with ERRORS!" : "Grad check OK!");
-        //}
-
         public override unsafe double TrainSequence(List<Matrix<T>> inputs, List<Matrix<T>> targets)
         {
 #if !CPUONLY
@@ -231,14 +182,15 @@ namespace Retia.Neural
         public void TransferStateToHost()
         {
 #if !CPUONLY
-            // TODO: _GPU
-            //if (_gpuNetwork == null)
-            //{
-            //    throw new InvalidOperationException("You are not using GPU!");
-            //}
+            if (_gpuNetworkPtr == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("You are not using GPU!");
+            }
 
-            //var spec = CreateSpec();
-            //_gpuNetwork.TransferStatesToHost(spec);
+            foreach (var layer in LayersList)
+            {
+                layer.TransferWeightsToHost();
+            }
 #else
             throw new InvalidOperationException("Library was compiled without GPU support!");
 #endif
@@ -302,12 +254,11 @@ namespace Retia.Neural
         public override void Optimize()
         {
 #if !CPUONLY
-            // TODO: _GPU
-            //if (_gpuNetwork != null)
-            //{
-            //    _gpuNetwork.Optimize();
-            //    return;
-            //}
+            if (_gpuNetworkPtr != IntPtr.Zero)
+            {
+                GpuInterface.OptimizeNetwork(_gpuNetworkPtr);
+                return;
+            }
 #endif
 
             foreach (var layer in LayersList)
@@ -343,12 +294,11 @@ namespace Retia.Neural
         public override void ResetMemory()
         {
 #if !CPUONLY
-            // TODO _GPU
-            //if (_gpuNetwork != null)
-            //{
-            //    _gpuNetwork.ResetMemory();
-            //    return;
-            //}
+            if (_gpuNetworkPtr != IntPtr.Zero)
+            {
+                GpuInterface.ResetNetworkMemory(_gpuNetworkPtr);
+                return;
+            }
 #endif
 
             foreach (var layer in LayersList)
@@ -358,12 +308,11 @@ namespace Retia.Neural
         public override void ResetOptimizer()
         {
 #if !CPUONLY
-            // TODO: _GPU
-            //if (_gpuNetwork != null)
-            //{
-            //    _gpuNetwork.ResetOptimizerCache();
-            //    return;
-            //}
+            if (_gpuNetworkPtr != IntPtr.Zero)
+            {
+                GpuInterface.ResetOptimizerCaches(_gpuNetworkPtr);
+                return;
+            }
 #endif
 
             foreach (var layer in LayersList)

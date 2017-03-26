@@ -109,5 +109,13 @@ namespace Retia.Neural.Layers
 
             return GpuLayerPtr;
         }
+
+        public override void TransferWeightsToDevice()
+        {
+        }
+
+        public override void TransferWeightsToHost()
+        {
+        }
     }
 }

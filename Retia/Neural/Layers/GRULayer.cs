@@ -471,7 +471,14 @@ namespace Retia.Neural.Layers
         public override IntPtr CreateGpuLayer()
         {
             GpuLayerPtr = GpuInterface.CreateGruLayer(InputSize, _hSize, 1, BatchSize, SeqLen);
-            TransferStatesToDevice(true, // CuDNN weight matrices are row-major
+            TransferWeightsToDevice();
+
+            return GpuLayerPtr;
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            TransferWeugthsToDevice(true, // CuDNN weight matrices are row-major
                 _wxr.Weight,
                 _wxz.Weight,
                 _wxh.Weight,
@@ -487,8 +494,26 @@ namespace Retia.Neural.Layers
                 _bhr.Weight,
                 _bhz.Weight,
                 _bhh.Weight);
+        }
 
-            return GpuLayerPtr;
+        public override void TransferWeightsToHost()
+        {
+            TransferWeigthsToHost(true, // CuDNN weight matrices are row-major
+                _wxr.Weight,
+                _wxz.Weight,
+                _wxh.Weight,
+
+                _whr.Weight,
+                _whz.Weight,
+                _whh.Weight,
+
+                _bxr.Weight,
+                _bxz.Weight,
+                _bxh.Weight,
+
+                _bhr.Weight,
+                _bhz.Weight,
+                _bhh.Weight);
         }
     }
 }

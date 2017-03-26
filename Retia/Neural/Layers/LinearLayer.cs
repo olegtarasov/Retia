@@ -183,8 +183,18 @@ namespace Retia.Neural.Layers
         public override IntPtr CreateGpuLayer()
         {
             GpuLayerPtr = GpuInterface.CreateLinearLayer(_weights.Weight.ColumnCount, _weights.Weight.RowCount, BatchSize, SeqLen);
-            TransferStatesToDevice(false, _weights.Weight, _bias.Weight);
+            TransferWeightsToDevice();
             return GpuLayerPtr;
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            TransferWeugthsToDevice(false, _weights.Weight, _bias.Weight);
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            TransferWeigthsToHost(false, _weights.Weight, _bias.Weight);
         }
     }
 }
