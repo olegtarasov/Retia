@@ -212,5 +212,11 @@ namespace Retia.Interop
 
         [DllImport(CudaDllName)]
         public static extern IntPtr CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
+
+        [DllImport(CudaDllName)]
+        public static extern unsafe void TransferLayerOutputsToHost(IntPtr layer, MatrixDefinition* outputs, int count);
+
+        [DllImport(CudaDllName)]
+        public static extern unsafe void LayerForwardSequence(IntPtr layer, MatrixDefinition* inputs, int count);
     }
 }

@@ -41,13 +41,6 @@ public:
 		return _seqLen;
 	}
 
-	/*void TransferOutputToHost(RawMatrixPtr* output) const
-	{
-		_output->CopyTo(*output);
-	}*/
-
-
-
 	virtual void TransferStatesToDevice(std::vector<WeightSyncContainer*>& states) = 0;
 	virtual void TransferStatesToHost(std::vector<WeightSyncContainer*>& states) = 0;
 	virtual void ForwardSequence(DeviceMatrix& input) = 0;

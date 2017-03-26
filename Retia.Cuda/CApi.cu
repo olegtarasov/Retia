@@ -66,6 +66,22 @@ SoftmaxLayer* CreateSoftmaxLayer(int inSize, int batchSize, int seqLen)
 	return new SoftmaxLayer(inSize, batchSize, seqLen);
 }
 
+void LayerForwardSequence(LayerBase *layer, MatrixDefinition *inputs, int count)
+{
+	auto hostInputs = GetMatrixPointers(inputs, count);
+	auto deviceInput = std::make_unique<DeviceMatrix>(inputs[0].Rows, inputs[0].Columns, count);
+
+	for (int i = 0; i < count; ++i)
+	{
+		auto element = deviceInput->GetSequenceElement(i);
+		element.CopyFrom(*hostInputs[i]);
+	}
+
+	layer->ForwardSequence(*deviceInput);
+
+	DestroyMatrixPointers(hostInputs);
+}
+
 void TransferLayerStatesToDevice(LayerBase* layer, WeightDefinition *weights, int count)
 {
 	auto states = GetWeightSyncContainers(weights, count);
@@ -82,6 +98,23 @@ void TransferLayerStatesToHost(LayerBase* layer, WeightDefinition *weights, int 
 	layer->TransferStatesToHost(states);
 
 	DestroyWeightSyncContainers(states);
+}
+
+void TransferLayerOutputsToHost(LayerBase *layer, MatrixDefinition *outputs, int count)
+{
+	auto hostOutputs = GetMatrixPointers(outputs, count);
+	auto deviceOutput = layer->output();
+
+	if (count != deviceOutput.seqLength())
+		throw RetiaException("Invalid host output buffer size!");
+
+	for (int i = 0; i < count; ++i)
+	{
+		auto el = deviceOutput.GetSequenceElement(i);
+		el.CopyTo(*hostOutputs[i]);
+	}
+
+	DestroyMatrixPointers(hostOutputs);
 }
 
 double TrainSequence(LayeredNet* net, MatrixDefinition* inputs, MatrixDefinition* targets, int count)

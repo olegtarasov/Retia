@@ -26,12 +26,14 @@ GPUAPI _VOID ResetOptimizerCaches(LayeredNet *network);
 GPUAPI LinearLayer* _cdecl CreateLinearLayer(int inputSize, int outSize, int batchSize, int seqLen);
 GPUAPI GruLayer* _cdecl CreateGruLayer(int inputSize, int hSize, int layers, int batchSize, int seqLen);
 GPUAPI SoftmaxLayer* _cdecl CreateSoftmaxLayer(int inSize, int batchSize, int seqLen);
+GPUAPI _VOID LayerForwardSequence(LayerBase *layer, MatrixDefinition *inputs, int count);
 
 /*
  * State transfer
  */
 GPUAPI _VOID TransferLayerStatesToDevice(LayerBase *layer, WeightDefinition *weights, int count);
 GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, WeightDefinition *weights, int count);
+GPUAPI _VOID TransferLayerOutputsToHost(LayerBase *layer, MatrixDefinition *outputs, int count);
 
 /*
  * Training
