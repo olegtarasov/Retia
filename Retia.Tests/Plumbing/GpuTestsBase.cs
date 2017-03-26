@@ -1,4 +1,4 @@
-﻿using Retia.Gpu;
+﻿using Retia.Interop;
 using Retia.Mathematics;
 
 namespace Retia.Tests.Plumbing

@@ -8,7 +8,7 @@ using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.Common.Mkl;
-using Retia.Gpu;
+using Retia.Interop;
 using Retia.Gui;
 using Retia.Gui.Models;
 using Retia.Gui.Windows;

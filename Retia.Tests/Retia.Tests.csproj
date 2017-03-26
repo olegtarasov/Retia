@@ -68,8 +68,8 @@
   <ItemGroup>
     <Compile Include="Genetic\GeneticTestsBase.cs" />
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
-    <Compile Include="Gpu\TransferTests.cs" />
-    <Compile Include="Helpers\MatrixPointersTests.cs" />
+    <Compile Include="Interop\TransferTests.cs" />
+    <Compile Include="Interop\MatrixPointersTests.cs" />
     <Compile Include="Helpers\StreamHelpersTests.cs" />
     <Compile Include="Mathematics\AlgorithmsTests.cs" />
     <Compile Include="Mathematics\MathProviderTests.cs" />

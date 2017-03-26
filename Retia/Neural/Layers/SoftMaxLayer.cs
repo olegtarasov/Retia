@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Gpu;
+using Retia.Interop;
 using Retia.Helpers;
 using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;

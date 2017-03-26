@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
-using Retia.Gpu;
+using Retia.Interop;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;

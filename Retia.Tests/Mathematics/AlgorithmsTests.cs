@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Gpu;
+using Retia.Interop;
+using Retia.Helpers;
 using Retia.Mathematics;
 using Retia.Neural;
 using Retia.Tests.Plumbing;
@@ -22,7 +23,7 @@ namespace Retia.Tests.Mathematics
             var m1 = MatrixFactory.RandomMatrix<float>(100, 100, 1e-5f, 1.0f);
             var m2 = MatrixFactory.RandomMatrix<float>(100, 100, 1e-5f, 1.0f);
 
-            using (var matrixPtrs = new HostMatrixPointers<float>(m1.CloneMatrix(), m2.CloneMatrix()))
+            using (var matrixPtrs = new MatrixPointersBag<float>(true, m1.CloneMatrix(), m2.CloneMatrix()))
             {
                 double local = MathProvider.CrossEntropyError(m1, m2);
                 double remote = Interface.TestCrossEntropyError(matrixPtrs.Definitions[0], matrixPtrs.Definitions[1]);
@@ -42,7 +43,7 @@ namespace Retia.Tests.Mathematics
             var remoteResult = MatrixFactory.Create<float>(100, 100);
 
             Matrix<float> local;
-            using (var matrixPtrs = new HostMatrixPointers<float>(m1.CloneMatrix(), m2.CloneMatrix(), remoteResult))
+            using (var matrixPtrs = new MatrixPointersBag<float>(true, m1.CloneMatrix(), m2.CloneMatrix(), remoteResult))
             {
                 local = MathProvider.BackPropagateCrossEntropyError(m1, m2);
                 Interface.TestCrossEntropyBackprop(matrixPtrs.Definitions[0], matrixPtrs.Definitions[1], matrixPtrs.Definitions[2]);
@@ -78,7 +79,7 @@ namespace Retia.Tests.Mathematics
 
                 MathProvider.GravesRmsPropUpdate(weightDecay, learningRate, decayRate, momentum, local);
 
-                using (var ptrs = new HostMatrixPointers<float>(remote.Weight, remote.Gradient, remote.Cache1, remote.Cache2, remote.CacheM))
+                using (var ptrs = new MatrixPointersBag<float>(true, remote.Weight, remote.Gradient, remote.Cache1, remote.Cache2, remote.CacheM))
                 {
                     Interface.TestRMSPropUpdate(ptrs.Definitions[0], ptrs.Definitions[1], ptrs.Definitions[2], ptrs.Definitions[3], ptrs.Definitions[4],
                         learningRate, decayRate, momentum, weightDecay);
@@ -102,7 +103,7 @@ namespace Retia.Tests.Mathematics
             local.Clamp(-4.0f, 4.0f);
             local.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));
 
-            using (var ptrs = new HostMatrixPointers<float>(remote))
+            using (var ptrs = new MatrixPointersBag<float>(true, remote))
             {
                 Interface.TestClampMatrix(ptrs.Definitions[0], 4.0f);
                 remote.AsColumnMajorArray().ShouldArrayEqualWithinError(MathProvider.Array(2.0f, -4.0f, 4.0f, 1.0f));

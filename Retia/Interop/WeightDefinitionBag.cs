@@ -3,20 +3,20 @@ using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Neural;
 
-namespace Retia.Gpu
+namespace Retia.Interop
 {
-    public struct HostWeightPointers<T> : IDisposable where T : struct, IEquatable<T>, IFormattable
+    public struct WeightDefinitionBag<T> : IDisposable where T : struct, IEquatable<T>, IFormattable
     {
-        private readonly MatrixPointers<T> _ptrs;
-        private readonly HostWeightDefinition[] _defs;
+        private readonly MatrixPointersBag<T> _ptrs;
+        private readonly WeightDefinition[] _defs;
 
         private bool _disposed;
 
-        public HostWeightPointers(params NeuroWeight<T>[] weights) : this(false, weights)
+        public WeightDefinitionBag(params NeuroWeight<T>[] weights) : this(false, weights)
         {
         }
 
-        public HostWeightPointers(bool rowMajor, params NeuroWeight<T>[] weights)
+        public WeightDefinitionBag(bool rowMajor, params NeuroWeight<T>[] weights)
         {
             _disposed = false;
 
@@ -32,26 +32,19 @@ namespace Retia.Gpu
                 matrices[++cnt] = weigth.CacheM;
             }
 
-            _ptrs = new MatrixPointers<T>(rowMajor, matrices);
+            _ptrs = new MatrixPointersBag<T>(rowMajor, false, matrices);
 
-            _defs = new HostWeightDefinition[weights.Length];
+            _defs = new WeightDefinition[weights.Length];
             cnt = -1;
             for (int i = 0; i < weights.Length; i++)
             {
                 var weight = weights[i];
-
-                _defs[i].Rows = weight.Weight.RowCount;
-                _defs[i].Columns = weight.Weight.ColumnCount;
-                _defs[i].SeqLength = 1;
-                _defs[i].WeightPtr = _ptrs[++cnt];
-                _defs[i].GradPtr = _ptrs[++cnt];
-                _defs[i].Cache1Ptr = _ptrs[++cnt];
-                _defs[i].Cache2Ptr = _ptrs[++cnt];
-                _defs[i].CacheMPtr = _ptrs[++cnt];
+                _defs[i] = new WeightDefinition(weight.Weight.RowCount, weight.Weight.ColumnCount, 1,
+                    _ptrs[++cnt], _ptrs[++cnt], _ptrs[++cnt], _ptrs[++cnt], _ptrs[++cnt]); // Oh yeah.
             }
         }
 
-        public HostWeightDefinition[] Definitions => _defs;
+        public WeightDefinition[] Definitions => _defs;
 
         public void Dispose()
         {

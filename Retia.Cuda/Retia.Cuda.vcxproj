@@ -89,6 +89,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Algorithms.h" />
+    <ClInclude Include="ApiCommon.h" />
     <ClInclude Include="CApi.h" />
     <ClInclude Include="CudaContext.h" />
     <ClInclude Include="CudaMemoryBlock.h" />
@@ -105,9 +106,11 @@
     <ClInclude Include="OptimizerBase.h" />
     <ClInclude Include="RMSPropOptimizer.h" />
     <ClInclude Include="SoftmaxLayer.h" />
+    <ClInclude Include="TestApi.h" />
     <ClInclude Include="WeightSyncContainer.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="TestApi.cu" />
     <CudaCompile Include="CApi.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>

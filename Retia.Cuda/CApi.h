@@ -1,14 +1,6 @@
 ﻿#pragma once
 
-#include "LayeredNet.h"
-#include "RMSPropOptimizer.h"
-#include "LinearLayer.h"
-#include "GruLayer.h"
-#include "SoftmaxLayer.h"
-
-// TODO: _Crossplatform exports
-#define GPUAPI extern "C" __declspec(dllexport)
-#define _VOID void _cdecl
+#include "ApiCommon.h"
 
 /*
  * Optimizers
@@ -35,22 +27,6 @@ GPUAPI SoftmaxLayer* _cdecl CreateSoftmaxLayer(int inSize, int batchSize, int se
 /*
  * State transfer
  */
-struct MatrixDefinition
-{
-	int Rows;
-	int Columns;
-	int SeqLength;
-	float *Pointer;
-};
-
-struct WeightDefinition
-{
-	int Rows;
-	int Columns;
-	int SeqLength;
-	float *WeightPtr, *GradPtr, *Cache1Ptr, *Cache2Ptr, *CacheMPtr;
-};
-
 GPUAPI _VOID TransferLayerStatesToDevice(LayerBase *layer, WeightDefinition *weights, int count);
 GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, WeightDefinition *weights, int count);
 
@@ -58,22 +34,6 @@ GPUAPI _VOID TransferLayerStatesToHost(LayerBase *layer, WeightDefinition *weigh
  * Training
  */
 GPUAPI double _cdecl TrainSequence(LayeredNet *net, MatrixDefinition *inputs, MatrixDefinition *targets, int count);
-
-/*
-* Tests
-*/
-GPUAPI double _cdecl TestCrossEntropyErrorCpu(MatrixDefinition m1, MatrixDefinition m2);
-GPUAPI double _cdecl TestCrossEntropyErrorGpu(MatrixDefinition m1, MatrixDefinition m2);
-GPUAPI _VOID TestCrossEntropyBackpropCpu(MatrixDefinition m1, MatrixDefinition m2, MatrixDefinition result);
-GPUAPI _VOID TestCrossEntropyBackpropGpu(MatrixDefinition m1, MatrixDefinition m2, MatrixDefinition result);
-GPUAPI _VOID TestRMSPropUpdateCpu(MatrixDefinition weight, MatrixDefinition grad, MatrixDefinition cache1,
-	MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
-GPUAPI _VOID TestRMSPropUpdateGpu(MatrixDefinition weight, MatrixDefinition grad, MatrixDefinition cache1,
-	MatrixDefinition cache2, MatrixDefinition cacheM, float learningRate, float decayRate, float momentum, float weightDecay);
-GPUAPI _VOID TestClampMatrixCpu(MatrixDefinition matrix, float threshold);
-GPUAPI _VOID TestClampMatrixGpu(MatrixDefinition matrix, float threshold);
-GPUAPI _VOID TestMatrixTransferCpu(MatrixDefinition matrix);
-GPUAPI _VOID TestMatrixTransferGpu(MatrixDefinition matrix);
 
 /*
  * Helpers

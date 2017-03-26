@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Gpu;
+using Retia.Interop;
 using Retia.Helpers;
 using Retia.Integration;
 using Retia.Mathematics;
@@ -187,9 +187,9 @@ namespace Retia.Neural.Layers
 
         protected unsafe void TransferStatesToDevice(bool rowMajor, params NeuroWeight<T>[] weights)
         {
-            using (var defs = new HostWeightPointers<T>(rowMajor, weights))
+            using (var defs = new WeightDefinitionBag<T>(rowMajor, weights))
             {
-                fixed (HostWeightDefinition* ptr = &defs.Definitions[0])
+                fixed (WeightDefinition* ptr = &defs.Definitions[0])
                 {
                     GpuInterface.TransferLayerStatesToDevice(GpuLayerPtr, ptr, weights.Length);
                 }
@@ -198,9 +198,9 @@ namespace Retia.Neural.Layers
 
         protected unsafe void TransferStatesToHost(bool rowMajor, params NeuroWeight<T>[] weights)
         {
-            using (var defs = new HostWeightPointers<T>(rowMajor, weights))
+            using (var defs = new WeightDefinitionBag<T>(rowMajor, weights))
             {
-                fixed (HostWeightDefinition* ptr = &defs.Definitions[0])
+                fixed (WeightDefinition* ptr = &defs.Definitions[0])
                 {
                     GpuInterface.TransferLayerStatesToHost(GpuLayerPtr, ptr, weights.Length);
                 }

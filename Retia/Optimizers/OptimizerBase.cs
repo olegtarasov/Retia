@@ -1,5 +1,5 @@
 using System;
-using Retia.Gpu;
+using Retia.Interop;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural;

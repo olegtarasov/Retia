@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Gpu;
+using Retia.Interop;
 using Retia.Helpers;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
@@ -214,10 +214,10 @@ namespace Retia.Neural
                     throw new InvalidOperationException("GPU is only supported for float data type!");
                 }
 
-                using (var inPtrs = new HostMatrixPointers<T>(inputs.ToArray()))
-                using (var targPtrs = new HostMatrixPointers<T>(targets.ToArray()))
+                using (var inPtrs = new MatrixDefinitionBag<T>(inputs.ToArray()))
+                using (var targPtrs = new MatrixDefinitionBag<T>(targets.ToArray()))
                 {
-                    fixed (HostMatrixDefinition* inPtr = &inPtrs.Definitions[0], targPtr = &targPtrs.Definitions[0])
+                    fixed (MatrixDefinition* inPtr = &inPtrs.Definitions[0], targPtr = &targPtrs.Definitions[0])
                     {
                         return GpuInterface.TrainSequence(_gpuNetworkPtr, inPtr, targPtr, inputs.Count);
                     }

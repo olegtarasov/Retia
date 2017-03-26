@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
+using Retia.Interop;
 using Retia.Neural;
 using Retia.RandomGenerator;
 using Float = System.Single;
@@ -32,7 +33,7 @@ namespace Retia.Mathematics
 
         public override void AdagradUpdate(Float learningRate, NeuroWeight<Float> weight)
         {
-            using (var ptrs = new MatrixPointers<Float>(weight.Weight, weight.Cache2, weight.Gradient))
+            using (var ptrs = new MatrixPointersBag<Float>(weight.Weight, weight.Cache2, weight.Gradient))
             {
                 AdagradUpdate(learningRate, ptrs[0], ptrs[1], ptrs[2], weight.Weight.Length());
             }
@@ -40,7 +41,7 @@ namespace Retia.Mathematics
 
         public override void ApplySigmoid2(Matrix<Float> matrix1, Matrix<Float> matrix2)
         {
-            using (var ptrs = new MatrixPointers<Float>(matrix1, matrix2))
+            using (var ptrs = new MatrixPointersBag<Float>(matrix1, matrix2))
             {
                 ApplySigmoid2(ptrs[0], ptrs[1], matrix1.Length());
             }
@@ -48,7 +49,7 @@ namespace Retia.Mathematics
 
         public override void ApplyTanh(Matrix<Float> matrix)
         {
-            using (var ptrs = new MatrixPointers<Float>(matrix))
+            using (var ptrs = new MatrixPointersBag<Float>(matrix))
             {
                 ApplyTanh(ptrs[0], matrix.Length());
             }
@@ -133,7 +134,7 @@ namespace Retia.Mathematics
 
         public override void CalculateH(Matrix<Float> H, Matrix<Float> hCandidate, Matrix<Float> z, Matrix<Float> lastH)
         {
-            using (var ptrs = new MatrixPointers<Float>(H, hCandidate, z, lastH))
+            using (var ptrs = new MatrixPointersBag<Float>(H, hCandidate, z, lastH))
             {
                 CalculateH(ptrs[0], ptrs[1], ptrs[2], ptrs[3], H.Length());
             }
@@ -191,7 +192,7 @@ namespace Retia.Mathematics
 
         public override void GravesRmsPropUpdate(float weightDecay, float learningRate, float decayRate, float momentum, NeuroWeight<Float> weight)
         {
-            using (var ptrs = new MatrixPointers<Float>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
+            using (var ptrs = new MatrixPointersBag<Float>(weight.Weight, weight.Cache1, weight.Cache2, weight.CacheM, weight.Gradient))
             {
                 GravesRMSPropUpdate(weightDecay, learningRate, decayRate, momentum, ptrs[0], ptrs[1], ptrs[2], ptrs[3], ptrs[4], weight.Weight.Length());
             }
@@ -333,7 +334,7 @@ namespace Retia.Mathematics
 
         public override void AdamUpdate(float learningRate, float b1, float b2, NeuroWeight<Float> weight)
         {
-            using (var ptrs = new MatrixPointers<Float>(weight.Weight, weight.Cache1, weight.Cache2, weight.Gradient))
+            using (var ptrs = new MatrixPointersBag<Float>(weight.Weight, weight.Cache1, weight.Cache2, weight.Gradient))
             {
                 AdamUpdate(learningRate, b1, b2, weight.Timestep, ptrs[0], ptrs[1], ptrs[2], ptrs[3], weight.Weight.Length());
             }

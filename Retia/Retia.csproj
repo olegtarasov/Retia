@@ -74,12 +74,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Gpu\GpuInterface.cs" />
-    <Compile Include="Gpu\HostMatrixDefinition.cs" />
-    <Compile Include="Gpu\HostMatrixPointers.cs" />
-    <Compile Include="Gpu\HostWeightPointers.cs" />
+    <Compile Include="Interop\GpuInterface.cs" />
+    <Compile Include="Interop\MatrixDefinition.cs" />
+    <Compile Include="Interop\MatrixPointersBag.cs" />
+    <Compile Include="Interop\WeightDefinitionBag.cs" />
     <Compile Include="Helpers\FileDownloader.cs" />
-    <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\MinMax.cs" />
     <Compile Include="Helpers\MinMaxTracker.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />

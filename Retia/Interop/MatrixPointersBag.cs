@@ -1,22 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Storage;
 
-namespace Retia.Helpers
+namespace Retia.Interop
 {
     /// <summary>
     /// A collection of pinned matrix pointers.
     /// Pointers are unpinned when an object is disposed.
     /// </summary>
     /// <typeparam name="T">Data type.</typeparam>
-    public struct MatrixPointers<T> : IDisposable where T : struct, IEquatable<T>, IFormattable
+    public struct MatrixPointersBag<T> : IDisposable where T : struct, IEquatable<T>, IFormattable
     {
         private readonly GCHandle[] _handles;
         private readonly IntPtr[] _pointers;
+        private readonly MatrixDefinition[] _defs;
         private readonly bool _rowMajor;
-        private readonly Dictionary<Matrix<T>, T[]> _arrayMap;
+        private readonly List<Tuple<Matrix<T>, T[]>> _arrayMap;
 
         private bool _disposed;
 
@@ -25,7 +26,17 @@ namespace Retia.Helpers
         /// The order of matrices is preserved.
         /// </summary>
         /// <param name="matrices">Matrices to pin pointers to.</param>
-        public MatrixPointers(params Matrix<T>[] matrices) : this(false, matrices)
+        public MatrixPointersBag(params Matrix<T>[] matrices) : this(false, matrices)
+        {
+        }
+
+        /// <summary>
+        /// Pins pointers to underlying matrix arrays and stores them for later use.
+        /// The order of matrices is preserved.
+        /// </summary>
+        /// <param name="generateDefinitions">Whether to generate matrix definitions for GPU transfer.</param>
+        /// <param name="matrices">Matrices to pin pointers to.</param>
+        public MatrixPointersBag(bool generateDefinitions, params Matrix<T>[] matrices) : this(false, generateDefinitions, matrices)
         {
         }
 
@@ -40,12 +51,14 @@ namespace Retia.Helpers
         /// <param name="rowMajor">
         /// Indicates whether matrices should be converted to row-major format.
         /// </param>
+        /// <param name="generateDefinitions">Whether to generate matrix definitions for GPU transfer.</param>
         /// <param name="matrices">Matrices to pin pointers to.</param>
-        public MatrixPointers(bool rowMajor, params Matrix<T>[] matrices)
+        public MatrixPointersBag(bool rowMajor, bool generateDefinitions, params Matrix<T>[] matrices)
         {
             _rowMajor = rowMajor;
 
-            _arrayMap = rowMajor ? new Dictionary<Matrix<T>, T[]>() : null;
+            _arrayMap = rowMajor ? new List<Tuple<Matrix<T>, T[]>>() : null;
+            _defs = generateDefinitions ? new MatrixDefinition[matrices.Length] : null;
 
             _disposed = false;
             _handles = new GCHandle[matrices.Length];
@@ -58,7 +71,7 @@ namespace Retia.Helpers
                 if (rowMajor)
                 {
                     array = matrix.ToRowMajorArray();
-                    _arrayMap[matrix] = array;
+                    _arrayMap.Add(new Tuple<Matrix<T>, T[]>(matrix, array));
                 }
                 else
                 {
@@ -66,7 +79,14 @@ namespace Retia.Helpers
                 }
                 
                 _handles[i] = GCHandle.Alloc(array, GCHandleType.Pinned);
-                _pointers[i] = _handles[i].AddrOfPinnedObject();
+
+                var ptr = _handles[i].AddrOfPinnedObject();
+                _pointers[i] = ptr;
+
+                if (generateDefinitions)
+                {
+                    _defs[i] = new MatrixDefinition(matrix.RowCount, matrix.ColumnCount, 1, ptr);
+                }
             }
         }
 
@@ -80,20 +100,27 @@ namespace Retia.Helpers
             get
             {
                 if (_disposed)
-                    throw new ObjectDisposedException(nameof(MatrixPointers<T>));
+                    throw new ObjectDisposedException(nameof(MatrixPointersBag<T>));
 
                 return _pointers[idx];
             }
         }
 
-        public IntPtr[] Pointers => _pointers;
+        public MatrixDefinition[] Definitions
+        {
+            get
+            {
+                if (_defs == null)
+                    throw new InvalidOperationException("Matrix definitions has not been generated!");
+
+                return _defs;
+            }
+        }
 
         public void Dispose()
         {
             if (_disposed)
-            {
                 return;
-            }
 
             _disposed = true;
 
@@ -101,8 +128,8 @@ namespace Retia.Helpers
             {
                 foreach (var pair in _arrayMap)
                 {
-                    var matrix = pair.Key;
-                    var storage = DenseColumnMajorMatrixStorage<T>.OfRowMajorArray(matrix.RowCount, matrix.ColumnCount, pair.Value);
+                    var matrix = pair.Item1;
+                    var storage = DenseColumnMajorMatrixStorage<T>.OfRowMajorArray(matrix.RowCount, matrix.ColumnCount, pair.Item2);
                     storage.CopyTo(matrix.Storage);
                 }
 

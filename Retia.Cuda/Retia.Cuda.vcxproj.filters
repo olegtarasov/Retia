@@ -55,6 +55,12 @@
     <ClInclude Include="WeightSyncContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TestApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApiCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -89,6 +95,9 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="NeuroWeight.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="TestApi.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>
