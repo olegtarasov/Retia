@@ -1,5 +1,6 @@
 ﻿#if !CPUONLY
-using Retia.Gpu;
+using Retia.Interop;
+using Retia.Tests.Interop;
 
 namespace Retia.Tests.Gpu
 {

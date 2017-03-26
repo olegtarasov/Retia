@@ -214,8 +214,8 @@ namespace Retia.Neural
                     throw new InvalidOperationException("GPU is only supported for float data type!");
                 }
 
-                using (var inPtrs = new MatrixDefinitionBag<T>(inputs.ToArray()))
-                using (var targPtrs = new MatrixDefinitionBag<T>(targets.ToArray()))
+                using (var inPtrs = new MatrixPointersBag<T>(true, inputs.ToArray()))
+                using (var targPtrs = new MatrixPointersBag<T>(true, targets.ToArray()))
                 {
                     fixed (MatrixDefinition* inPtr = &inPtrs.Definitions[0], targPtr = &targPtrs.Definitions[0])
                     {
