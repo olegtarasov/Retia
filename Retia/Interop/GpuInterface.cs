@@ -163,6 +163,12 @@ namespace Retia.Interop
 
             [DllImport(CudaDllName)]
             public static extern void TestWeightTransferRowMajorGpu(WeightDefinition weight);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestComplexWeightTransfer(WeightDefinition weight);
+
+            [DllImport(CudaDllName)]
+            public static extern void TestComplexWeightTransferRowMajor(WeightDefinition weight);
         }
 
         [DllImport(CudaDllName)]

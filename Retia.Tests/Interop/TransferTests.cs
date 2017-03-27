@@ -97,7 +97,7 @@ namespace Retia.Tests.Interop
             local.CacheM.ShouldMatrixEqualWithinError(remote.CacheM);
         }
 
-        private static void MutateMatrix(Matrix<float> matrix)
+        protected static void MutateMatrix(Matrix<float> matrix)
         {
             for (int col = 0; col < matrix.ColumnCount; col++)
             {
@@ -108,7 +108,7 @@ namespace Retia.Tests.Interop
             }
         }
 
-        private static void MutateMatrixRowMajor(Matrix<float> matrix)
+        protected static void MutateMatrixRowMajor(Matrix<float> matrix)
         {
             var la = matrix.ToRowMajorArray();
             for (int row = 0; row < matrix.RowCount; row++)

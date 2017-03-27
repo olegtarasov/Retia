@@ -262,3 +262,63 @@ void TestWeightTransferRowMajorGpu(WeightDefinition weight)
 	TestDeviceMatrixRowMajor(weight.Rows, weight.Columns, weight.CacheMPtr);
 }
 
+void TestComplexWeightTransfer(WeightDefinition weight)
+{
+	auto gWeight = std::make_unique<NeuroWeight>(weight.Rows, weight.Columns, weight.SeqLength);
+	auto container = std::make_unique<WeightSyncContainer>(weight.Rows, weight.Columns, weight.SeqLength,
+		weight.WeightPtr, weight.GradPtr, weight.Cache1Ptr, weight.Cache2Ptr, weight.CacheMPtr);
+	auto coeff = thrust::device_vector<float>(container->weight()->length());
+
+	MutateVector(weight.Rows, weight.Columns, coeff);
+
+	gWeight->TransferStateToDevice(*container);
+
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->weight().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->weight().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->gradient().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->gradient().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache1().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache1().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache2().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache2().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache_m().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache_m().end(), coeff.end())),
+		test_mutator());
+	
+	gWeight->TransferStateToHost(*container);
+}
+
+void TestComplexWeightTransferRowMajor(WeightDefinition weight)
+{
+	auto gWeight = std::make_unique<NeuroWeight>(weight.Rows, weight.Columns, weight.SeqLength);
+	auto container = std::make_unique<WeightSyncContainer>(weight.Rows, weight.Columns, weight.SeqLength,
+		weight.WeightPtr, weight.GradPtr, weight.Cache1Ptr, weight.Cache2Ptr, weight.CacheMPtr);
+	auto coeff = thrust::device_vector<float>(container->weight()->length());
+
+	MutateVectorRowMajor(weight.Rows, weight.Columns, coeff);
+
+	gWeight->TransferStateToDevice(*container);
+
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->weight().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->weight().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->gradient().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->gradient().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache1().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache1().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache2().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache2().end(), coeff.end())),
+		test_mutator());
+	thrust::for_each(thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache_m().begin(), coeff.begin())),
+		thrust::make_zip_iterator(thrust::make_tuple(gWeight->cache_m().end(), coeff.end())),
+		test_mutator());
+
+	gWeight->TransferStateToHost(*container);
+}
+

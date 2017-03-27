@@ -22,3 +22,5 @@ GPUAPI _VOID TestWeightTransferCpu(WeightDefinition weight);
 GPUAPI _VOID TestWeightTransferGpu(WeightDefinition weight);
 GPUAPI _VOID TestWeightTransferRowMajorCpu(WeightDefinition weight);
 GPUAPI _VOID TestWeightTransferRowMajorGpu(WeightDefinition weight);
+GPUAPI _VOID TestComplexWeightTransfer(WeightDefinition weight);
+GPUAPI _VOID TestComplexWeightTransferRowMajor(WeightDefinition weight);
