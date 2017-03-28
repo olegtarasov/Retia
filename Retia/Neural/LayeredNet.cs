@@ -77,9 +77,6 @@ namespace Retia.Neural
             set
             {
                 _optimizer = value;
-#if !CPUONLY
-                
-#endif
             }
         }
 

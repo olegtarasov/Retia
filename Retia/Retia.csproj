@@ -142,6 +142,7 @@
     <Compile Include="Training\Data\IDataSet.cs" />
     <Compile Include="Training\Data\LinearDataSet.cs" />
     <Compile Include="Training\Data\Sample.cs" />
+    <Compile Include="Training\Data\Samples\XorDataset.cs" />
     <Compile Include="Training\Data\SequentialDataSet.cs" />
     <Compile Include="Training\Data\SetDataProvider.cs" />
     <Compile Include="Training\Data\TrainingSequence.cs" />
