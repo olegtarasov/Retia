@@ -67,12 +67,12 @@ namespace Retia.Tests.Mathematics
         [MemberData(nameof(GetRMSPropTestData))]
         public void RMSPropValuesAreEqual(float learningRate, float decayRate, float weightDecay, float momentum)
         {
-            var local = new NeuroWeight<float>(MatrixFactory.RandomMatrix<float>(20, 20, 1e-2f));
+            var local = new NeuroWeight<float>(MatrixFactory.RandomMatrix<float>(10, 10, 1e-2f));
             var remote = local.Clone();
 
             for (int i = 0; i < 100; i++)
             {
-                var grad = MatrixFactory.RandomMatrix<float>(20, 20, 1.0f);
+                var grad = MatrixFactory.RandomMatrix<float>(10, 10, 1.0f);
 
                 grad.CopyTo(local.Gradient);
                 grad.CopyTo(remote.Gradient);
