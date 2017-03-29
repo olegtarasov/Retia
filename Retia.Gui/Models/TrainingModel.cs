@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using OxyPlot;
+using OxyPlot.Wpf;
 using PropertyChanged;
 using Retia.Integration;
 using Retia.Training.Trainers;
@@ -49,6 +52,11 @@ namespace Retia.Gui.Models
 
             _trainer.TrainingStateChanged += TrainerOnTrainingStateChanged;
             _trainer.TrainReport += TrainerOnTrainReport;
+        }
+
+        public void ExportErrorPlot(Stream stream, int width, int height)
+        {
+            Dispatch(() => PngExporter.Export(ReportModel.PlotModel, stream, width, height, OxyColors.White));
         }
 
         private bool CanStop(object o)

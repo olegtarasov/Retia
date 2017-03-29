@@ -10,6 +10,8 @@ using System.Windows;
 using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Single;
+using OxyPlot;
+using OxyPlot.Wpf;
 using Retia.Gui;
 using Retia.Gui.Models;
 using Retia.Gui.Windows;
@@ -111,13 +113,39 @@ namespace LanguageModel
             var session = new OptimizingSession(Path.GetFileNameWithoutExtension(batchesPath));
             var trainer = new OptimizingTrainer<float>(network, optimizer, _dataProvider.TrainingSet, trainOptions, session);
 
+            RetiaGui retiaGui;
+            TypedTrainingModel<float> model = null;
+            if (gui)
+            {
+                retiaGui = new RetiaGui();
+                retiaGui.RunAsync(() =>
+                {
+                    model = new TypedTrainingModel<float>(trainer);
+                    return new TrainingWindow(model);
+                });
+            }
+
             var epochWatch = new Stopwatch();
            
 			trainer.EpochReached += sess =>
 		    {
                 epochWatch.Stop();
 		        Console.WriteLine($"Trained epoch in {epochWatch.Elapsed.TotalSeconds} s.");
-		        //Console.ReadKey();
+
+                // Showcasing plot export
+                if (model != null)
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        model.ExportErrorPlot(stream, 600, 400);
+
+                        stream.Seek(0, SeekOrigin.Begin);
+
+                        session.AddFileToReport("ErrorPlots\\plot.png", stream);
+                    }
+                }
+
+                epochWatch.Restart();
 		    };
             trainer.PeriodicActions.Add(new UserAction(new ActionSchedule(100, PeriodType.Iteration), () =>
             {
@@ -125,18 +153,16 @@ namespace LanguageModel
                 {
                     network.TransferStateToHost();
                 }
-                Console.WriteLine(TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab));
+
+                string text = TestRNN(network.Clone(1, SEQ_LEN), 500, _dataProvider.Vocab);
+                Console.WriteLine(text);
+                session.AddFileToReport("Generated\\text.txt", text);
+
                 trainOptions.ProgressWriter.ItemComplete();
             }));
 
-            RetiaGui retiaGui;
-		    if (gui)
-		    {
-		        retiaGui = new RetiaGui();
-                retiaGui.RunAsync(() => new TrainingWindow(new TypedTrainingModel<float>(trainer)));
-		    }
-		   
             var runner = ConsoleRunner.Create(trainer, network);
+            epochWatch.Start();
             runner.Run();
 		}
   

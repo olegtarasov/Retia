@@ -64,6 +64,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\oxyplot\Source\OxyPlot.Wpf\OxyPlot.Wpf.csproj">
+      <Project>{698CCD8E-ADCC-4565-8517-5EDD36F07155}</Project>
+      <Name>OxyPlot.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\oxyplot\Source\OxyPlot\OxyPlot.csproj">
+      <Project>{7a0b35c0-dd17-4964-8e9a-44d6cecdc692}</Project>
+      <Name>OxyPlot</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Retia.Gui\Retia.Gui.csproj">
       <Project>{eb0005db-e481-43ea-9802-352bae4b0526}</Project>
       <Name>Retia.Gui</Name>

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace Retia.Training.Trainers.Sessions
 {
     public abstract class TrainingSessionBase : IDisposable
     {
+        private static readonly object _addFileLock = new object();
+        
         protected readonly bool SaveReport;
         protected readonly string SessionDir;
 
@@ -47,6 +50,47 @@ namespace Retia.Training.Trainers.Sessions
         public string Name { get; private set; }
         public int Iteration { get; set; }
         public int Epoch { get; set; }
+
+        public void AddFileToReport(string fileName, string content)
+        {
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content), false))
+            {
+                AddFileToReport(fileName, stream);
+            }
+        }
+
+        public void AddFileToReport(string fileName, Stream content)
+        {
+            if (!SaveReport)
+            {
+                return;
+            }
+
+            lock (_addFileLock)
+            {
+                string sourcePath = Path.Combine(SessionDir, fileName);
+                string dir = Path.GetDirectoryName(sourcePath);
+                string name = Path.GetFileNameWithoutExtension(fileName);
+                string ext = Path.GetExtension(fileName);
+                string fullPath = Path.Combine(dir, $"{name}_{DateTime.Now:dd.MM.yy_HH.mm.ss}{ext}");
+
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                if (File.Exists(fullPath))
+                {
+                    var files = Directory.GetFiles(dir, $"{name}*");
+                    fullPath = Path.Combine(dir, $"{name}_{DateTime.Now:dd.MM.yy_HH.mm.ss}_{files.Length}{ext}");
+                }
+
+                using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
+                {
+                    content.CopyTo(stream);
+                }
+            }
+        }
 
         protected virtual void Dispose(bool disposing)
         {
