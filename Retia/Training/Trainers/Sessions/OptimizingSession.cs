@@ -21,16 +21,25 @@ namespace Retia.Training.Trainers.Sessions
         private bool _flushing = false;
 
 
-        public OptimizingSession(string name) : this(name, null)
+        public OptimizingSession(bool saveReport = true) : this(null, null, saveReport)
         {
         }
 
-        public OptimizingSession(string name, string baseDirectory) : base(name, baseDirectory)
+        public OptimizingSession(string name, bool saveReport = true) : this(name, null, saveReport)
         {
-            _networksDir = Path.Combine(_sessionDir, "Network");
+        }
+
+        public OptimizingSession(string name, string baseDirectory, bool saveReport = true) : base(name, baseDirectory)
+        {
+            if (!saveReport)
+            {
+                return;
+            }
+
+            _networksDir = Path.Combine(SessionDir, "Network");
             Directory.CreateDirectory(_networksDir);
 
-            _errorWriter = new StreamWriter(Path.Combine(_sessionDir, "errors.csv"));
+            _errorWriter = new StreamWriter(Path.Combine(SessionDir, "errors.csv"));
             _errorWriter.WriteLine("iterarion;epoch;filtered_error;raw_error");
             _errorWriter.Flush();
         }
@@ -58,10 +67,13 @@ namespace Retia.Training.Trainers.Sessions
 
             _swapErrorBuffer = Interlocked.Exchange(ref _errorBuffer, _swapErrorBuffer);
 
-            for (int i = 0; i < _swapErrorBuffer.Count; i++)
+            if (SaveReport)
             {
-                var err = _swapErrorBuffer[i];
-                _errorWriter.WriteLine($"{err.Iteration};{err.Epoch};{err.FilteredError};{err.RawError}");
+                for (int i = 0; i < _swapErrorBuffer.Count; i++)
+                {
+                    var err = _swapErrorBuffer[i];
+                    _errorWriter.WriteLine($"{err.Iteration};{err.Epoch};{err.FilteredError};{err.RawError}");
+                }
             }
 
             var result = _swapErrorBuffer.ToList(); // Get a safe copy of errors list.
@@ -76,6 +88,11 @@ namespace Retia.Training.Trainers.Sessions
 
         public void SaveNetwork(int versionsToKeep)
         {
+            if (!SaveReport)
+            {
+                return;
+            }
+
             var files = Directory.GetFiles(_networksDir);
             Array.Sort(files);
 
@@ -97,7 +114,7 @@ namespace Retia.Training.Trainers.Sessions
             if (disposing)
             {
                 GetAndFlushErrors();
-                _errorWriter.Dispose();
+                _errorWriter?.Dispose();
             }
         }
     }

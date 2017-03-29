@@ -119,7 +119,7 @@ namespace Retia.Tests.Gpu
                 ErrorFilterSize = 0,
                 ReportProgress = ActionSchedule.Disabled,
                 ReportMesages = false
-            }, new OptimizingSession("Test"));
+            }, new OptimizingSession(false));
 
             var cts = new CancellationTokenSource();
             trainer.SequenceTrained += s =>

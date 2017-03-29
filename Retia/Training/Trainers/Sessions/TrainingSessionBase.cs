@@ -6,17 +6,28 @@ namespace Retia.Training.Trainers.Sessions
 {
     public abstract class TrainingSessionBase : IDisposable
     {
-        protected readonly string _sessionDir;
+        protected readonly bool SaveReport;
+        protected readonly string SessionDir;
 
-        public TrainingSessionBase(string name) : this(name, null)
+        protected TrainingSessionBase(bool saveReport = true) : this(null, null, saveReport)
+        {
+        }
+
+        public TrainingSessionBase(string name, bool saveReport = true) : this(name, null, saveReport)
         {
             Name = name;
         }
 
-        public TrainingSessionBase(string name, string baseDirectory)
+        public TrainingSessionBase(string name, string baseDirectory, bool saveReport = true)
         {
+            SaveReport = saveReport;
             Name = name;
 
+            if (!saveReport)
+            {
+                return;
+            }
+            
             string baseDir = baseDirectory;
             if (string.IsNullOrEmpty(baseDir))
             {
@@ -29,8 +40,8 @@ namespace Retia.Training.Trainers.Sessions
             }
 
             string dir = $"{(string.IsNullOrEmpty(Name) ? "Unnamed" : Name)}_{DateTime.Now:dd.MM.yy_HH.mm.ss}";
-            _sessionDir = string.IsNullOrEmpty(baseDir) ? dir : Path.Combine(baseDir, dir);
-            Directory.CreateDirectory(_sessionDir);
+            SessionDir = string.IsNullOrEmpty(baseDir) ? dir : Path.Combine(baseDir, dir);
+            Directory.CreateDirectory(SessionDir);
         }
 
         public string Name { get; private set; }
