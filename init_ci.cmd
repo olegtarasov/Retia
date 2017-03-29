@@ -17,20 +17,18 @@ echo "Failed to install CUDA"
 exit /B 1
 )
 
-echo "Installing VS 2017 integration"
+echo Installing VS integration
 copy _vs\*.* "c:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\BuildCustomizations"
 
 cd ..
                            
 echo Downloading cuDNN
-appveyor DownloadFile https://www.dropbox.com/s/9t56hoewk7p0hfj/cudnn-8.0-windows7-x64-v5.1.zip?dl=1 -FileName cudnn-8.0-windows7-x64-v5.1-zip
-7z x cudnn-8.0-windows7-x64-v5.1-zip -ocudnn
+appveyor DownloadFile https://www.dropbox.com/s/9t56hoewk7p0hfj/cudnn-8.0-windows7-x64-v5.1.zip?dl=1
+7z x cudnn-8.0-windows7-x64-v5.1.zip -ocudnn
 
 copy cudnn\cuda\bin\*.* "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\bin"
 copy cudnn\cuda\lib\x64\*.* "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64"
 copy cudnn\cuda\include\*.* "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include"
-
-
 
 set PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\libnvvp;%PATH%
 set CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0
