@@ -8,14 +8,12 @@ using CLAP;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.Common.Mkl;
+using Retia.Interop;
 using Retia.Gui;
 using Retia.Gui.Models;
 using Retia.Gui.Windows;
 using Retia.Integration;
 using Retia.Mathematics;
-#if !CPUONLY
-using Retia.NativeWrapper;
-#endif
 using Retia.Neural;
 using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
@@ -35,7 +33,7 @@ namespace Benchmark
         [Verb]
         public void TestGpuLayers()
         {
-            var dataSet = new TestDataSet<float>(3, 4, 2, 5);
+            var dataSet = new TestDataSet<float>(3, 4, 5, 10);
 
             Console.WriteLine("Testing softmax forward");
             var softmaxLayer = new SoftMaxLayer<float>(dataSet.InputSize);
@@ -50,24 +48,33 @@ namespace Benchmark
             TestLayerForward(gruLayer, dataSet);
         }
 
-        private void TestLayerForward(LayerBase<float> layer, TestDataSet<float> dataSet, int? outSize = null)
+        private unsafe void TestLayerForward(LayerBase<float> layer, TestDataSet<float> dataSet, int? outSize = null)
         {
             layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
+            var gpuLayer = layer.CreateGpuLayer();
 
             int finalOutSize = outSize.GetValueOrDefault(dataSet.TargetSize);
-            var gpuTester = new LayerTester(layer.CreateSpec());
-
+            
             for (int i = 0; i < 3; i++)
             {
                 var seq = dataSet.GetNextSamples(dataSet.SampleCount);
                 var cpuOut = new List<Matrix<float>>();
+                layer.InitSequence();
                 foreach (var input in seq.Inputs)
                 {
                     cpuOut.Add(layer.Step(input));
                 }
 
-                var gpuOut = Enumerable.Range(0, dataSet.SampleCount).Select(x => Matrix<float>.Build.Dense(finalOutSize, dataSet.BatchSize)).ToList();
-                gpuTester.TestForward(seq.Inputs, gpuOut);
+                var gpuOut = Enumerable.Range(0, dataSet.SampleCount).Select(x => Matrix<float>.Build.Dense(finalOutSize, dataSet.BatchSize)).ToArray();
+                using (var inPtrs = new MatrixPointersBag<float>(true, seq.Inputs.ToArray()))
+                using (var outPtrs = new MatrixPointersBag<float>(true, gpuOut))
+                {
+                    fixed (MatrixDefinition* inDef = &inPtrs.Definitions[0], outDef = &outPtrs.Definitions[0])
+                    {
+                        GpuInterface.LayerForwardSequence(gpuLayer, inDef, seq.Inputs.Count);
+                        GpuInterface.TransferLayerOutputsToHost(gpuLayer, outDef, gpuOut.Length);
+                    }
+                }
 
                 //Console.WriteLine("CPU output:");
                 //foreach (var matrix in cpuOut)
@@ -83,6 +90,8 @@ namespace Benchmark
                 //    Console.WriteLine("---------------");
                 //}
 
+                //Console.WriteLine("================================");
+
                 for (int j = 0; j < dataSet.SampleCount; j++)
                 {
                     var cpuArr = cpuOut[j].AsColumnMajorArray();
@@ -96,11 +105,7 @@ namespace Benchmark
                         }
                     }
                 }
-
-                layer.ResetMemory();
             }
-
-            gpuTester.Dispose();
         }
 #endif
     }

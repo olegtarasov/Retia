@@ -13,12 +13,6 @@
     <ClInclude Include="Exceptions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NeuroLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NeuroWeigth.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LinearLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -43,35 +37,29 @@
     <ClInclude Include="Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LayeredNetBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayeredNetFactoryBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="MatrixBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayeredNetFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Algorithms.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RawMatrixPtr.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayerContainerBase.h">
-      <Filter>Header Files\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="LayerContainer.h">
+    <ClInclude Include="CApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AlgorithmTester.h">
-      <Filter>Header Files\Interfaces</Filter>
+    <ClInclude Include="LayerBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuroWeight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightSyncContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApiCommon.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -83,15 +71,9 @@
       <UniqueIdentifier>{93e1b579-c7c1-4962-930b-46415cfe7d04}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files\Interfaces">
-      <UniqueIdentifier>{50f8c309-f017-4915-9469-49f7502c2a62}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="LinearLayer.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="NeuroWeigth.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="RMSPropOptimizer.cu">
@@ -106,22 +88,16 @@
     <CudaCompile Include="LayeredNet.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="LayeredNetFactory.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
-    <CudaCompile Include="LayeredNetFactoryBase.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
     <CudaCompile Include="CuDnnTensor.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="LayerContainer.cu">
+    <CudaCompile Include="CApi.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="LayerContainerBase.cu">
+    <CudaCompile Include="NeuroWeight.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="AlgorithmTester.cu">
+    <CudaCompile Include="TestApi.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>
@@ -136,6 +112,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Exceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

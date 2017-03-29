@@ -1,6 +1,5 @@
 ﻿using System;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Mathematics;
 
 namespace Retia.Neural.Initializers
 {

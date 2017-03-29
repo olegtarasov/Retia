@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Mathematics;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
 

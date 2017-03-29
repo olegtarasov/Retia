@@ -1,8 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Net;
+﻿using System.IO;
 using System.Reflection;
-using Ionic.Zip;
 using MathNet.Numerics;
 using Retia.Helpers;
 using Retia.Integration;

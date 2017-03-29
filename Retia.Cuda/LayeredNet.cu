@@ -4,18 +4,10 @@
 
 void LayeredNet::UpdateLearningRate(float learningRate)
 {
-	_optimizer->set_learningRate(learningRate);
+	_optimizer->setLearningRate(learningRate);
 }
 
-void LayeredNet::TransferStatesToHost(int layer, std::vector<RawMatrixPtr*>& states)
-{
-	if (layer >= _layers.size())
-		throw RetiaException("Index out of range");
-
-	_layers[layer]->TransferStatesToHost(states);
-}
-
-double LayeredNet::TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector<RawMatrixPtr*>& targets)
+double LayeredNet::TrainSequence(std::vector<HostMatrixPtr*>& inputs, std::vector<HostMatrixPtr*>& targets)
 {
 	if (inputs.size() != _seqLen || targets.size() != _seqLen) throw RetiaException("Wrong number of matrices!");
 
@@ -34,13 +26,13 @@ double LayeredNet::TrainSequence(std::vector<RawMatrixPtr*>& inputs, std::vector
 	return TrainSequence(devInput, devTarget);
 }
 
-void LayeredNet::AddLayer(NeuroLayer* layer)
+void LayeredNet::AddLayer(LayerBase* layer)
 {
 	auto inSize = _layers.size() > 0 ? _layers[_layers.size() - 1]->outputSize() : _inputSize;
 	if (layer->inputSize() != inSize)
 		throw RetiaException("Conflicting layer size!");
 	
-	_layers.push_back(std::unique_ptr<NeuroLayer>(layer));
+	_layers.push_back(std::unique_ptr<LayerBase>(layer));
 }
 
 double LayeredNet::TrainSequence(DeviceMatrix& input, DeviceMatrix& target)

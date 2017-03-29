@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Mathematics;
 
 namespace Retia.Training.Data
 {

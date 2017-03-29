@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
-using Retia.Contracts;
+using Retia.Interop;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
@@ -49,21 +48,21 @@ namespace Retia.Neural.Layers
         {
             _hSize = hSize;
 
-            _wxh = linearWeightInitializer.CreateMatrix(hSize, xSize);
-            _wxr = linearWeightInitializer.CreateMatrix(hSize, xSize);
-            _wxz = linearWeightInitializer.CreateMatrix(hSize, xSize);
-
-            _whh = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
-            _whr = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
-            _whz = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
-
-            _bxh = biasInitializer.CreateMatrix(hSize, 1);
-            _bxr = biasInitializer.CreateMatrix(hSize, 1);
-            _bxz = biasInitializer.CreateMatrix(hSize, 1);
-
-            _bhh = biasInitializer.CreateMatrix(hSize, 1);
-            _bhr = biasInitializer.CreateMatrix(hSize, 1);
-            _bhz = biasInitializer.CreateMatrix(hSize, 1);
+            _wxh = new NeuroWeight<T>(linearWeightInitializer.CreateMatrix(hSize, xSize));
+            _wxr = new NeuroWeight<T>(linearWeightInitializer.CreateMatrix(hSize, xSize));
+            _wxz = new NeuroWeight<T>(linearWeightInitializer.CreateMatrix(hSize, xSize));
+                   
+            _whh = new NeuroWeight<T>(hiddenWeightInitializer.CreateMatrix(hSize, hSize));
+            _whr = new NeuroWeight<T>(hiddenWeightInitializer.CreateMatrix(hSize, hSize));
+            _whz = new NeuroWeight<T>(hiddenWeightInitializer.CreateMatrix(hSize, hSize));
+                   
+            _bxh = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bxr = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bxz = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+                   
+            _bhh = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bhr = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bhz = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
 
             ResetOptimizer();
 
@@ -435,35 +434,7 @@ namespace Retia.Neural.Layers
             _zVals.Clear();
             _rVals.Clear();
             Inputs.Clear();
-        }
-
-        public override LayerSpecBase CreateSpec()
-        {
-            if (typeof(T) != typeof(float))
-            {
-                throw new InvalidOperationException("Only float for GPU!");
-            }
-
-            var weights = new GruLayerWeights
-                          {
-                              Wxr = _wxr.Weight as Matrix<float>,
-                              Wxz = _wxz.Weight as Matrix<float>,
-                              Wxh = _wxh.Weight as Matrix<float>,
-                                                
-                              Whr = _whr.Weight as Matrix<float>,
-                              Whz = _whz.Weight as Matrix<float>,
-                              Whh = _whh.Weight as Matrix<float>,
-                                                
-                              bxr = _bxr.Weight as Matrix<float>,
-                              bxz = _bxz.Weight as Matrix<float>,
-                              bxh = _bxh.Weight as Matrix<float>,
-                                                
-                              bhr = _bhr.Weight as Matrix<float>,
-                              bhz = _bhz.Weight as Matrix<float>,
-                              bhh = _bhh.Weight as Matrix<float>
-            };
-
-            return new GruLayerSpec(InputSize, BatchSize, SeqLen, 1, _hSize, weights);
+            ResetMemory();
         }
 
         protected override void Initialize()
@@ -496,6 +467,54 @@ namespace Retia.Neural.Layers
             _whr.ClearGrad();
             _whz.ClearGrad();
             _whh.ClearGrad();
+        }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            GpuLayerPtr = GpuInterface.CreateGruLayer(InputSize, _hSize, 1, BatchSize, SeqLen);
+            TransferWeightsToDevice();
+
+            return GpuLayerPtr;
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            TransferWeugthsToDevice(true, // CuDNN weight matrices are row-major
+                _wxr,
+                _wxz,
+                _wxh,
+
+                _whr,
+                _whz,
+                _whh,
+
+                _bxr,
+                _bxz,
+                _bxh,
+
+                _bhr,
+                _bhz,
+                _bhh);
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            TransferWeigthsToHost(true, // CuDNN weight matrices are row-major
+                _wxr,
+                _wxz,
+                _wxh,
+
+                _whr,
+                _whz,
+                _whh,
+
+                _bxr,
+                _bxz,
+                _bxh,
+
+                _bhr,
+                _bhz,
+                _bhh);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
 using Retia.Optimizers;
@@ -134,11 +133,6 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override LayerSpecBase CreateSpec()
-        {
-            throw new NotSupportedException();
-        }
-
         protected override void Initialize()
         {
             _scale = Matrix<T>.Build.Dense(_size, BatchSize, MathProvider.Scalar(_dropout));
@@ -146,6 +140,21 @@ namespace Retia.Neural.Layers
 
         public override void ClearGradients()
         {
+        }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            throw new NotSupportedException();
         }
     }
 }

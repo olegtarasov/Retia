@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Neural.Initializers;
 using Retia.Optimizers;
@@ -76,11 +75,6 @@ namespace Retia.Neural.Layers
         public override LayerBase<T> Clone()
         {
             return new AffineLayer<T>(this);
-        }
-
-        public override LayerSpecBase CreateSpec()
-        {
-            throw new NotSupportedException();
         }
 
         public override List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
@@ -182,6 +176,21 @@ namespace Retia.Neural.Layers
         {
             _linearLayer.ClearGradients();
             _activationLayer.ClearGradients();
+        }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            throw new NotSupportedException();
         }
     }
 }

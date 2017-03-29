@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using Ionic.Zip;
 using Retia.Integration;
 

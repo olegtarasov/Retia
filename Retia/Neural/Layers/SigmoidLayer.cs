@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Mathematics;
-using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
 
 namespace Retia.Neural.Layers
@@ -97,11 +95,6 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override LayerSpecBase CreateSpec()
-        {
-            throw new NotSupportedException();
-        }
-
         public override void ToVectorState(T[] destination, ref int idx, bool grad = false)
         {
         }
@@ -112,6 +105,21 @@ namespace Retia.Neural.Layers
 
         public override void ClearGradients()
         {
+        }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            throw new NotSupportedException();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using Retia.Contracts;
 using Retia.Neural;
 
 namespace Retia.Optimizers
@@ -26,14 +25,14 @@ namespace Retia.Optimizers
             MathProvider.AdamUpdate(LearningRate, _b1, _b2, weight);
         }
 
-        public override OptimizerSpecBase CreateSpec()
-        {
-            throw new NotSupportedException();
-        }
-
         public override OptimizerBase<T> Clone()
         {
             return new AdamOptimizer<T>(this);
+        }
+
+        public override IntPtr CreateGpuOptimizer()
+        {
+            throw new NotSupportedException();
         }
     }
 }

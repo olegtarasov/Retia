@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Single;
-using Retia.Contracts;
+using Retia.Interop;
 using Retia.Helpers;
-using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
-using Retia.RandomGenerator;
 
 namespace Retia.Neural.Layers
 {
@@ -103,12 +99,22 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override LayerSpecBase CreateSpec()
+        public override void ClearGradients()
         {
-            return new SoftmaxLayerSpec(_size, BatchSize, SeqLen);
         }
 
-        public override void ClearGradients()
+        public override IntPtr CreateGpuLayer()
+        {
+            GpuLayerPtr = GpuInterface.CreateSoftmaxLayer(_size, BatchSize, SeqLen);
+
+            return GpuLayerPtr;
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+        }
+
+        public override void TransferWeightsToHost()
         {
         }
     }

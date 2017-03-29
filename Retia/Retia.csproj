@@ -41,7 +41,6 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release [CPUOnly]|x64'">
     <OutputPath>bin\$(Platform)\Release\</OutputPath>
@@ -51,7 +50,6 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip">
@@ -76,8 +74,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interop\GpuInterface.cs" />
+    <Compile Include="Interop\MatrixDefinition.cs" />
+    <Compile Include="Interop\MatrixPointersBag.cs" />
+    <Compile Include="Interop\WeightDefinitionBag.cs" />
     <Compile Include="Helpers\FileDownloader.cs" />
-    <Compile Include="Helpers\MatrixPointers.cs" />
     <Compile Include="Helpers\MinMax.cs" />
     <Compile Include="Helpers\MinMaxTracker.cs" />
     <Compile Include="Helpers\StreamHelpers.cs" />
@@ -114,9 +115,9 @@
     <Compile Include="Neural\Layers\DerivativeLayerBase.cs" />
     <Compile Include="Neural\Layers\DropoutLayer.cs" />
     <Compile Include="Neural\Layers\GRULayer.cs" />
+    <Compile Include="Neural\Layers\LayerBase.cs" />
     <Compile Include="Neural\Layers\LinearLayer.cs" />
     <Compile Include="Neural\Layers\ModulusLayer.cs" />
-    <Compile Include="Neural\Layers\LayerBase.cs" />
     <Compile Include="Neural\Layers\SigmoidLayer.cs" />
     <Compile Include="Neural\Layers\SoftMaxLayer.cs" />
     <Compile Include="Neural\Layers\TanhLayer.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Training\Data\IDataSet.cs" />
     <Compile Include="Training\Data\LinearDataSet.cs" />
     <Compile Include="Training\Data\Sample.cs" />
+    <Compile Include="Training\Data\Samples\XorDataset.cs" />
     <Compile Include="Training\Data\SequentialDataSet.cs" />
     <Compile Include="Training\Data\SetDataProvider.cs" />
     <Compile Include="Training\Data\TrainingSequence.cs" />
@@ -178,10 +180,18 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\Retia.Cuda\bin\$(Platform)\Debug\Retia.Cuda.dll">
+      <Link>Retia.Cuda.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Release [CPUOnly]' Or '$(Configuration)' == 'Release'">
     <Content Include="..\FastFuncs\bin\$(Platform)\Release\FastFuncs.dll">
       <Link>FastFuncs.dll</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\Retia.Cuda\bin\$(Platform)\Release\Retia.Cuda.dll">
+      <Link>Retia.Cuda.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -193,18 +203,6 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>MathProviderImplD.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Retia.Contracts\Retia.Contracts.csproj">
-      <Project>{d9562091-9caa-4b3e-92a1-746642339f1f}</Project>
-      <Name>Retia.Contracts</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'Debug'">
-    <ProjectReference Include="..\Retia.NativeWrapper\Retia.NativeWrapper.vcxproj">
-      <Project>{389882c7-2b2d-498f-8266-15519540fcce}</Project>
-      <Name>Retia.NativeWrapper</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
