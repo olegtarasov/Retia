@@ -31,8 +31,8 @@ namespace Retia.Neural.Layers
 
         public LinearLayer(int xSize, int ySize, IMatrixInitializer<T> matrixInitializer)
         {
-            _weights = matrixInitializer.CreateMatrix(ySize, xSize);
-            _bias = matrixInitializer.CreateMatrix(ySize, 1);
+            _weights = new NeuroWeight<T>(matrixInitializer.CreateMatrix(ySize, xSize));
+            _bias = new NeuroWeight<T>(matrixInitializer.CreateMatrix(ySize, 1));
 
             ErrorFunction = new MeanSquareError<T>();
 
@@ -189,12 +189,12 @@ namespace Retia.Neural.Layers
 
         public override void TransferWeightsToDevice()
         {
-            TransferWeugthsToDevice(false, _weights.Weight, _bias.Weight);
+            TransferWeugthsToDevice(false, _weights, _bias);
         }
 
         public override void TransferWeightsToHost()
         {
-            TransferWeigthsToHost(false, _weights.Weight, _bias.Weight);
+            TransferWeigthsToHost(false, _weights, _bias);
         }
     }
 }

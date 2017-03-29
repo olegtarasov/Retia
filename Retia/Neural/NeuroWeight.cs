@@ -137,10 +137,5 @@ namespace Retia.Neural
             CacheM.Clear();
 		    Timestep = 0;
 		}
-
-		public static implicit operator NeuroWeight<T>(Matrix<T> weight)
-		{
-			return new NeuroWeight<T>(weight);
-		}
 	}
 }

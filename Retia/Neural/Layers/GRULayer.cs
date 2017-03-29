@@ -48,21 +48,21 @@ namespace Retia.Neural.Layers
         {
             _hSize = hSize;
 
-            _wxh = linearWeightInitializer.CreateMatrix(hSize, xSize);
-            _wxr = linearWeightInitializer.CreateMatrix(hSize, xSize);
-            _wxz = linearWeightInitializer.CreateMatrix(hSize, xSize);
-
-            _whh = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
-            _whr = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
-            _whz = hiddenWeightInitializer.CreateMatrix(hSize, hSize);
-
-            _bxh = biasInitializer.CreateMatrix(hSize, 1);
-            _bxr = biasInitializer.CreateMatrix(hSize, 1);
-            _bxz = biasInitializer.CreateMatrix(hSize, 1);
-
-            _bhh = biasInitializer.CreateMatrix(hSize, 1);
-            _bhr = biasInitializer.CreateMatrix(hSize, 1);
-            _bhz = biasInitializer.CreateMatrix(hSize, 1);
+            _wxh = new NeuroWeight<T>(linearWeightInitializer.CreateMatrix(hSize, xSize));
+            _wxr = new NeuroWeight<T>(linearWeightInitializer.CreateMatrix(hSize, xSize));
+            _wxz = new NeuroWeight<T>(linearWeightInitializer.CreateMatrix(hSize, xSize));
+                   
+            _whh = new NeuroWeight<T>(hiddenWeightInitializer.CreateMatrix(hSize, hSize));
+            _whr = new NeuroWeight<T>(hiddenWeightInitializer.CreateMatrix(hSize, hSize));
+            _whz = new NeuroWeight<T>(hiddenWeightInitializer.CreateMatrix(hSize, hSize));
+                   
+            _bxh = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bxr = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bxz = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+                   
+            _bhh = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bhr = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
+            _bhz = new NeuroWeight<T>(biasInitializer.CreateMatrix(hSize, 1));
 
             ResetOptimizer();
 
@@ -480,41 +480,41 @@ namespace Retia.Neural.Layers
         public override void TransferWeightsToDevice()
         {
             TransferWeugthsToDevice(true, // CuDNN weight matrices are row-major
-                _wxr.Weight,
-                _wxz.Weight,
-                _wxh.Weight,
+                _wxr,
+                _wxz,
+                _wxh,
 
-                _whr.Weight,
-                _whz.Weight,
-                _whh.Weight,
+                _whr,
+                _whz,
+                _whh,
 
-                _bxr.Weight,
-                _bxz.Weight,
-                _bxh.Weight,
+                _bxr,
+                _bxz,
+                _bxh,
 
-                _bhr.Weight,
-                _bhz.Weight,
-                _bhh.Weight);
+                _bhr,
+                _bhz,
+                _bhh);
         }
 
         public override void TransferWeightsToHost()
         {
             TransferWeigthsToHost(true, // CuDNN weight matrices are row-major
-                _wxr.Weight,
-                _wxz.Weight,
-                _wxh.Weight,
+                _wxr,
+                _wxz,
+                _wxh,
 
-                _whr.Weight,
-                _whz.Weight,
-                _whh.Weight,
+                _whr,
+                _whz,
+                _whh,
 
-                _bxr.Weight,
-                _bxz.Weight,
-                _bxh.Weight,
+                _bxr,
+                _bxz,
+                _bxh,
 
-                _bhr.Weight,
-                _bhz.Weight,
-                _bhh.Weight);
+                _bhr,
+                _bhz,
+                _bhh);
         }
     }
 }
