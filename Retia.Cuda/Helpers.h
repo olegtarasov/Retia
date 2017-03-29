@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <iostream>
-#include "NeuroWeigth.h"
+#include "NeuroWeight.h"
 
 template <class TMatrix>
 void InitMatrix(TMatrix& matrix, float *array)
@@ -48,7 +48,7 @@ void PrintWeights(TMatrix& weight, TMatrix& gradient, TMatrix& cache1, TMatrix& 
 	std::cout << " " << std::endl << "=====================" << std::endl << " " << std::endl;
 }
 
-inline void PrintWeights(NeuroWeigth& weight)
+inline void PrintWeights(NeuroWeight& weight)
 {
 	PrintWeights(weight.weight(), weight.gradient(), weight.cache1(), weight.cache2(), weight.cache_m(), 0);
 }

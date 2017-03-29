@@ -17,19 +17,19 @@ using std::endl;
 using thrust::get;
 
 SoftmaxLayer::SoftmaxLayer(int inSize, int batchSize, int seqLen)
-	: NeuroLayer(inSize, inSize, batchSize, seqLen)
+	: LayerBase(inSize, inSize, batchSize, seqLen)
 {
 	_xTensor = std::make_unique<CuDnnNdTensor>(_batchSize * _seqLen, _inputSize, 1, false);
 	_output = std::make_unique<DeviceMatrix>(_inputSize, _batchSize, _seqLen);
 	_sensitivity = std::make_unique<DeviceMatrix>(_inputSize, _batchSize, _seqLen);
 }
 
-void SoftmaxLayer::TransferStatesFromHost(std::vector<RawMatrixPtr*>& states)
+void SoftmaxLayer::TransferStatesToDevice(std::vector<WeightSyncContainer*>& states)
 {
 	// Nothing to do here.
 }
 
-void SoftmaxLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
+void SoftmaxLayer::TransferStatesToHost(std::vector<WeightSyncContainer*>& states)
 {
 	// Nothing to do here.
 }
@@ -62,7 +62,7 @@ void SoftmaxLayer::Optimize(OptimizerBase& optimizer)
 
 void SoftmaxLayer::ErrorPropagate(DeviceMatrix& target)
 {
-	Algorithms::PropagateError(*_output, target, *_sensitivity);
+	Algorithms::BackpropagateCrossEntropyError(*_output, target, *_sensitivity);
 }
 
 double SoftmaxLayer::LayerError(DeviceMatrix& target)

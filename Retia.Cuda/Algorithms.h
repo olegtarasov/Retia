@@ -12,11 +12,11 @@
 #define CACHE2(t) thrust::get<3>(t)
 #define CACHEM(t) thrust::get<4>(t)
 
-struct ErrorPropagationFunctor : public thrust::binary_function<float, float, float>
+struct CrossEntropyPropagationFunctor : public thrust::binary_function<float, float, float>
 {
 	const int _batchSize;
 
-	ErrorPropagationFunctor(int batchSize)
+	CrossEntropyPropagationFunctor(int batchSize)
 		: _batchSize(batchSize)
 	{
 	}
@@ -97,20 +97,20 @@ class Algorithms
 {
 public:
 	template <class TMatrix>
-	static void PropagateError(TMatrix& output, TMatrix& target, TMatrix& result)
+	static void BackpropagateCrossEntropyError(TMatrix& output, TMatrix& target, TMatrix& result)
 	{
-		thrust::transform(output.begin(), output.end(), target.begin(), result.begin(), ErrorPropagationFunctor(target.columns()));
+		thrust::transform(output.begin(), output.end(), target.begin(), result.begin(), CrossEntropyPropagationFunctor(target.columns()));
 	}
 
 	template <class TMatrix> 
 	static double CrossEntropyError(TMatrix& output, TMatrix& target)
 	{
-		auto err = thrust::transform_reduce(
+		double err = thrust::transform_reduce(
 			thrust::make_zip_iterator(thrust::make_tuple(output.begin(), target.begin())),
 			thrust::make_zip_iterator(thrust::make_tuple(output.end(), target.end())),
-			CrossEntropyErrorFunctor(/*output.columns()*/),
-			0.0f,
-			thrust::plus<float>());
+			CrossEntropyErrorFunctor(),
+			0.0,
+			thrust::plus<double>());
 
 		return -err / (output.columns() * output.seqLength());
 	}

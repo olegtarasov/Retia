@@ -1,28 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
+using Retia.Interop;
 using Retia.Helpers;
 using Retia.Integration;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;
+using MatrixExtensions = Retia.Mathematics.MatrixExtensions;
 
 namespace Retia.Neural.Layers
 {
     public abstract class LayerBase<T> : ICloneable<LayerBase<T>>, IFileWritable where T : struct, IEquatable<T>, IFormattable
     {
+        protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
         private readonly List<NeuroWeight<T>> _weights = new List<NeuroWeight<T>>();
 
-        protected readonly MathProviderBase<T> MathProvider = MathProvider<T>.Instance;
-        protected int BatchSize;
-        protected int SeqLen;
+        protected int BatchSize, SeqLen;
 
-        public List<Matrix<T>> Inputs { get; set; } = new List<Matrix<T>>();
-        public List<Matrix<T>> Outputs { get; set; } = new List<Matrix<T>>();
-
+        protected IntPtr GpuLayerPtr = IntPtr.Zero;
+        
         protected LayerBase()
         {
         }
@@ -49,32 +48,37 @@ namespace Retia.Neural.Layers
             }
         }
 
-        public ErrorFunctionBase<T> ErrorFunction { get; set; }
-
         public abstract int InputSize { get; }
         public abstract int OutputSize { get; }
         public abstract int TotalParamCount { get; }
+
+        public ErrorFunctionBase<T> ErrorFunction { get; set; }
+
+        public List<Matrix<T>> Inputs { get; set; } = new List<Matrix<T>>();
+        public List<Matrix<T>> Outputs { get; set; } = new List<Matrix<T>>();
+
         public virtual IReadOnlyList<NeuroWeight<T>> Weights => _weights;
 
+        public abstract void ClampGrads(float limit);
         public abstract void ClearGradients();
         public abstract LayerBase<T> Clone();
+        public abstract IntPtr CreateGpuLayer();
 
-        public virtual void Save(Stream s)
-        {
-            using (var writer = s.NonGreedyWriter())
-            {
-                writer.Write(BatchSize);
-                writer.Write(SeqLen);
-                writer.Write(ErrorFunction != null);
 
-                if (ErrorFunction != null)
-                {
-                    writer.Write(ErrorFunction.GetType().FullName);
-                }
-            }
-        }
+        /// <summary>
+        /// Modifies layer state from a vector of doubles.
+        /// </summary>
+        public abstract void FromVectorState(T[] vector, ref int idx);
+
+        public abstract void InitSequence();
 
         public abstract void Optimize(OptimizerBase<T> optimizer);
+
+        public abstract void ResetMemory();
+        public abstract void ResetOptimizer();
+
+        public abstract void TransferWeightsToDevice();
+        public abstract void TransferWeightsToHost();
 
         /// <summary>
         ///     Forward layer step
@@ -84,22 +88,11 @@ namespace Retia.Neural.Layers
         /// <returns>Layer output</returns>
         public abstract Matrix<T> Step(Matrix<T> input, bool inTraining = false);
 
-        public abstract void ResetMemory();
-        public abstract void ResetOptimizer();
-        public abstract void InitSequence();
-        public abstract void ClampGrads(float limit);
-        public abstract LayerSpecBase CreateSpec();
-
         /// <summary>
         /// Converts layer state to a vector of doubles.
         /// </summary>
         /// <returns>Layer vector state.</returns>
         public abstract void ToVectorState(T[] destination, ref int idx, bool grad=false);
-
-        /// <summary>
-        /// Modifies layer state from a vector of doubles.
-        /// </summary>
-        public abstract void FromVectorState(T[] vector, ref int idx);
 
 
         /// <summary>
@@ -115,13 +108,17 @@ namespace Retia.Neural.Layers
         }
 
         /// <summary>
-        /// Registers layer weights to return from <see cref="Weights"/>.
+        ///     Calculates matched error (out-target) and propagates it through layer to inputs
         /// </summary>
-        /// <param name="weights">Weight collection.</param>
-        protected void RegisterWeights(params NeuroWeight<T>[] weights)
+        /// <param name="targets">Sequence of targets</param>
+        public virtual List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
         {
-            _weights.Clear();
-            _weights.AddRange(weights);
+            if (ErrorFunction == null)
+            {
+                throw new InvalidOperationException("Layer error function is not specified!");
+            }
+
+            return ErrorFunction.BackpropagateError(Outputs, targets);
         }
 
         /// <summary>
@@ -140,6 +137,21 @@ namespace Retia.Neural.Layers
             return ErrorFunction.GetError(y, target);
         }
 
+        public virtual void Save(Stream s)
+        {
+            using (var writer = s.NonGreedyWriter())
+            {
+                writer.Write(BatchSize);
+                writer.Write(SeqLen);
+                writer.Write(ErrorFunction != null);
+
+                if (ErrorFunction != null)
+                {
+                    writer.Write(ErrorFunction.GetType().FullName);
+                }
+            }
+        }
+
         public virtual void SetParam(int i, T value)
         {
             int refInd = 0;
@@ -150,25 +162,6 @@ namespace Retia.Neural.Layers
             FromVectorState(state, ref refInd);
         }
 
-        /// <summary>
-        ///     Calculates matched error (out-target) and propagates it through layer to inputs
-        /// </summary>
-        /// <param name="targets">Sequence of targets</param>
-        public virtual List<Matrix<T>> ErrorPropagate(List<Matrix<T>> targets)
-        {
-            if (ErrorFunction == null)
-            {
-                throw new InvalidOperationException("Layer error function is not specified!");
-            }
-
-            return ErrorFunction.BackpropagateError(Outputs, targets);
-        }
-
-        public void Save(string filename)
-        {
-            this.SaveObject(filename);
-        }
-
         public T GetParam(int i, bool grad = false)
         {
             int refInd=0;
@@ -177,8 +170,45 @@ namespace Retia.Neural.Layers
             return state[i];
         }
 
+        public void Save(string filename)
+        {
+            this.SaveObject(filename);
+        }
+
         protected virtual void Initialize()
         {
+        }
+
+        /// <summary>
+        /// Registers layer weights to return from <see cref="Weights"/>.
+        /// </summary>
+        /// <param name="weights">Weight collection.</param>
+        protected void RegisterWeights(params NeuroWeight<T>[] weights)
+        {
+            _weights.Clear();
+            _weights.AddRange(weights);
+        }
+
+        protected unsafe void TransferWeugthsToDevice(bool rowMajor, params NeuroWeight<T>[] weights)
+        {
+            using (var defs = new WeightDefinitionBag<T>(rowMajor, weights))
+            {
+                fixed (WeightDefinition* ptr = &defs.Definitions[0])
+                {
+                    GpuInterface.TransferLayerStatesToDevice(GpuLayerPtr, ptr, weights.Length);
+                }
+            }
+        }
+
+        protected unsafe void TransferWeigthsToHost(bool rowMajor, params NeuroWeight<T>[] weights)
+        {
+            using (var defs = new WeightDefinitionBag<T>(rowMajor, weights))
+            {
+                fixed (WeightDefinition* ptr = &defs.Definitions[0])
+                {
+                    GpuInterface.TransferLayerStatesToHost(GpuLayerPtr, ptr, weights.Length);
+                }
+            }
         }
 
         internal void Initialize(int batchSize, int seqLen)

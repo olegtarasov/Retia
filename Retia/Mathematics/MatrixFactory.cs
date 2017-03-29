@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
-using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
@@ -61,6 +59,8 @@ namespace Retia.Mathematics
         /// <param name="input">String to parse.</param>
         public static Matrix<T> ParseString<T>(string input) where T : struct, IEquatable<T>, IFormattable
         {
+            var mathProvider = MathProvider<T>.Instance;
+
             input = input.Replace(',', '.').Trim();
 
             var rows = input.Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -89,7 +89,7 @@ namespace Retia.Mathematics
 
                 for (int col = 0; col < cols.Length; col++)
                 {
-                    matrix[row, col] = (T)Convert.ChangeType(double.Parse(cols[col], NumberFormatInfo.InvariantInfo), typeof(T)); // Bubble up the format error
+                    matrix[row, col] = mathProvider.Scalar(double.Parse(cols[col], NumberFormatInfo.InvariantInfo)); // Bubble up the format error
                 }
             }
 

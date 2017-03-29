@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Integration;
-using Retia.Mathematics;
 
 namespace Retia.Training.Batching
 {

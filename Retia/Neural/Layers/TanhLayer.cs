@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Contracts;
 using Retia.Helpers;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
@@ -115,13 +111,23 @@ namespace Retia.Neural.Layers
         {
         }
 
-        public override LayerSpecBase CreateSpec()
+        public override void ClearGradients()
+        {
+        }
+
+        public override IntPtr CreateGpuLayer()
         {
             throw new NotSupportedException();
         }
 
-        public override void ClearGradients()
+        public override void TransferWeightsToDevice()
         {
+            throw new NotSupportedException();
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            throw new NotSupportedException();
         }
     }
 }

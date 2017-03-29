@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
-using Retia.Helpers;
 using Retia.Neural;
-using Retia.RandomGenerator;
 
 namespace Retia.Mathematics
 {
@@ -44,9 +42,9 @@ namespace Retia.Mathematics
         public abstract T[] Array(params float[] input);
 
         /// <summary>
-        /// Tests two values of T for equality with error margin of 10e-7.
+        /// Tests two values of T for equality with error margin of 1e-7.
         /// </summary>
-        protected abstract bool AlmostEqual(T a, T b);
+        public abstract bool AlmostEqual(T a, T b, float margin = 1e-7f);
 
         #endregion
 

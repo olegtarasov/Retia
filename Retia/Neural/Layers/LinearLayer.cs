@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Providers.LinearAlgebra;
-using Retia.Contracts;
+using Retia.Interop;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Neural.Initializers;
@@ -30,8 +31,8 @@ namespace Retia.Neural.Layers
 
         public LinearLayer(int xSize, int ySize, IMatrixInitializer<T> matrixInitializer)
         {
-            _weights = matrixInitializer.CreateMatrix(ySize, xSize);
-            _bias = matrixInitializer.CreateMatrix(ySize, 1);
+            _weights = new NeuroWeight<T>(matrixInitializer.CreateMatrix(ySize, xSize));
+            _bias = new NeuroWeight<T>(matrixInitializer.CreateMatrix(ySize, 1));
 
             ErrorFunction = new MeanSquareError<T>();
 
@@ -173,20 +174,27 @@ namespace Retia.Neural.Layers
             return inputSensList;
         }
 
-        public override LayerSpecBase CreateSpec()
-        {
-            if (typeof(T) != typeof(float))
-            {
-                throw new InvalidOperationException("Only float for GPU!");
-            }
-
-            return new LinearLayerSpec(_weights.Weight.ColumnCount, BatchSize, SeqLen, _weights.Weight.RowCount, _weights.Weight as Matrix<float>, _bias.Weight as Matrix<float>);
-        }
-
         public override void ClearGradients()
         {
             _weights.ClearGrad();
             _bias.ClearGrad();
+        }
+
+        public override IntPtr CreateGpuLayer()
+        {
+            GpuLayerPtr = GpuInterface.CreateLinearLayer(_weights.Weight.ColumnCount, _weights.Weight.RowCount, BatchSize, SeqLen);
+            TransferWeightsToDevice();
+            return GpuLayerPtr;
+        }
+
+        public override void TransferWeightsToDevice()
+        {
+            TransferWeugthsToDevice(false, _weights, _bias);
+        }
+
+        public override void TransferWeightsToHost()
+        {
+            TransferWeigthsToHost(false, _weights, _bias);
         }
     }
 }

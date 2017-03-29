@@ -1,7 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
-using Retia.Contracts;
-using Retia.Mathematics;
 using Retia.Neural;
 
 namespace Retia.Optimizers
@@ -27,7 +24,7 @@ namespace Retia.Optimizers
             return new AdagradOptimizer<T>(this);
         }
 
-        public override OptimizerSpecBase CreateSpec()
+        public override IntPtr CreateGpuOptimizer()
         {
             throw new NotSupportedException();
         }

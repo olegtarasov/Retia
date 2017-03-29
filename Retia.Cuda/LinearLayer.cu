@@ -6,30 +6,30 @@
 using std::cout;
 using std::endl;
 
-LinearLayer::LinearLayer(int inSize, int outSize, int batchSize, int seqLength): NeuroLayer(inSize, outSize, batchSize, seqLength)
+LinearLayer::LinearLayer(int inSize, int outSize, int batchSize, int seqLength): LayerBase(inSize, outSize, batchSize, seqLength)
 {
-	_w = std::make_unique<NeuroWeigth>(outSize, inSize);
-	_b = std::make_unique<NeuroWeigth>(outSize, 1, 1);
+	_w = std::make_unique<NeuroWeight>(outSize, inSize);
+	_b = std::make_unique<NeuroWeight>(outSize, 1, 1);
 
 	_output = std::make_unique<DeviceMatrix>(outSize, batchSize, seqLength);
 	_sensitivity = std::make_unique<DeviceMatrix>(inSize, batchSize, seqLength);
 	_identity = std::make_unique<DeviceMatrix>(batchSize, 1, 1);
 }
 
-void LinearLayer::TransferStatesFromHost(std::vector<RawMatrixPtr*>& states)
+void LinearLayer::TransferStatesToDevice(std::vector<WeightSyncContainer*>& states)
 {
 	if (states.size() != 2) throw RetiaException("State vector should have the length of exactly 2");
 
-	_w->weight().CopyFrom(*states[0]);
-	_b->weight().CopyFrom(*states[1]);
+	_w->TransferStateToDevice(*states[0]);
+	_b->TransferStateToDevice(*states[1]);
 }
 
-void LinearLayer::TransferStatesToHost(std::vector<RawMatrixPtr*>& states)
+void LinearLayer::TransferStatesToHost(std::vector<WeightSyncContainer*>& states)
 {
 	if (states.size() != 2) throw RetiaException("State vector should have the length of exactly 2");
 
-	_w->weight().CopyTo(*states[0]);
-	_b->weight().CopyTo(*states[1]);
+	_w->TransferStateToHost(*states[0]);
+	_b->TransferStateToHost(*states[1]);
 }
 
 void LinearLayer::ForwardSequence(DeviceMatrix& input)

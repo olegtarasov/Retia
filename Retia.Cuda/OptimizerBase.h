@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "NeuroWeigth.h"
+#include "NeuroWeight.h"
 
 class OptimizerBase
 {
@@ -18,12 +18,12 @@ public:
 		return _learningRate;
 	}
 
-	void set_learningRate(float learningRate)
+	void setLearningRate(float learningRate)
 	{
 		_learningRate = learningRate;
 	}
 
-	virtual void Optimize(NeuroWeigth& weigth) = 0;
+	virtual void Optimize(NeuroWeight& weigth) = 0;
 
 protected:
 	float	_learningRate;

@@ -6,7 +6,7 @@
 
 using namespace thrust;
 
-void RMSPropOptimizer::Optimize(NeuroWeigth& weigth)
+void RMSPropOptimizer::Optimize(NeuroWeight& weigth)
 {
 	Algorithms::RMSPropOptimize(weigth.weight(), weigth.gradient(), weigth.cache1(), weigth.cache2(), weigth.cache_m(), _learningRate, _decayRate, _momentum, _weightDecay);
 }

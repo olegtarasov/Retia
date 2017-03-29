@@ -5,13 +5,12 @@
 #include "Matrix.h"
 #include "OptimizerBase.h"
 #include "Exceptions.h"
-#include "RawMatrixPtr.h"
 
-class NeuroLayer
+class LayerBase
 {
 public:
 
-	NeuroLayer(int inSize, int outSize, int batchSize, int seqLen)
+	LayerBase(int inSize, int outSize, int batchSize, int seqLen)
 		: _inputSize(inSize),
 		  _outputSize(outSize),
 		  _batchSize(batchSize), 
@@ -19,7 +18,7 @@ public:
 	{
 	}
 
-	virtual ~NeuroLayer() = default;
+	virtual ~LayerBase() = default;
 
 
 	int inputSize() const
@@ -42,13 +41,8 @@ public:
 		return _seqLen;
 	}
 
-	void TransferOutputToHost(RawMatrixPtr* output) const
-	{
-		_output->CopyTo(*output);
-	}
-
-	virtual void TransferStatesFromHost(std::vector<RawMatrixPtr*>& states) = 0;
-	virtual void TransferStatesToHost(std::vector<RawMatrixPtr*>& states) = 0;
+	virtual void TransferStatesToDevice(std::vector<WeightSyncContainer*>& states) = 0;
+	virtual void TransferStatesToHost(std::vector<WeightSyncContainer*>& states) = 0;
 	virtual void ForwardSequence(DeviceMatrix& input) = 0;
 	virtual void BackpropSequence(DeviceMatrix& input, DeviceMatrix& outSens) = 0;
 	virtual void Optimize(OptimizerBase& optimizer) = 0;

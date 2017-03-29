@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Retia.Mathematics;
 using Retia.Neural;
-using Retia.Neural.Layers;
 using Retia.Training.Data;
 
 namespace Retia.Training.Testers

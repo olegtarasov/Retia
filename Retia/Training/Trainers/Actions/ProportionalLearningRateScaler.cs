@@ -1,5 +1,4 @@
-﻿using Retia.Optimizers;
-using Retia.Training.Trainers.Sessions;
+﻿using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Training.Trainers.Actions
 {
