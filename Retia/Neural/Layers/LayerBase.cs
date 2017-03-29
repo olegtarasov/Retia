@@ -189,7 +189,7 @@ namespace Retia.Neural.Layers
             _weights.AddRange(weights);
         }
 
-        protected unsafe void TransferWeugthsToDevice(bool rowMajor, params NeuroWeight<T>[] weights)
+        protected unsafe void TransferWeigthsToDevice(bool rowMajor, params NeuroWeight<T>[] weights)
         {
             using (var defs = new WeightDefinitionBag<T>(rowMajor, weights))
             {

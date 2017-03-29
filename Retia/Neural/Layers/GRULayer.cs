@@ -446,8 +446,21 @@ namespace Retia.Neural.Layers
 
         private void RegisterWeights()
         {
-            RegisterWeights(_bxr, _bxz, _bxh, _bhr, _bhz, _bhh,
-                _wxr, _wxz, _wxh, _whr, _whz, _whh);
+            RegisterWeights(_wxr,
+                _wxz,
+                _wxh,
+
+                _whr,
+                _whz,
+                _whh,
+
+                _bxr,
+                _bxz,
+                _bxh,
+
+                _bhr,
+                _bhz,
+                _bhh);
         }
 
         public override void ClearGradients()
@@ -479,7 +492,7 @@ namespace Retia.Neural.Layers
 
         public override void TransferWeightsToDevice()
         {
-            TransferWeugthsToDevice(true, // CuDNN weight matrices are row-major
+            TransferWeigthsToDevice(true, // CuDNN weight matrices are row-major
                 _wxr,
                 _wxz,
                 _wxh,
