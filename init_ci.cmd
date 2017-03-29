@@ -1,9 +1,9 @@
 @echo off
 echo Downloading CUDA toolkit 8
-rem appveyor DownloadFile  https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_windows-exe -FileName cuda_8.0.44_windows.exe
-appveyor DownloadFile  https://www.dropbox.com/s/ll2ay531hw3i1p7/cuda.zip?dl=1
-7z x cuda.zip -ocuda
-cd cuda
+appveyor DownloadFile  https://developer.nvidia.com/compute/cuda/8.0/Prod2/network_installers/cuda_8.0.61_win10_network-exe -FileName setup.exe
+rem appveyor DownloadFile  https://www.dropbox.com/s/ll2ay531hw3i1p7/cuda.zip?dl=1
+rem 7z x cuda.zip -ocuda
+rem cd cuda
 echo Installing CUDA toolkit 8
 setup.exe -s compiler_8.0 ^
                            cublas_8.0 ^
