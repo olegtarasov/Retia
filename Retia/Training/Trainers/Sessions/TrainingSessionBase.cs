@@ -72,7 +72,7 @@ namespace Retia.Training.Trainers.Sessions
                 string dir = Path.GetDirectoryName(sourcePath);
                 string name = Path.GetFileNameWithoutExtension(fileName);
                 string ext = Path.GetExtension(fileName);
-                string fullPath = Path.Combine(dir, $"{name}_{DateTime.Now:dd.MM.yy_HH.mm.ss}{ext}");
+                string fullPath = Path.Combine(dir, $"{name}_e{Epoch}i{Iteration}{ext}");
 
                 if (!Directory.Exists(dir))
                 {
@@ -82,7 +82,7 @@ namespace Retia.Training.Trainers.Sessions
                 if (File.Exists(fullPath))
                 {
                     var files = Directory.GetFiles(dir, $"{name}*");
-                    fullPath = Path.Combine(dir, $"{name}_{DateTime.Now:dd.MM.yy_HH.mm.ss}_{files.Length}{ext}");
+                    fullPath = Path.Combine(dir, $"{name}_e{Epoch}i{Iteration}_{files.Length}{ext}");
                 }
 
                 using (var stream = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
