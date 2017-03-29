@@ -17,6 +17,9 @@ echo "Failed to install CUDA"
 exit /B 1
 )
 
+echo "Installing VS 2017 integration"
+copy _vs\*.* "c:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\BuildCustomizations"
+
 cd ..
                            
 echo Downloading cuDNN
