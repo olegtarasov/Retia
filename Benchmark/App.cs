@@ -50,62 +50,7 @@ namespace Benchmark
 
         private unsafe void TestLayerForward(LayerBase<float> layer, TestDataSet<float> dataSet, int? outSize = null)
         {
-            layer.Initialize(dataSet.BatchSize, dataSet.SampleCount);
-            var gpuLayer = layer.CreateGpuLayer();
-
-            int finalOutSize = outSize.GetValueOrDefault(dataSet.TargetSize);
             
-            for (int i = 0; i < 3; i++)
-            {
-                var seq = dataSet.GetNextSamples(dataSet.SampleCount);
-                var cpuOut = new List<Matrix<float>>();
-                layer.InitSequence();
-                foreach (var input in seq.Inputs)
-                {
-                    cpuOut.Add(layer.Step(input));
-                }
-
-                var gpuOut = Enumerable.Range(0, dataSet.SampleCount).Select(x => Matrix<float>.Build.Dense(finalOutSize, dataSet.BatchSize)).ToArray();
-                using (var inPtrs = new MatrixPointersBag<float>(true, seq.Inputs.ToArray()))
-                using (var outPtrs = new MatrixPointersBag<float>(true, gpuOut))
-                {
-                    fixed (MatrixDefinition* inDef = &inPtrs.Definitions[0], outDef = &outPtrs.Definitions[0])
-                    {
-                        GpuInterface.LayerForwardSequence(gpuLayer, inDef, seq.Inputs.Count);
-                        GpuInterface.TransferLayerOutputsToHost(gpuLayer, outDef, gpuOut.Length);
-                    }
-                }
-
-                //Console.WriteLine("CPU output:");
-                //foreach (var matrix in cpuOut)
-                //{
-                //    Console.WriteLine(matrix.ToMatrixString());
-                //    Console.WriteLine("---------------");
-                //}
-
-                //Console.WriteLine("GPU output:");
-                //foreach (var matrix in gpuOut)
-                //{
-                //    Console.WriteLine(matrix.ToMatrixString());
-                //    Console.WriteLine("---------------");
-                //}
-
-                //Console.WriteLine("================================");
-
-                for (int j = 0; j < dataSet.SampleCount; j++)
-                {
-                    var cpuArr = cpuOut[j].AsColumnMajorArray();
-                    var gpuArr = gpuOut[j].AsColumnMajorArray();
-
-                    for (int k = 0; k < cpuArr.Length; k++)
-                    {
-                        if (Math.Abs(cpuArr[k] - gpuArr[k]) > 1e-4f)
-                        {
-                            Console.WriteLine($"FAILED on iteration {i}");
-                        }
-                    }
-                }
-            }
         }
 #endif
     }
