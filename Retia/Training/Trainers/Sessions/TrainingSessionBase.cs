@@ -49,6 +49,7 @@ namespace Retia.Training.Trainers.Sessions
 
         public string Name { get; private set; }
         public int Iteration { get; set; }
+        public int IterationsPerEpoch { get; set; }
         public int Epoch { get; set; }
 
         public void AddFileToReport(string fileName, string content)

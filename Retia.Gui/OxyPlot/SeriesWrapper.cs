@@ -16,7 +16,7 @@ namespace Retia.Gui.OxyPlot
 
     public class SeriesWrapper<TSeries, TSeriesPoint, TSourcePoint> : SeriesWrapperBase where TSeries : XYAxisSeries
     {
-        private readonly List<TSeriesPoint> _points;
+        private List<TSeriesPoint> _points;
         private readonly Func<TSeriesPoint, PointWrapper> _pointWrapperFunc;
         private readonly Func<TSourcePoint, TSeriesPoint> _sourceToSeriesFunc;
 
@@ -84,6 +84,16 @@ namespace Retia.Gui.OxyPlot
         public void ClearPoints()
         {
             _points.Clear();
+        }
+
+        public void DecimatePoints(int decimator)
+        {
+            for (int i = _points.Count - 1; i >= 0; i -= decimator)
+            {
+                _points.RemoveAt(i);
+            }
+
+            _curIdx /= 10;
         }
 
         private void GotoX(double x)

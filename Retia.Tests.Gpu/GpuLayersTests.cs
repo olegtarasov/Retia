@@ -59,7 +59,7 @@ namespace Retia.Tests.Gpu
 
             int finalOutSize = outSize.GetValueOrDefault(dataSet.TargetSize);
 
-            for (int step = 0; step < 3; step++)
+            for (int step = 0; step < 3; step++) // Making 3 runs
             {
                 var seq = dataSet.GetNextSamples(dataSet.SampleCount);
                 var cpuOut = new List<Matrix<float>>();

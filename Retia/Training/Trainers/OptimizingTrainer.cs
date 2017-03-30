@@ -143,6 +143,8 @@ namespace Retia.Training.Trainers
             _mav = Options.ErrorFilterSize > 0 ? new MAV(Options.ErrorFilterSize) : null;
             _lastError = 0;
 
+            Session.IterationsPerEpoch = TrainingSet.SampleCount / Options.SequenceLength;
+
             Options.ProgressWriter?.Message($"Sequence length: {Options.SequenceLength}");
             Options.ProgressWriter?.Message($"Using network with total param count {_network.TotalParamCount}");
         }
