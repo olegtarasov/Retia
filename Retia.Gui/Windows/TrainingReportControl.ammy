@@ -13,14 +13,14 @@ UserControl "Retia.Gui.Windows.TrainingReportControl" {
 			@LabeledText("Epoch:", bind Report.Epoch) {}
 		}
 
-		@LabeledControl("Plot range (iters):") {
+		@LabeledControl("Plot resolution:") {
 			DockPanel.Dock: Bottom
 
 			TextBox { 
 				#VCenter
 				Margin: 4
 				Width: 40
-				Text: bind PlotRange
+				Text: bind PlotResolution
 			}
 		}
 

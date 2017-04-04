@@ -189,7 +189,7 @@ namespace Retia.Neural.Layers
 
         public override void TransferWeightsToDevice()
         {
-            TransferWeugthsToDevice(false, _weights, _bias);
+            TransferWeigthsToDevice(false, _weights, _bias);
         }
 
         public override void TransferWeightsToHost()

@@ -36,4 +36,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: InternalsVisibleTo("Retia.Tests")]
+[assembly: InternalsVisibleTo("Retia.Tests.Gpu")]
 [assembly: InternalsVisibleTo("Benchmark")]

@@ -35,10 +35,10 @@
       </StackPanel>
     </WrapPanel>
     <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
-      <Label Margin="4" Content="Plot range (iters):"/>
+      <Label Margin="4" Content="Plot resolution:"/>
       <TextBox VerticalAlignment="Center" Margin="4" Width="40">
         <TextBox.Text>
-          <Binding Path="PlotRange"/>
+          <Binding Path="PlotResolution"/>
         </TextBox.Text>
       </TextBox>
     </StackPanel>

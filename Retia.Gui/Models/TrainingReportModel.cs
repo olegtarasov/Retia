@@ -4,6 +4,7 @@ using OxyPlot;
 using PropertyChanged;
 using Retia.Gui.OxyPlot;
 using Retia.Training.Trainers;
+using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Gui.Models
 {
@@ -12,6 +13,14 @@ namespace Retia.Gui.Models
     {
         private readonly LineSeriesWrapper<DataPoint> _errorSeries;
         private readonly LineSeriesWrapper<DataPoint> _testErrorSeries;
+
+        private int _errDecCnt = 0;
+        private long _errIdx = 0;
+        private long _errDecimator = 0;
+
+        private int _testDecCnt = 0;
+        private long _testIdx = 0;
+        private long _testDecimator = 0;
 
         public TrainingReportModel()
         {
@@ -39,44 +48,59 @@ namespace Retia.Gui.Models
 
         public OptimizationReportEventArgs Report { get; set; }
 
-        public int PlotRange { get; set; } = 10000;
+        public int PlotResolution { get; set; } = 1000;
 
-        internal void AddTestError(double error)
+        internal void AddTestError(TrainingSessionBase session, double error)
         {
-            _testErrorSeries.AddPoint(new DataPoint(_errorSeries.SeriesPoints.Count, error));
+            int iters = session.Epoch * session.IterationsPerEpoch;
+
+            if (_testDecimator == 0 || _testIdx >= _testDecimator)
+            {
+                _testIdx = 0;
+                _testErrorSeries.AddPoint(new DataPoint(iters + session.Iteration, error));
+            }
+            else
+            {
+                _testIdx++;
+            }
+
+            if (_testErrorSeries.SeriesPoints.Count >= PlotResolution)
+            {
+                _testErrorSeries.DecimatePoints(2);
+                _testDecCnt++;
+                _testDecimator = _testDecCnt * 2;
+                _testIdx = 0;
+            }
+
+
             PlotModel.InvalidatePlot(true);
         }
 
         internal void UpdateReport(OptimizationReportEventArgs report)
         {
             Report = report;
-            foreach (var error in report.Errors)
+            int iters = report.Session.Epoch * report.Session.IterationsPerEpoch;
+            for (int i = 0; i < report.Errors.Count; i++, _errIdx++)
             {
-                _errorSeries.AddPoint(new DataPoint(_errorSeries.SeriesPoints.Count, error.FilteredError));
+                if (_errDecimator == 0 || _errIdx >= _errDecimator)
+                {
+                    _errIdx = 0;
+                    _errorSeries.AddPoint(new DataPoint(iters + report.Session.Iteration - report.Errors.Count + i, report.Errors[i].FilteredError));
+                }
             }
 
-            if (PlotRange == 0 || _errorSeries.SeriesPoints.Count < PlotRange)
+            if (_errorSeries.SeriesPoints.Count >= PlotResolution)
             {
-                PlotModel.ZoomX();
-            }
-            else
-            {
-                PlotModel.XAxis.Zoom(_errorSeries.SeriesPoints.Count - PlotRange, _errorSeries.SeriesPoints.Count);
+                _errorSeries.DecimatePoints(2);
+                _errDecCnt++;
+                _errDecimator = _errDecCnt * 2;
+                _errIdx = 0;
             }
 
+            PlotModel.ZoomX();
             PlotModel.ZoomY();
-            
+
             PlotModel.InvalidatePlot(true);
         }
-
-        //internal void AddMessage(string message)
-        //{
-        //    const int maxBuffer = 1024 * 100;
-        //    if (Message.Length >= maxBuffer)
-        //    {
-        //        Message = string.Empty;
-        //    }
-        //    Message += message + Environment.NewLine;
-        //}
     }
 }

@@ -20,6 +20,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\$(Platform)\Release\</OutputPath>
@@ -29,6 +30,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug [CPUOnly]|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -79,6 +81,7 @@
   <ItemGroup>
     <Compile Include="GpuAlgorithmsTests.cs" />
     <Compile Include="Dummy.cs" />
+    <Compile Include="GpuLayersTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="GpuTransferTests.cs" />
   </ItemGroup>
