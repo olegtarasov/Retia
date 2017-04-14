@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Retia.Tests</RootNamespace>
     <AssemblyName>Retia.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -31,9 +32,20 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MathNet.Numerics, Version=3.17.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="MathNet.Numerics, Version=3.18.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.18.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraphPCL.3.6.61114.2\lib\net40-client\QuickGraph.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Data, Version=3.6.61114.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraphPCL.3.6.61114.2\lib\net40-client\QuickGraph.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Graphviz, Version=3.6.61114.0, Culture=neutral, PublicKeyToken=f3fb40175eec2af3, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraphPCL.3.6.61114.2\lib\net40-client\QuickGraph.Graphviz.dll</HintPath>
+    </Reference>
+    <Reference Include="QuickGraph.Serialization, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\QuickGraphPCL.3.6.61114.2\lib\net40-client\QuickGraph.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -66,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analytical\AnTests.cs" />
     <Compile Include="Genetic\GeneticTestsBase.cs" />
     <Compile Include="Genetic\Selectors\UniformDistributionSelectorTests.cs" />
     <Compile Include="Interop\TransferTests.cs" />
@@ -92,6 +105,10 @@
     <Compile Include="Training\LinearDataSetTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Retia.Analytical\Retia.Analytical.csproj">
+      <Project>{364510f0-12ee-4f76-99fb-b9d028907914}</Project>
+      <Name>Retia.Analytical</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Retia.Genetic\Retia.Genetic.csproj">
       <Project>{6b721697-aaae-465c-916f-17f7f06e78d3}</Project>
       <Name>Retia.Genetic</Name>
@@ -99,6 +116,10 @@
     <ProjectReference Include="..\Retia\Retia.csproj">
       <Project>{80608848-F915-434C-A22C-62A2BB9DE046}</Project>
       <Name>Retia</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StringToExpression\src\StringToExpression\StringToExpression.csproj">
+      <Project>{b1b0a26f-04e2-40e5-b25c-12764e50befc}</Project>
+      <Name>StringToExpression</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -108,7 +129,6 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
