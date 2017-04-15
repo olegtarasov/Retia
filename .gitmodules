@@ -2,6 +2,3 @@
 	path = oxyplot
 	url = https://github.com/total-world-domination/oxyplot.git
 	branch = develop
-[submodule "StringToExpression"]
-	path = StringToExpression
-	url = https://github.com/total-world-domination/StringToExpression.git

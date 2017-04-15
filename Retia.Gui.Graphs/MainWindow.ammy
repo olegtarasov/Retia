@@ -1,0 +1,31 @@
+﻿using Retia.Gui.Graphs;
+using Retia.Analytical;
+
+Window "Retia.Gui.Graphs.MainWindow" {
+	Loaded: Window_OnLoaded
+
+	Resources: [
+		DataTemplate {
+			DataType: Expr
+
+			TextBlock { 
+				Text: bind
+						convert (Expr vertex) => "[" + vertex.Type + "]" + vertex.Name
+			}
+		}
+	]
+
+	Grid {
+		ScrollViewer { 
+			VerticalScrollBarVisibility: Visible
+			HorizontalScrollBarVisibility: Visible
+
+			GLayout {
+				Graph: bind Graph
+				LayoutAlgorithmType: "LinLog"
+				OverlapRemovalAlgorithmType: "FSA"
+				HighlightAlgorithmType: "Simple"
+			}
+		}
+	}
+}

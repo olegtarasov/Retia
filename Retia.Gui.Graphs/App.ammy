@@ -1,0 +1,3 @@
+﻿Application "Retia.Gui.Graphs.App" {
+  StartupUri: "MainWindow.g.xaml"
+}
