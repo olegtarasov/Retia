@@ -49,7 +49,7 @@ namespace Retia.Gui.Graphs
             DataContext = new Model
                           {
                               //Graph = der
-                              Graph = Analyzer.Analyze(h.Graph)
+                              Graph = Analyzer.Stack(lin.Graph)
                           };
         }
     }

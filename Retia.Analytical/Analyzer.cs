@@ -8,6 +8,133 @@ namespace Retia.Analytical
 {
     public class Analyzer
     {
+        private struct StackedEdge
+        {
+            public readonly Expr DerTarget;
+            public readonly Edge<Expr> Edge;
+
+            public StackedEdge(Expr derTarget, Edge<Expr> edge)
+            {
+                DerTarget = derTarget;
+                Edge = edge;
+            }
+        }
+
+        public static ExprGraph Stack(ExprGraph graph)
+        {
+            var result = new ExprGraph();
+            var srcToDerMap = new Dictionary<Expr, Expr>();
+            var srcSplitMap = new Dictionary<Expr, Expr>();
+            var stateMap = new Dictionary<Expr, Expr>();
+            var stack = new Stack<StackedEdge>();
+            int stateCnt = 0;
+
+            void StackEdges(Expr source, Expr derTarget)
+            {
+                foreach (var edge in graph.OutEdges(source))
+                {
+                    stack.Push(new StackedEdge(derTarget, edge));
+                }
+            }
+
+            (Expr derivative, Expr target) ProcessSourceVertex(Expr source, Edge<Expr> srcEdge)
+            {
+                Expr split = null;
+                Expr der = null;
+
+                if (!srcToDerMap.TryGetValue(source, out der))
+                {
+                    der = GetDerivative(source);
+
+                    if (der != null)
+                    {
+                        result.AddVertex(der);
+                    }
+
+                    var srcOut = graph.OutEdges(source).ToArray();
+                    if (srcOut.Length > 1)
+                    {
+                        split = ProcessSourceSplit(source);
+                        if (der != null)
+                        {
+                            result.AddEdge(new Edge<Expr>(split, der));
+                        }
+                        else
+                        {
+                            der = split;
+                        }
+                    }
+
+                    if (source.IsMul)
+                    {
+                        ProcessSourceMul(srcEdge, der);
+                    }
+                    else
+                    {
+                        srcToDerMap[source] = split ?? der;
+                    }
+                }
+
+                return (der, split ?? der);
+            }
+
+            Expr ProcessSourceSplit(Expr source)
+            {
+                if (!srcSplitMap.TryGetValue(source, out var splitSum))
+                {
+                    splitSum = new Expr(null, ExprType.Add);
+                    srcSplitMap[source] = splitSum;
+                    result.AddVertex(splitSum);
+                }
+
+                return splitSum;
+            }
+
+            void ProcessSourceMul(Edge<Expr> srcEdge, Expr der)
+            {
+                var source = srcEdge.Target;
+
+                if (srcEdge == null)
+                    throw new InvalidOperationException("Source multiplication edge is null!");
+
+                var inEdges = graph.InEdges(source).ToArray();
+                if (inEdges.Length != 2)
+                    throw new InvalidOperationException("Source multiplication has more than 2 in edges!");
+
+                var adj = inEdges.Select(x => x.Source).FirstOrDefault(x => x != srcEdge.Source);
+                if (adj == null)
+                    throw new InvalidOperationException("Couldn't get adjacent multilication argument!");
+
+                if (!stateMap.TryGetValue(adj, out var state))
+                {
+                    state = new Expr(adj.Name ?? $"State {stateCnt++}", ExprType.State);
+                    stateMap[adj] = state;
+                    result.AddVertex(state);
+                }
+
+                result.AddEdge(new Edge<Expr>(state, der));
+            }
+
+            var roots = graph.Roots().ToArray();
+
+            foreach (var root in roots)
+            {
+                StackEdges(root, ProcessSourceVertex(root, null).target);
+            }
+
+            while (stack.Count > 0)
+            {
+                var edge = stack.Pop();
+                var der = ProcessSourceVertex(edge.Edge.Target, edge.Edge);
+
+                result.AddEdge(new Edge<Expr>(der.derivative, edge.DerTarget));
+                if (!srcToDerMap.ContainsKey(edge.Edge.Target))
+                    StackEdges(edge.Edge.Target, der.target);
+            }
+
+            return result;
+        }
+
         public static ExprGraph Analyze(ExprGraph graph)
         {
             var result = new ExprGraph();

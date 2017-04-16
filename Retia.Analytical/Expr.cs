@@ -58,6 +58,7 @@ namespace Retia.Analytical
         public string Name { get; set; }
         public ExprType Type { get; set; }
         public ExprGraph Graph => _graph;
+        public bool IsMul => Type == ExprType.Mul || Type == ExprType.Hadamard;
 
         public void Output(string name)
         {
