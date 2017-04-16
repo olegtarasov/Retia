@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using System;
+using System.Linq;
 using QuickGraph;
 using QuickGraph.Algorithms;
-using Graph = QuickGraph.BidirectionalGraph<Retia.Analytical.Expr, QuickGraph.Edge<Retia.Analytical.Expr>>;
+using Graph = Retia.Analytical.ExprGraph;
 
 namespace Retia.Analytical
 {
@@ -11,12 +11,21 @@ namespace Retia.Analytical
         Input,
         Output,
         Weight,
+        State,
+        PrevState,
         Add,
         Sub,
         Mul,
         Hadamard,
         Func,
-        One
+        One,
+
+        // Derivatives
+        Derivative,
+        InputSens,
+        WeightGradient,
+        StateSens,
+        NextState
     }
 
     public class Expr
@@ -48,13 +57,20 @@ namespace Retia.Analytical
 
         public string Name { get; set; }
         public ExprType Type { get; set; }
-        public IBidirectionalGraph<Expr, Edge<Expr>> Graph => _graph;
+        public ExprGraph Graph => _graph;
 
         public void Output(string name)
         {
             var output = new Expr(name, ExprType.Output);
             _graph.AddVertex(output);
             _graph.AddEdge(new Edge<Expr>(this, output));
+        }
+
+        public void State(string name)
+        {
+            var state = new Expr(name, ExprType.State);
+            _graph.AddVertex(state);
+            _graph.AddEdge(new Edge<Expr>(this, state));
         }
 
         public static Expr Input(string name)
@@ -74,7 +90,10 @@ namespace Retia.Analytical
 
         public static Expr operator -(Expr left, Expr right)
         {
-            return new Expr(left, right, ExprType.Sub);
+            if (left.Type != ExprType.One)
+                throw new InvalidOperationException("Subtraction is allowed only for 1 - x");
+
+            return Func("OneSub", right);
         }
 
         public static Expr operator *(Expr left, Expr right)
@@ -107,6 +126,11 @@ namespace Retia.Analytical
             return new Expr(null, ExprType.One);
         }
 
+        public static Expr PrevState(string name)
+        {
+            return new Expr(name, ExprType.PrevState);
+        }
+
         private Graph ConcatGraphs(params Graph[] graphs)
         {
             var result = new Graph();
@@ -123,6 +147,11 @@ namespace Retia.Analytical
             }
 
             return result;
+        }
+
+        public override string ToString()
+        {
+            return $"[{Type}]{Name}";
         }
     }
 }

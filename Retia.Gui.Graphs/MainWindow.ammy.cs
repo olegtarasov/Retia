@@ -41,11 +41,15 @@ namespace Retia.Gui.Graphs
             var h = ((One() - z) ^ hCan) + (z ^ hp);
 
             h.Output("y");
-            h.Output("h");
+            h.State("h");
+
+            var lin = Weight("W") * Input("x") + Weight("b");
+            lin.Output("y");
 
             DataContext = new Model
                           {
-                              Graph = h.Graph
+                              //Graph = der
+                              Graph = Analyzer.Analyze(h.Graph)
                           };
         }
     }

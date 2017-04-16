@@ -5,12 +5,12 @@ using Retia.Analytical;
 
 namespace Retia.Gui.Graphs
 {
-    public class GLayout : GraphLayout<Expr, Edge<Expr>, IBidirectionalGraph<Expr, Edge<Expr>>>
+    public class GLayout : GraphLayout<Expr, Edge<Expr>, ExprGraph>
     { }
 
     [ImplementPropertyChanged]
     public class Model
     {
-        public IBidirectionalGraph<Expr, Edge<Expr>> Graph { get; set; }
+        public ExprGraph Graph { get; set; }
     }
 }
