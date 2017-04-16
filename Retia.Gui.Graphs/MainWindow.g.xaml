@@ -13,12 +13,24 @@
     <ToolBar DockPanel.Dock="Top">
       <Button Click="BtnModel_OnClick">Forward</Button>
       <Button Click="BtnDer_OnClick">Backward</Button>
+      <Button Click="BtnRelayout_OnClick">Looks like shit</Button>
+      <ComboBox>
+        <ComboBox.ItemsSource>
+          <Binding Path="Layouts"/>
+        </ComboBox.ItemsSource>
+        <ComboBox.SelectedItem>
+          <Binding Path="CurLayout"/>
+        </ComboBox.SelectedItem>
+      </ComboBox>
     </ToolBar>
     <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
-      <ns1:GLayout LayoutAlgorithmType="LinLog" OverlapRemovalAlgorithmType="FSA" HighlightAlgorithmType="Simple" IsAnimationEnabled="False">
+      <ns1:GLayout x:Name="graph" OverlapRemovalAlgorithmType="FSA" HighlightAlgorithmType="Simple" IsAnimationEnabled="False">
         <ns1:GLayout.Graph>
           <Binding Path="Graph"/>
         </ns1:GLayout.Graph>
+        <ns1:GLayout.LayoutAlgorithmType>
+          <Binding Path="CurLayout"/>
+        </ns1:GLayout.LayoutAlgorithmType>
       </ns1:GLayout>
     </ScrollViewer>
   </DockPanel>

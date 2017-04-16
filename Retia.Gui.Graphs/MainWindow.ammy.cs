@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using GraphSharp.Algorithms.Layout.Simple.FDP;
+using GraphSharp.Algorithms.Layout.Simple.Hierarchical;
 using Retia.Analytical;
 
 using static Retia.Analytical.Expr;
@@ -38,10 +40,21 @@ namespace Retia.Gui.Graphs
             //test.Output("y");
             //_model = test;
 
+            //graph.LayoutParameters = new EfficientSugiyamaLayoutParameters
+            //                         {
+            //                             //EdgeRouting = SugiyamaEdgeRoutings.Orthogonal,
+            //                             //LayerDistance = 30,
+            //                             //VertexDistance = 30
+            //                         };
             DataContext = new Model
                           {
                               Graph = _model.Graph
                           };
+        }
+
+        private void BtnRelayout_OnClick(object sender, RoutedEventArgs e)
+        {
+            graph.Relayout();
         }
 
         private void BtnModel_OnClick(object sender, RoutedEventArgs e)

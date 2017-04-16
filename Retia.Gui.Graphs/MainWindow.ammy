@@ -30,14 +30,25 @@ Window "Retia.Gui.Graphs.MainWindow" {
 
 				Click: BtnDer_OnClick
 			}
+
+			Button { 
+				"Looks like shit"
+
+				Click: BtnRelayout_OnClick
+			}
+
+			ComboBox { 
+				ItemsSource: bind Layouts
+				SelectedItem: bind CurLayout
+			}
 		}
 		ScrollViewer { 
 			VerticalScrollBarVisibility: Visible
 			HorizontalScrollBarVisibility: Visible
 
-			GLayout {
+			GLayout "graph" {
 				Graph: bind Graph
-				LayoutAlgorithmType: "LinLog"
+				LayoutAlgorithmType: bind CurLayout
 				OverlapRemovalAlgorithmType: "FSA"
 				HighlightAlgorithmType: "Simple"
 				IsAnimationEnabled: false
