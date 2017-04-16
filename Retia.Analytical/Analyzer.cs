@@ -37,13 +37,15 @@ namespace Retia.Analytical
                 }
             }
 
-            (Expr derivative, Expr target) ProcessSourceVertex(Expr source, Edge<Expr> srcEdge)
+            (Expr derivative, Expr target, bool stackEdges) ProcessSourceVertex(Expr source, Edge<Expr> srcEdge)
             {
                 Expr split = null;
                 Expr der = null;
+                bool stackEdges = false;
 
-                if (!srcToDerMap.TryGetValue(source, out der))
+                if (!srcToDerMap.TryGetValue(source, out der) || source.IsMul)
                 {
+                    stackEdges = true;
                     der = GetDerivative(source);
 
                     if (der != null)
@@ -65,17 +67,18 @@ namespace Retia.Analytical
                         }
                     }
 
-                    if (source.IsMul)
-                    {
-                        ProcessSourceMul(srcEdge, der);
-                    }
-                    else
+                    if (!source.IsMul && (split != null || der != null))
                     {
                         srcToDerMap[source] = split ?? der;
                     }
                 }
 
-                return (der, split ?? der);
+                if (source.IsMul)
+                {
+                    ProcessSourceMul(srcEdge, der);
+                }
+
+                return (der, split ?? der, stackEdges);
             }
 
             Expr ProcessSourceSplit(Expr source)
@@ -127,9 +130,11 @@ namespace Retia.Analytical
                 var edge = stack.Pop();
                 var der = ProcessSourceVertex(edge.Edge.Target, edge.Edge);
 
-                result.AddEdge(new Edge<Expr>(der.derivative, edge.DerTarget));
-                if (!srcToDerMap.ContainsKey(edge.Edge.Target))
-                    StackEdges(edge.Edge.Target, der.target);
+                if (der.derivative != null)
+                    result.AddEdge(new Edge<Expr>(der.derivative, edge.DerTarget));
+
+                if (der.stackEdges)
+                    StackEdges(edge.Edge.Target, der.target ?? edge.DerTarget);
             }
 
             return result;

@@ -12,6 +12,8 @@ namespace Retia.Gui.Graphs
 {
     public partial class MainWindow
     {
+        private Expr _model;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -19,19 +21,6 @@ namespace Retia.Gui.Graphs
 
         private void Window_OnLoaded(object sender, RoutedEventArgs e)
         {
-            //var pars = new[] { "Wxr", "Wxz", "Wxh", "Whr", "Whz", "Whh", "bxr", "bxz", "bxh", "bhr", "bhz", "bhh" };
-            //var ins = new[] { "x", "hp" };
-
-            //string model = @"
-            //    r = sig(Wxr * x + Whr * hp + bxr + bhr);
-            //    z = sig(Wxz * x + Whz * hp + bxz + bhz); 
-            //    hCan = tanh(Wxh * x + r ^ (Whh * hp + bhh) + bxh);
-            //    h = (1 - z) ^ hCan + z ^ hp;";
-
-            //var result = new ModelParser().Parse(model, pars, ins);
-
-            //var graph = CalculationGraph.Create(result, new[] { "h" });
-
             var x = Input("x");
             var hp = Input("hp");
 
@@ -43,13 +32,31 @@ namespace Retia.Gui.Graphs
             h.Output("y");
             h.State("h");
 
-            var lin = Weight("W") * Input("x") + Weight("b");
-            lin.Output("y");
+            _model = h;
+
+            //var test = Sigmoid(Weight("W") * Input("x") + Weight("b")) + Weight("z");
+            //test.Output("y");
+            //_model = test;
 
             DataContext = new Model
                           {
-                              //Graph = der
-                              Graph = Analyzer.Stack(lin.Graph)
+                              Graph = _model.Graph
+                          };
+        }
+
+        private void BtnModel_OnClick(object sender, RoutedEventArgs e)
+        {
+            DataContext = new Model
+                          {
+                              Graph = _model.Graph
+                          };
+        }
+
+        private void BtnDer_OnClick(object sender, RoutedEventArgs e)
+        {
+            DataContext = new Model
+                          {
+                              Graph = Analyzer.Stack(_model.Graph)
                           };
         }
     }

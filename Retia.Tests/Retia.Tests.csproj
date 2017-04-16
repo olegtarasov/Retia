@@ -104,10 +104,6 @@
     <Compile Include="Training\LinearDataSetTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Retia.Analytical\Retia.Analytical.csproj">
-      <Project>{364510f0-12ee-4f76-99fb-b9d028907914}</Project>
-      <Name>Retia.Analytical</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Retia.Genetic\Retia.Genetic.csproj">
       <Project>{6b721697-aaae-465c-916f-17f7f06e78d3}</Project>
       <Name>Retia.Genetic</Name>
