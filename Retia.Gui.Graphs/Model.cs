@@ -11,7 +11,7 @@ namespace Retia.Gui.Graphs
     public class GLayout : GraphLayout<Expr, Edge<Expr>, ExprGraph>
     { }
 
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class Model
     {
         public ExprGraph Graph { get; set; }
