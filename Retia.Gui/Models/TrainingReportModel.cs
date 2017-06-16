@@ -8,7 +8,7 @@ using Retia.Training.Trainers.Sessions;
 
 namespace Retia.Gui.Models
 {
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class TrainingReportModel
     {
         private readonly LineSeriesWrapper<DataPoint> _errorSeries;
