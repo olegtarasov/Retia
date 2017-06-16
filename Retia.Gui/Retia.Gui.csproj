@@ -33,15 +33,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AmmySidekick, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7c1296d24569a67d, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ammy.WPF.1.2.21\lib\net40\AmmySidekick.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="PropertyChanged, Version=1.52.1.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
-      <HintPath>..\packages\PropertyChanged.Fody.1.52.1\lib\netstandard10\PropertyChanged.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xaml" />
@@ -89,6 +82,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Ammy.WPF">
+      <Version>1.2.75</Version>
+    </PackageReference>
+    <PackageReference Include="MathNet.Numerics" Version="3.19.0" />
+    <PackageReference Include="PropertyChanged.Fody">
+      <Version>2.1.2</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\oxyplot\Source\OxyPlot.Wpf\OxyPlot.Wpf.csproj">
       <Project>{698ccd8e-adcc-4565-8517-5edd36f07155}</Project>
       <Name>OxyPlot.Wpf</Name>
@@ -103,11 +105,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="FodyWeavers.xml" />
+    <None Include="FodyWeavers.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="lib.ammy" />
-    <None Include="packages.config" />
     <None Include="Windows\Mixins.ammy" />
     <None Include="Windows\ScheduleControl.ammy" />
     <None Include="Windows\TrainingControl.ammy" />
@@ -115,17 +116,7 @@
     <None Include="Windows\TrainingWindow.ammy" />
     <None Include="Windows\TrainOptionsControl.ammy" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.1.29.4\build\dotnet\Fody.targets'))" />
-    <Error Condition="!Exists('..\packages\Ammy.1.2.21\build\Ammy.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Ammy.1.2.21\build\Ammy.targets'))" />
-  </Target>
-  <Import Project="..\packages\Fody.1.29.4\build\dotnet\Fody.targets" Condition="Exists('..\packages\Fody.1.29.4\build\dotnet\Fody.targets')" />
-  <Import Project="..\packages\Ammy.1.2.21\build\Ammy.targets" Condition="Exists('..\packages\Ammy.1.2.21\build\Ammy.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -14,14 +14,14 @@ using Retia.Training.Trainers.Actions;
 
 namespace Retia.Gui.Models
 {
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public abstract class TrainingModelBase
     {
         public TrainOptionsModel OptionsModel { get; set; }
         public TrainingReportModel ReportModel { get; set; }
     }
 
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class TypedTrainingModel<T> : TrainingModelBase where T : struct, IEquatable<T>, IFormattable
     {
         #region Dispatch
