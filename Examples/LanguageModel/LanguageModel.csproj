@@ -33,13 +33,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CLAP, Version=4.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\CLAP.4.6\lib\net35\CLAP.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="MathNet.Numerics, Version=3.18.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\MathNet.Numerics.3.18.0\lib\net40\MathNet.Numerics.dll</HintPath>
-    </Reference>
+    <PackageReference Include="CLAP" Version="4.6.0" />
+    <PackageReference Include="MathNet.Numerics" Version="3.19.0" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -60,7 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\oxyplot\Source\OxyPlot.Wpf\OxyPlot.Wpf.csproj">

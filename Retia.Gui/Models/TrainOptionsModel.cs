@@ -4,7 +4,7 @@ using PropertyChanged;
 
 namespace Retia.Gui.Models
 {
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class TrainOptionsModel
     {
         public int ErrorFilterSize { get; set; } = 100;

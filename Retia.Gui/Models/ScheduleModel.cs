@@ -6,7 +6,7 @@ using Retia.Training.Trainers.Actions;
 
 namespace Retia.Gui.Models
 {
-    [ImplementPropertyChanged]
+    [AddINotifyPropertyChangedInterface]
     public class ScheduleModel
     {
         public bool CanChangePeriod { get; set; }
