@@ -2,3 +2,6 @@
 	path = oxyplot
 	url = https://github.com/total-world-domination/oxyplot.git
 	branch = develop
+[submodule "NotLimited.Framework"]
+	path = NotLimited.Framework
+	url = https://olegtarasov@github.com/olegtarasov/NotLimited.Framework.git
