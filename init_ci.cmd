@@ -30,7 +30,9 @@ copy cudnn\cuda\bin\*.* "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0\b
 copy cudnn\cuda\lib\x64\*.* "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0\lib\x64"
 copy cudnn\cuda\include\*.* "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include"
 
-refreshenv
+set PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin;%PATH%
+set CUDA_PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0
+set CUDA_PATH_V9_0=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0
 
 nvcc -V
 
