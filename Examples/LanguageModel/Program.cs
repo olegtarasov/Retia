@@ -16,6 +16,8 @@ namespace LanguageModel
     {
 		private static void Main(string[] args)
 		{
+            Console.OutputEncoding = Encoding.UTF8;
+
             try
 		    {
 		        new Parser<App>().Run(args, new App());

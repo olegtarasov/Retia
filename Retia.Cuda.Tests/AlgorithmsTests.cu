@@ -22,7 +22,7 @@ TEST(AlgorithmsTests, CanPropagateError)
 	cout << "Target:" << endl;
 	PrintMatrix(target);*/
 	
-	Algorithms::PropagateError(output, target, result);
+	Algorithms::BackpropagateCrossEntropyError(output, target, result);
 
 	/*cout << "Result" << endl;
 	PrintMatrix(result);*/
@@ -67,5 +67,5 @@ TEST(AlgorithmsTests, CanCalculateCrossEntropyError)
 	/*cout << "Result: " << result << endl;
 	cout << "Ref: " << ref;*/
 
-	ASSERT_EQ(result, ref);
+	ASSERT_LT(abs(result - ref), 10e-5);
 }

@@ -1,4 +1,4 @@
-<UserControl x:Class="Retia.Gui.Windows.TrainingControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.Windows" xmlns:ns1="clr-namespace:AmmySidekick;assembly=AmmySidekick" ns1:Ammy.Register="/Retia.Gui;component/Windows/TrainingControl.g.xaml">
+<UserControl x:Class="Retia.Gui.Windows.TrainingControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.Windows">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto"/>
@@ -15,17 +15,17 @@
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" MaxWidth="300">
         <StackPanel Orientation="Vertical">
           <ns0:TrainOptionsControl>
-            <FrameworkElement.DataContext>
+            <ns0:TrainOptionsControl.DataContext>
               <Binding Path="OptionsModel"/>
-            </FrameworkElement.DataContext>
+            </ns0:TrainOptionsControl.DataContext>
           </ns0:TrainOptionsControl>
         </StackPanel>
       </ScrollViewer>
     </Expander>
     <ns0:TrainingReportControl Grid.Column="1">
-      <FrameworkElement.DataContext>
+      <ns0:TrainingReportControl.DataContext>
         <Binding Path="ReportModel"/>
-      </FrameworkElement.DataContext>
+      </ns0:TrainingReportControl.DataContext>
     </ns0:TrainingReportControl>
   </Grid>
 </UserControl>

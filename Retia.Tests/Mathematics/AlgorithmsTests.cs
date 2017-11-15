@@ -52,7 +52,7 @@ namespace Retia.Tests.Mathematics
             remoteResult.ShouldMatrixEqualWithinError(local);
         }
 
-        private static IEnumerable<object[]> GetRMSPropTestData()
+        public static IEnumerable<object[]> GetRMSPropTestData()
         {
             yield return new object[] { 5e-4f, 0.0f, 0.0f, 0.0f };
             yield return new object[] { 5e-4f, 0.5f, 0.0f, 0.0f };

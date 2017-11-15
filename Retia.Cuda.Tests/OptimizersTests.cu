@@ -1,7 +1,7 @@
 ﻿#include <gtest/gtest.h>
 #include <iostream>
 #include "Matrix.h"
-#include "NeuroWeigth.h"
+#include "NeuroWeight.h"
 #include "Helpers.h"
 #include "Algorithms.h"
 
@@ -42,7 +42,7 @@ TEST(RMSPropTests, CanOptimizeSimple)
 	//PrintWeights(weight, grad, cache1, cache2, cacheM, -1);
 	for (int i = 0; i < 200; ++i)
 	{
-		Algorithms::PropagateError(weight, target, grad);
+		Algorithms::BackpropagateCrossEntropyError(weight, target, grad);
 		Algorithms::RMSPropOptimize(weight, grad, cache1, cache2, cacheM, 0.01f, 0.95f, 0.9f, 0.0f);
 		//PrintWeights(weight, grad, cache1, cache2, cacheM, i);
 	}

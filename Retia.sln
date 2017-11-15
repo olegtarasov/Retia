@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Retia.Cuda", "Retia.Cuda\Retia.Cuda.vcxproj", "{33DEF350-DA8A-406C-A134-1324033E05B7}"
 EndProject
@@ -81,6 +81,7 @@ Global
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release [CPUOnly]|x64.ActiveCfg = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release|Any CPU.ActiveCfg = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release|x64.ActiveCfg = Release|x64
+		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release|x64.Build.0 = Release|x64
 		{80608848-F915-434C-A22C-62A2BB9DE046}.Debug [CPUOnly]|Any CPU.ActiveCfg = Debug [CPUOnly]|x64
 		{80608848-F915-434C-A22C-62A2BB9DE046}.Debug [CPUOnly]|x64.ActiveCfg = Debug [CPUOnly]|x64
 		{80608848-F915-434C-A22C-62A2BB9DE046}.Debug [CPUOnly]|x64.Build.0 = Debug [CPUOnly]|x64
@@ -276,5 +277,8 @@ Global
 		{EB0005DB-E481-43EA-9802-352BAE4B0526} = {FE9F9AA9-DD09-4D28-960E-020B44345710}
 		{365D6BB6-B1B5-45D5-9AE8-3B0D66E18BE6} = {64470CD0-0C60-4DAE-A76B-3BE23DC3652F}
 		{4302D58B-5BBF-4FAF-A885-514787999DEC} = {FE9F9AA9-DD09-4D28-960E-020B44345710}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1A21ADC1-F98E-4315-A0C2-CCB89B58A438}
 	EndGlobalSection
 EndGlobal
