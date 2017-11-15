@@ -1,7 +1,7 @@
-<Window x:Class="Retia.Gui.Windows.TrainingWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.Windows" xmlns:ns1="clr-namespace:AmmySidekick;assembly=AmmySidekick" Width="1024" Height="600" ns1:Ammy.Register="/Retia.Gui;component/Windows/TrainingWindow.g.xaml">
+<Window x:Class="Retia.Gui.Windows.TrainingWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.Windows" Width="1024" Height="600">
   <ns0:TrainingControl>
-    <FrameworkElement.DataContext>
+    <ns0:TrainingControl.DataContext>
       <Binding/>
-    </FrameworkElement.DataContext>
+    </ns0:TrainingControl.DataContext>
   </ns0:TrainingControl>
 </Window>

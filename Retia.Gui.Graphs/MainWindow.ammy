@@ -1,0 +1,58 @@
+﻿using Retia.Gui.Graphs;
+using Retia.Analytical;
+
+Window "Retia.Gui.Graphs.MainWindow" {
+	Loaded: Window_OnLoaded
+
+	Resources: [
+		DataTemplate {
+			DataType: Expr
+
+			TextBlock { 
+				Text: bind
+						convert (Expr vertex) => "[" + vertex.Type + "]" + vertex.Name
+			}
+		}
+	]
+
+	DockPanel {
+		ToolBar { 
+			DockPanel.Dock: Top
+
+			Button { 
+				"Forward"
+
+				Click: BtnModel_OnClick
+			}
+
+			Button { 
+				"Backward"
+
+				Click: BtnDer_OnClick
+			}
+
+			Button { 
+				"Looks like shit"
+
+				Click: BtnRelayout_OnClick
+			}
+
+			ComboBox { 
+				ItemsSource: bind Layouts
+				SelectedItem: bind CurLayout
+			}
+		}
+		ScrollViewer { 
+			VerticalScrollBarVisibility: Visible
+			HorizontalScrollBarVisibility: Visible
+
+			GLayout "graph" {
+				Graph: bind Graph
+				LayoutAlgorithmType: bind CurLayout
+				OverlapRemovalAlgorithmType: "FSA"
+				HighlightAlgorithmType: "Simple"
+				IsAnimationEnabled: false
+			}
+		}
+	}
+}

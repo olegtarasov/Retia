@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Retia</RootNamespace>
     <AssemblyName>Retia</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MarkdownLog" Version="0.9.3" />
-    <PackageReference Include="MathNet.Numerics" Version="3.19.0" />
+    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
     <PackageReference Include="DotNetZip" Version="1.10.1" />
   </ItemGroup>
   <ItemGroup>

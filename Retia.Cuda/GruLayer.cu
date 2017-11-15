@@ -178,7 +178,7 @@ void GruLayer::InitLayers()
 
 	// Create RNN descriptor
 	_rnnDesc.Create();
-	result = cudnnSetRNNDescriptor(_rnnDesc, _hSize, _layers, _dropoutDesc, CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL, CUDNN_GRU, CUDNN_DATA_FLOAT);
+	result = cudnnSetRNNDescriptor_v5(_rnnDesc, _hSize, _layers, _dropoutDesc, CUDNN_LINEAR_INPUT, CUDNN_UNIDIRECTIONAL, CUDNN_GRU, CUDNN_DATA_FLOAT);
 	if (result != CUDNN_STATUS_SUCCESS)
 	{
 		throw CuDnnException(result);

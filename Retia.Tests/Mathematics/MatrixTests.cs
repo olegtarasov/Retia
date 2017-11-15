@@ -97,7 +97,7 @@ namespace Retia.Tests.Mathematics
 
         #region Accumulate operations
 
-        private static IEnumerable<object[]> GetAccumulatePositiveTestData()
+        public static IEnumerable<object[]> GetAccumulatePositiveTestData()
         {
             // Alpha-beta combinations
             yield return new object[] { Matrix5By3, Matrix3By6, Matrix<T>.Build.Dense(5, 6, Matrix<T>.One), Transpose.DontTranspose, Transpose.DontTranspose, false };
@@ -141,7 +141,7 @@ namespace Retia.Tests.Mathematics
             C.AsColumnMajorArray().ShouldArrayEqualWithinError(((useC ? Matrix<T>.One : Matrix<T>.Zero) * tC + tA * tB).ToColumnMajorArray());
         }
 
-        private static IEnumerable<object[]> GetAccumulateScalarPositiveTestData()
+        public static IEnumerable<object[]> GetAccumulateScalarPositiveTestData()
         {
             yield return new object[] { Matrix5By3, Matrix<T>.Build.Dense(5, 3, Matrix<T>.One), 1.0f };
             yield return new object[] { Matrix5By3, Matrix<T>.Build.Dense(5, 3, Matrix<T>.One), 0.0f };

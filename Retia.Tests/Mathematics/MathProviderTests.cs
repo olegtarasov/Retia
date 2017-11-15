@@ -41,7 +41,7 @@ namespace Retia.Tests.Mathematics
 
         protected MathProviderBase<T> MathProvider => MathProvider<T>.Instance;
 
-        private static IEnumerable<object[]> GetActivationFuncsTestData()
+        public static IEnumerable<object[]> GetActivationFuncsTestData()
         {
             yield return new object[] { MatrixFactory.RandomMatrix<T>(1, 1, 1.0f) };
             yield return new object[] { MatrixFactory.RandomMatrix<T>(1, 2, 1.0f) };
