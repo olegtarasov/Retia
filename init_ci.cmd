@@ -1,5 +1,5 @@
 @echo off
-echo Downloading CUDA toolkit 8
+echo Downloading CUDA toolkit 9
 appveyor DownloadFile  https://www.dropbox.com/s/qfgvrf9i109mdsh/cuda9.zip?dl=1
 7z x cuda9.zip -ocuda
 cd cuda
@@ -12,7 +12,7 @@ setup.exe -s compiler_9.0 ^
                            curand_dev_9.0 ^
                            visual_studio_integration_9.0
 
-if NOT EXIST "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin\cudart64_80.dll" ( 
+if NOT EXIST "%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin\cudart64_90.dll" ( 
 echo "Failed to install CUDA"
 exit /B 1
 )
