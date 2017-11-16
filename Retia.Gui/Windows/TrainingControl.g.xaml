@@ -1,4 +1,4 @@
-<UserControl x:Class="Retia.Gui.Windows.TrainingControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.Windows">
+<UserControl x:Class="Retia.Gui.Windows.TrainingControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Gui.Windows" xmlns:ns1="clr-namespace:AmmySidekick;assembly=AmmySidekick" ns1:Ammy.Register="/Retia.Gui;component/Windows/TrainingControl.g.xaml">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto"/>

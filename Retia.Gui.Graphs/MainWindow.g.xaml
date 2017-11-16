@@ -1,4 +1,4 @@
-<Window x:Class="Retia.Gui.Graphs.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Analytical;assembly=Retia.Analytical" xmlns:ns1="clr-namespace:Retia.Gui.Graphs" xmlns:ns2="clr-namespace:AmmySidekick;assembly=AmmySidekick" Loaded="Window_OnLoaded">
+<Window x:Class="Retia.Gui.Graphs.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ns0="clr-namespace:Retia.Analytical;assembly=Retia.Analytical" xmlns:ns1="clr-namespace:Retia.Gui.Graphs" xmlns:ns2="clr-namespace:AmmySidekick;assembly=AmmySidekick" Loaded="Window_OnLoaded" ns2:Ammy.Register="/Retia.Gui.Graphs;component/MainWindow.g.xaml">
   <Window.Resources>
     <DataTemplate DataType="{x:Type ns0:Expr}">
       <TextBlock>
