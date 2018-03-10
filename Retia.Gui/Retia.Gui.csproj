@@ -84,11 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ammy.WPF">
-      <Version>1.2.87</Version>
+      <Version>1.2.94</Version>
     </PackageReference>
-    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
+    <PackageReference Include="MathNet.Numerics" Version="4.4.0" />
     <PackageReference Include="PropertyChanged.Fody">
-      <Version>2.1.4</Version>
+      <Version>2.2.9</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

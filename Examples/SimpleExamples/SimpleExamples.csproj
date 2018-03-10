@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CLAP" Version="4.6.0" />
-    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
+    <PackageReference Include="MathNet.Numerics" Version="4.4.0" />
     <PackageReference Include="DotNetZip" Version="1.10.1" />
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +65,10 @@
     <ProjectReference Include="..\..\Retia.Gui\Retia.Gui.csproj">
       <Project>{eb0005db-e481-43ea-9802-352bae4b0526}</Project>
       <Name>Retia.Gui</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Retia.Integration\Retia.Integration.csproj">
+      <Project>{352dd37a-f0bd-4f58-9405-f39024b98cbb}</Project>
+      <Name>Retia.Integration</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Retia\Retia.csproj">
       <Project>{80608848-f915-434c-a22c-62a2bb9de046}</Project>

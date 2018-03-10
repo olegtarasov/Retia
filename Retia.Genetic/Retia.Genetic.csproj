@@ -61,6 +61,10 @@
     <Compile Include="Selectors\StochasticAcceptanceSelector.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Retia.Integration\Retia.Integration.csproj">
+      <Project>{352dd37a-f0bd-4f58-9405-f39024b98cbb}</Project>
+      <Name>Retia.Integration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Retia\Retia.csproj">
       <Project>{80608848-F915-434C-A22C-62A2BB9DE046}</Project>
       <Name>Retia</Name>
