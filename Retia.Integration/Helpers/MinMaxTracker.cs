@@ -1,4 +1,4 @@
-﻿namespace Retia.Helpers
+﻿namespace Retia.Integration.Helpers
 {
     /// <summary>
     /// Tracks mininmum and maximum values.

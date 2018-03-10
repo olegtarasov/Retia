@@ -74,8 +74,6 @@
     <Compile Include="Interop\WeightDefinitionBag.cs" />
     <Compile Include="Helpers\FileDownloader.cs" />
     <Compile Include="Helpers\MinMax.cs" />
-    <Compile Include="Helpers\MinMaxTracker.cs" />
-    <Compile Include="Helpers\StreamHelpers.cs" />
     <Compile Include="Integration\ConsoleRunner.cs" />
     <Compile Include="Mathematics\MathProviderImplD.cs">
       <AutoGen>True</AutoGen>

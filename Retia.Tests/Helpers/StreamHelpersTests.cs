@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 using Xunit;
 using XunitShould;
 

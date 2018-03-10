@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Retia.Integration;
 
-namespace Retia.Helpers
+namespace Retia.Integration.Helpers
 {
     /// <summary>
     /// Helper functions to deal with streams.

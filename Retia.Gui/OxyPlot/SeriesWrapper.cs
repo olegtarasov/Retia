@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OxyPlot.Series;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 
 namespace Retia.Gui.OxyPlot
 {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 using Retia.Neural.Initializers;
 using Retia.Optimizers;
 
