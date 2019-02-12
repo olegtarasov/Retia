@@ -11,6 +11,7 @@ using Retia.Gui.Models;
 using Retia.Gui.Windows;
 using Retia.Helpers;
 using Retia.Integration;
+using Retia.Integration.Helpers;
 using Retia.Mathematics;
 using Retia.Neural;
 using Retia.Neural.Layers;

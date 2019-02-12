@@ -62,7 +62,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CLAP" Version="4.6.0" />
-    <PackageReference Include="MathNet.Numerics" Version="4.4.0" />
+    <PackageReference Include="MathNet.Numerics" Version="4.7.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

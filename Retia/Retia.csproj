@@ -53,8 +53,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MarkdownLog" Version="0.9.3" />
-    <PackageReference Include="MathNet.Numerics" Version="4.4.0" />
-    <PackageReference Include="DotNetZip" Version="1.10.1" />
+    <PackageReference Include="MathNet.Numerics" Version="4.7.0" />
+    <PackageReference Include="DotNetZip" Version="1.13.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
