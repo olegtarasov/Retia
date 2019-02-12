@@ -53,8 +53,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MarkdownLog" Version="0.9.3" />
-    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
-    <PackageReference Include="DotNetZip" Version="1.10.1" />
+    <PackageReference Include="MathNet.Numerics" Version="4.7.0" />
+    <PackageReference Include="DotNetZip" Version="1.13.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -74,15 +74,7 @@
     <Compile Include="Interop\WeightDefinitionBag.cs" />
     <Compile Include="Helpers\FileDownloader.cs" />
     <Compile Include="Helpers\MinMax.cs" />
-    <Compile Include="Helpers\MinMaxTracker.cs" />
-    <Compile Include="Helpers\StreamHelpers.cs" />
-    <Compile Include="Integration\ConsoleProgressWriter.cs" />
     <Compile Include="Integration\ConsoleRunner.cs" />
-    <Compile Include="Integration\ICloneable.cs" />
-    <Compile Include="Integration\IFileWritable.cs" />
-    <Compile Include="Integration\IProgressWriter.cs" />
-    <Compile Include="Integration\IStreamWritable.cs" />
-    <Compile Include="Integration\ProgressTracker.cs" />
     <Compile Include="Mathematics\MathProviderImplD.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -174,7 +166,7 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Retia.Cuda\bin\$(Platform)\Debug\Retia.Cuda.dll">
+    <Content Condition="'$(Configuration)' == 'Debug'" Include="..\Retia.Cuda\bin\$(Platform)\Debug\Retia.Cuda.dll">
       <Link>Retia.Cuda.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -184,7 +176,7 @@
       <Link>FastFuncs.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\Retia.Cuda\bin\$(Platform)\Release\Retia.Cuda.dll">
+    <Content Condition="'$(Configuration)' == 'Release'" Include="..\Retia.Cuda\bin\$(Platform)\Release\Retia.Cuda.dll">
       <Link>Retia.Cuda.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -201,7 +193,12 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Retia.Integration\Retia.Integration.csproj">
+      <Project>{352dd37a-f0bd-4f58-9405-f39024b98cbb}</Project>
+      <Name>Retia.Integration</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

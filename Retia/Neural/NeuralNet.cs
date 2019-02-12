@@ -5,6 +5,7 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
 using Retia.Integration;
+using Retia.Integration.Helpers;
 using Retia.Mathematics;
 using Retia.Optimizers;
 

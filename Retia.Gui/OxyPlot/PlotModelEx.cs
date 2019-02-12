@@ -5,6 +5,7 @@ using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 
 namespace Retia.Gui.OxyPlot
 {

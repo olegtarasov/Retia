@@ -6,6 +6,7 @@ using MathNet.Numerics.LinearAlgebra;
 using Retia.Interop;
 using Retia.Helpers;
 using Retia.Integration;
+using Retia.Integration.Helpers;
 using Retia.Mathematics;
 using Retia.Neural.ErrorFunctions;
 using Retia.Optimizers;

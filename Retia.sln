@@ -33,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{64
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gui", "Gui", "{FE9F9AA9-DD09-4D28-960E-020B44345710}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot", "oxyplot\Source\OxyPlot\OxyPlot.csproj", "{7A0B35C0-DD17-4964-8E9A-44D6CECDC692}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OxyPlot", "oxyplot\Source\OxyPlot\OxyPlot.csproj", "{7A0B35C0-DD17-4964-8E9A-44D6CECDC692}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OxyPlot.Wpf", "oxyplot\Source\OxyPlot.Wpf\OxyPlot.Wpf.csproj", "{698CCD8E-ADCC-4565-8517-5EDD36F07155}"
 EndProject
@@ -46,6 +46,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Analytical", "Retia.Analytical\Retia.Analytical.csproj", "{364510F0-12EE-4F76-99FB-B9D028907914}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Gui.Graphs", "Retia.Gui.Graphs\Retia.Gui.Graphs.csproj", "{4302D58B-5BBF-4FAF-A885-514787999DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Retia.Integration", "Retia.Integration\Retia.Integration.csproj", "{352DD37A-F0BD-4F58-9405-F39024B98CBB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,7 +64,6 @@ Global
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug [CPUOnly]|Any CPU.ActiveCfg = Release|x64
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug [CPUOnly]|Any CPU.Build.0 = Release|x64
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug [CPUOnly]|x64.ActiveCfg = Debug|x64
-		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug [CPUOnly]|x64.Build.0 = Debug|x64
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug|x64.ActiveCfg = Debug|x64
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Debug|x64.Build.0 = Debug|x64
@@ -74,10 +75,13 @@ Global
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Release|x64.ActiveCfg = Release|x64
 		{33DEF350-DA8A-406C-A134-1324033E05B7}.Release|x64.Build.0 = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Debug [CPUOnly]|Any CPU.ActiveCfg = Release|x64
+		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Debug [CPUOnly]|Any CPU.Build.0 = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Debug [CPUOnly]|x64.ActiveCfg = Debug|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Debug|x64.ActiveCfg = Debug|x64
+		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Debug|x64.Build.0 = Debug|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release [CPUOnly]|Any CPU.ActiveCfg = Release|x64
+		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release [CPUOnly]|Any CPU.Build.0 = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release [CPUOnly]|x64.ActiveCfg = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release|Any CPU.ActiveCfg = Release|x64
 		{F983F8DD-C402-4504-9CBA-391655C6ABE9}.Release|x64.ActiveCfg = Release|x64
@@ -266,6 +270,22 @@ Global
 		{4302D58B-5BBF-4FAF-A885-514787999DEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4302D58B-5BBF-4FAF-A885-514787999DEC}.Release|x64.ActiveCfg = Release|Any CPU
 		{4302D58B-5BBF-4FAF-A885-514787999DEC}.Release|x64.Build.0 = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug [CPUOnly]|Any CPU.ActiveCfg = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug [CPUOnly]|Any CPU.Build.0 = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug [CPUOnly]|x64.ActiveCfg = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug [CPUOnly]|x64.Build.0 = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Debug|x64.Build.0 = Debug|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release [CPUOnly]|Any CPU.ActiveCfg = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release [CPUOnly]|Any CPU.Build.0 = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release [CPUOnly]|x64.ActiveCfg = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release [CPUOnly]|x64.Build.0 = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release|x64.ActiveCfg = Release|Any CPU
+		{352DD37A-F0BD-4F58-9405-F39024B98CBB}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

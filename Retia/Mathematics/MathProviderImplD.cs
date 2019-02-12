@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 using Retia.Interop;
 using Retia.Neural;
 using Retia.RandomGenerator;

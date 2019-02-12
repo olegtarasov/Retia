@@ -87,7 +87,7 @@ namespace Retia.Mathematics
             var aa = a.AsColumnMajorArray();
             var ba = b.AsColumnMajorArray();
 
-            ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).SubtractArrays(aa, ba, aa);
+            ((ILinearAlgebraProvider<T>)LinearAlgebraControl.Provider).SubtractArrays(aa, ba, aa);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Retia.Mathematics
         /// </summary>
         public static void Accumulate<T>(this Matrix<T> C, Matrix<T> A, Matrix<T> B, Transpose transposeA = Transpose.DontTranspose, Transpose transposeB = Transpose.DontTranspose, bool useC = true) where T : struct, IEquatable<T>, IFormattable
         {
-            ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).MatrixMultiplyWithUpdate(transposeA, transposeB, Matrix<T>.One, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, useC ? Matrix<T>.One : Matrix<T>.Zero, C.AsColumnMajorArray());
+            ((ILinearAlgebraProvider<T>)LinearAlgebraControl.Provider).MatrixMultiplyWithUpdate(transposeA, transposeB, Matrix<T>.One, A.AsColumnMajorArray(), A.RowCount, A.ColumnCount, B.AsColumnMajorArray(), B.RowCount, B.ColumnCount, useC ? Matrix<T>.One : Matrix<T>.Zero, C.AsColumnMajorArray());
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace Retia.Mathematics
                 //        Control.LinearAlgebraProvider.ScaleArray(alpha, aa as double[], aa as double[]);
                 //}
                 
-                ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).AddArrays(xa, aa, xa);
+                ((ILinearAlgebraProvider<T>)LinearAlgebraControl.Provider).AddArrays(xa, aa, xa);
             }
         }
 
@@ -228,7 +228,7 @@ namespace Retia.Mathematics
                 throw new Exception("Vector dimensions must agree!");
 
             var ya = y.AsColumnMajorArray();
-            ((ILinearAlgebraProvider<T>)Control.LinearAlgebraProvider).AddVectorToScaledVector(ya, Matrix<T>.One, x.AsColumnMajorArray(), ya);
+            ((ILinearAlgebraProvider<T>)LinearAlgebraControl.Provider).AddVectorToScaledVector(ya, Matrix<T>.One, x.AsColumnMajorArray(), ya);
         }
     }
 }

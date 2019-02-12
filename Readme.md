@@ -21,11 +21,6 @@ deep learning framework!
 
 ## Building from source
 
-| Branch | Status |
-|--------|:-------|
-| master | [![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr/branch/master?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia/branch/master) |
-| develop | [![Build status](https://ci.appveyor.com/api/projects/status/8ohrw1c7leli7lmr/branch/develop?svg=true)](https://ci.appveyor.com/project/olegtarasov/retia/branch/develop) |
-
 Retia is following the F5 build paradigm: you should just open the solution in Visual Studio,
 hit F5 and it should run. You can build CPU-only version just like that. All you need is a C++
 compiler installed as part of Visual Studio.

@@ -26,6 +26,11 @@ namespace Retia.Mathematics
         public int Order { get; set; }
 
         /// <summary>
+        /// Returns whether MAV gathered enough data.
+        /// </summary>
+        public bool IsSaturated => _buffer.Count == Order;
+
+        /// <summary>
         /// Filters the next value.
         /// </summary>
         /// <param name="value">Value to filter.</param>

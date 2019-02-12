@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MarkdownLog" Version="0.9.3" />
-    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="Xunit2Should" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +77,10 @@
     <ProjectReference Include="..\Retia.Genetic\Retia.Genetic.csproj">
       <Project>{6b721697-aaae-465c-916f-17f7f06e78d3}</Project>
       <Name>Retia.Genetic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Retia.Integration\Retia.Integration.csproj">
+      <Project>{352dd37a-f0bd-4f58-9405-f39024b98cbb}</Project>
+      <Name>Retia.Integration</Name>
     </ProjectReference>
     <ProjectReference Include="..\Retia\Retia.csproj">
       <Project>{80608848-F915-434C-A22C-62A2BB9DE046}</Project>

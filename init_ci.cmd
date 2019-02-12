@@ -17,10 +17,7 @@ echo "Failed to install CUDA"
 exit /B 1
 )
 
-rem echo Installing VS integration
-rem copy _vs\*.* "c:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\BuildCustomizations"
-
-rem cd ..
+cd ..
                            
 echo Downloading cuDNN
 appveyor DownloadFile https://www.dropbox.com/s/984rz70pnjnclk2/cudnn7.zip?dl=1

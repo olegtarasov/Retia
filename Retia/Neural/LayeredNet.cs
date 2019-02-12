@@ -5,6 +5,7 @@ using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Interop;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 using Retia.Neural.Layers;
 using Retia.Optimizers;
 #if !CPUONLY

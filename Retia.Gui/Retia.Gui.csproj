@@ -84,11 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Ammy.WPF">
-      <Version>1.2.87</Version>
+      <Version>1.2.94</Version>
     </PackageReference>
-    <PackageReference Include="MathNet.Numerics" Version="3.20.0" />
+    <PackageReference Include="MathNet.Numerics" Version="4.7.0" />
     <PackageReference Include="PropertyChanged.Fody">
-      <Version>2.1.4</Version>
+      <Version>2.6.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +99,10 @@
     <ProjectReference Include="..\oxyplot\Source\OxyPlot\OxyPlot.csproj">
       <Project>{7a0b35c0-dd17-4964-8e9a-44d6cecdc692}</Project>
       <Name>OxyPlot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Retia.Integration\Retia.Integration.csproj">
+      <Project>{08f2fa79-2660-49e9-bebc-4930b5d59c8c}</Project>
+      <Name>Retia.Integration</Name>
     </ProjectReference>
     <ProjectReference Include="..\Retia\Retia.csproj">
       <Project>{80608848-f915-434c-a22c-62a2bb9de046}</Project>

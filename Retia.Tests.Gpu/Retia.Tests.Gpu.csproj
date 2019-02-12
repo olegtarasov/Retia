@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MarkdownLog" Version="0.9.3" />
-    <PackageReference Include="xunit" Version="2.3.1" />
+    <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="Xunit2Should" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +74,10 @@
     <Compile Include="GpuTransferTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Retia.Integration\Retia.Integration.csproj">
+      <Project>{352dd37a-f0bd-4f58-9405-f39024b98cbb}</Project>
+      <Name>Retia.Integration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Retia.Tests\Retia.Tests.csproj">
       <Project>{987ee651-9a46-4012-89e2-3d8e952a2a2c}</Project>
       <Name>Retia.Tests</Name>
@@ -82,6 +86,9 @@
       <Project>{80608848-f915-434c-a22c-62a2bb9de046}</Project>
       <Name>Retia</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

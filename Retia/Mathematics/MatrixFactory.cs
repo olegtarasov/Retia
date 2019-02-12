@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using MathNet.Numerics.LinearAlgebra;
 using Retia.Helpers;
+using Retia.Integration.Helpers;
 
 namespace Retia.Mathematics
 {
