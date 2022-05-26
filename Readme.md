@@ -1,3 +1,17 @@
+# ⚠️ Legacy warning
+Hey! This project was a fun way for me to learn how neural networks operate at the lowest level. It doesn't have any production value in {current_year}, as there are many large and supported frameworks. But it had a huge educational value for me as I explored low-level concepts:
+
+* Optimized matrix computations on CPU with MKL and BLAS, and how to use them in managed .NET environment;
+* Offloading computation-heavy math operations to a separate C++ library and integrating it with .NET;
+* Supporting a GPU-accelerated mode by creating a separate C++ interface with cuDnn library;
+* Stitching together .NET and C++ parts in a unified framework with optimized memory management;
+* Unified code for double-precision and single-precision computation;
+* Manual forward and backpropagation derivation for different neural network layers;
+* Experiments in automatic backpropagation derivation based on forward layers configuration;
+* All the other glue that makes a bunch of code a framework :)
+
+Have fun exploring the code, as I definetely had fun creating this toy framework!
+
 # Retia framework
 
 Retia is a deep learning framework written in C# and designed to be simple and easy 
@@ -13,11 +27,8 @@ with your data, and it's fast on GPU leveraging the latest technologies like cuD
 
 Retia is in an early stage of development. We focused on recurrent networks in order to 
 start somewhere. So now you can build deep GRU models to create language models and other 
-fun stuff. We will be adding more layer types in the future. As a matter of fact, Retia is
-so easily customizable that you can start making your own layers in no time at all!
-
-We are eager to see you pull requests, so that together we can build a simple and powerful
-deep learning framework!
+fun stuff. As a matter of fact, Retia is so easily customizable that you can start making 
+your own layers in no time at all!
 
 ## Building from source
 
