@@ -8,6 +8,7 @@ Hey! This project was a fun way for me to learn how neural networks operate at t
 * Unified code for double-precision and single-precision computation;
 * Manual forward and backpropagation derivation for different neural network layers;
 * Experiments in automatic backpropagation derivation based on forward layers configuration;
+* Experiments in genetic algorithms and their applicability in training neural networks;
 * All the other glue that makes a bunch of code a framework :)
 
 Have fun exploring the code, as I definetely had fun creating this toy framework!
